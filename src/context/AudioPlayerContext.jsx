@@ -19,7 +19,9 @@ const AudioPlayerContext = ({ children }) => {
         const audioElement = audioRef.current;
         try {
             setCurrentTrack(song);
-            audioElement.src = `${import.meta.env.VITE_MUSIC_API}/stream/${song.videoId}`;
+            // audioElement.src = `${import.meta.env.VITE_MUSIC_API}/stream/${song.videoId}`;
+            // audioElement.src = "https://aac.saavncdn.com/807/f0044bbd3aa18ad6b5b3360dd1b8ed78_320.mp4";
+            audioElement.src = "https://aac.saavncdn.com/796/55e78f64b3abecafec7d55f09b85f7b4_160.mp4";
             load(
                 audioElement.src,
                 {
@@ -35,8 +37,6 @@ const AudioPlayerContext = ({ children }) => {
                     },
                 }
             );
-
-
             setIsPlaying(true);
         } catch (error) {
             console.error('Error playing track:', error);
