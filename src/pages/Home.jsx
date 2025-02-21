@@ -5,7 +5,7 @@ import { BsThreeDots } from "react-icons/bs";
 import NavBar from '../components/NavBar';
 import axios from 'axios';
 import Siderbar from '@/components/Siderbar';
-import SearchResult from '@/components/SearchResult';
+import SearchResult from '@/components/SearchableDropdown';
 import MusicPlayer from '@/components/MusicPlayer';
 const Home = () => {
     const [homesongs, setHomesongs] = useState([]);
