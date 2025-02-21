@@ -10,7 +10,9 @@ import { SkipBack } from 'lucide-react';
 import { Shuffle } from 'lucide-react';
 import { Repeat } from 'lucide-react';
 import { VolumeOff } from 'lucide-react';
+import { Volume1 } from 'lucide-react';
 const MusicPlayer = () => {
+
     const {
         playTrack,
         currentTrack,
@@ -50,7 +52,7 @@ const MusicPlayer = () => {
         setIsDragging(false);
     };
     const formatTime = (seconds) => {
-        if (isNaN(seconds)) {
+        if (Number.isNaN(seconds)) {
             return '00:00';
         }
         const minutes = Math.floor(seconds / 60);
@@ -58,7 +60,7 @@ const MusicPlayer = () => {
         return `${minutes}:${remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}`;
     }
     useEffect(() => {
-        playTrack();
+        // playTrack();
     }, []);
     useEffect(() => {
 
@@ -116,8 +118,10 @@ const MusicPlayer = () => {
                 </div>
             </div>
             <div className='flex items-center gap-3'>
-                <h1 className='tracking-wider'>00:00/00:00</h1>
-                {volume === 0 ? <VolumeOff /> : <Volume2 />}
+                <h1 className='tracking-wider'>
+                    {formatTime(pos)}/{formatTime(duration)}
+                </h1>
+                {volume !== 0 ? volume > 0.5 ? <Volume2 /> : <Volume1 /> : <VolumeOff />}
                 <Slider
                     value={[volume]}
                     max={1}

@@ -10,7 +10,7 @@ const NavBar = () => {
         <div className='fixed bg-[#0a1113] w-full h-[12vh] flex justify-between items-center px-12 z-[100]'>
             <div className='flex items-center justify-center gap-2'>
                 <Music size={34} color='#f2371d' strokeWidth={4} className='mt-2' />
-                <h1 className='text-3xl font-bold'>winamp</h1>
+                <h1 className='text-3xl font-bold'> Ongaku</h1>
             </div>
             <div className="relative w-1/3 flex items-center">
                 <FiSearch className="absolute left-3 text-gray-400 w-5 h-5" />
