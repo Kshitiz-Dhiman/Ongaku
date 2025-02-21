@@ -47,7 +47,7 @@ const NavBar = () => {
         try {
             const response = await axios(`http://localhost:4000/search?q=${inputValue}`)
             const data1 = response.data;
-
+            console.log(data1);
             setTopQuery(data1.data.top_query.data);
             setSongSuggestions(data1.data.songs.data);
             setAlbumSuggestions(data1.data.albums.data);
@@ -88,21 +88,15 @@ const NavBar = () => {
     const {
         playTrack,
         currentTrack,
-        isPlaying,
-        trackTime,
-        handleProgressChange,
-        setCurrentTrack  // Make sure this is available in your context
+        setCurrentTrack
     } = useContext(AudioPlayerData);
     const [selectedOption, setSelectedOption] = useState(null);
 
     const handleSelect = async (option) => {
-        // setSelectedOption(option);
-        // console.log(option);
         if (option?.type === 'song') {
             try {
                 const response = await axios.get(`http://localhost:3000/song?id=${option.value}`);
                 const songData = response.data;
-                // console.log(songData.data.songs[0]);
                 playTrack(songData.download[4].link);
                 const trackInfo = {
                     id: songData.data.songs[0].id,
