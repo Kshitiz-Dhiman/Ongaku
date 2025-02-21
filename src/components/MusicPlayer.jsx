@@ -100,7 +100,7 @@ const MusicPlayer = () => {
                     onValueChange={handleSliderChange}
                     onPointerDown={() => setIsDragging(true)}
                     onValueCommit={handleSliderCommit}
-                    className="w-[40rem] h-1 rounded-lg bg-gray-600 cursor-pointer"
+                    className="w-[40rem] h-1 rounded-lg bg-gray-600 cursor-pointer relative"
                 />
                 <div
 
