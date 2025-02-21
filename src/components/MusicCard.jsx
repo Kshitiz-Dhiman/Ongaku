@@ -1,12 +1,10 @@
 import React from 'react'
 import Image from "../assets/download.jpeg"
 import { Play } from "lucide-react"
-
+import { trimString } from "../utils/utils"
 function MusicCard({ key, song }) {
-    console.log(song);
-    const trimString = (str, maxLength) => {
-        return str.length > maxLength ? str.substring(0, maxLength) + "..." : str;
-    };
+    // console.log(song);
+
 
     return (
         <div className="max-w-[250px] rounded-xl cursor-pointer p-3">
@@ -20,8 +18,8 @@ function MusicCard({ key, song }) {
             </div>
             <div className="py-5">
                 <h5 className="mb-2 text-xl font-bold leading-9 text-white">
-                    <h1 className="">{trimString(song?.name, 20)}</h1>
-                    <span className="text-[#6e7273] ">{trimString(song.subtitle, 20)}</span>
+                    <h1 className="">{trimString(song?.name, 16)}</h1>
+                    <span className="text-[#6e7273] ">{trimString(song.subtitle, 17)}</span>
                 </h5>
             </div>
         </div >

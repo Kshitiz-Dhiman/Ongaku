@@ -11,6 +11,7 @@ import { Shuffle } from 'lucide-react';
 import { Repeat } from 'lucide-react';
 import { VolumeOff } from 'lucide-react';
 import { Volume1 } from 'lucide-react';
+import { trimString } from '../utils/utils';
 const MusicPlayer = () => {
 
     const {
@@ -83,11 +84,11 @@ const MusicPlayer = () => {
         <div className='bg-[#080c10] text-white rounded-xl fixed bottom-0 w-full h-30 flex items-center justify-between gap-4 px-10'>
             <div className='flex items-center gap-4'>
                 <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
-                    <img src={currentTrack?.thumbnails?.[0]?.url} alt="" className='w-full h-full object-cover' />
+                    <img src={currentTrack?.image} alt="" className='w-full h-full object-cover' />
                 </div>
                 <div className='flex flex-col'>
-                    <h1 className='text-lg'>{currentTrack?.name || 'No Track Selected'}</h1>
-                    <h1 className='text-sm text-gray-400'>{currentTrack?.artist?.name || 'Unknown Artist'}</h1>
+                    <h1 className='text-lg'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
+                    <h1 className='text-sm text-gray-400'>{trimString(currentTrack?.subtitle, 23) || 'Unknown Artist'}</h1>
                 </div>
             </div>
             <div className='flex flex-col items-center gap-4'>
@@ -102,14 +103,14 @@ const MusicPlayer = () => {
                     className="w-[40rem] h-1 rounded-lg bg-gray-600 cursor-pointer"
                 />
                 <div
-                    onClick={togglePlayPause}
+
                     className='cursor-pointer hover:opacity-80'
-                    onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
+
                 >
                     <div className='flex justify-center items-center gap-4'>
                         <Shuffle />
                         <SkipBack />
-                        <div className='p-2 rounded-full bg-white'>
+                        <div onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }} className='p-2 rounded-full bg-white' onClick={togglePlayPause}>
                             {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={24} /> : <Play color='black' size={24} />}
                         </div>
                         <SkipForward />
