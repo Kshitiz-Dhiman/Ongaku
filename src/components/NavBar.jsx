@@ -39,16 +39,15 @@ const customStyles = {
 };
 
 const NavBar = () => {
-    const [topQuery, setTopQuery] = useState();
+    console.log(import.meta.env.VITE_MUSIC_API)
     const [songSuggestions, setSongSuggestions] = useState([]);
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
     const [playlistSuggestions, setPlaylistSuggestions] = useState([]);
     const loadSuggestions = async (inputValue) => {
         try {
-            const response = await axios(`http://localhost:4000/search?q=${inputValue}`)
+            const response = await axios(`${import.meta.env.VITE_MUSIC_API}/search?q=${inputValue}`)
             const data1 = response.data;
-            console.log(data1);
-            setTopQuery(data1.data.top_query.data);
+            console.log(data1.data.songs.data)
             setSongSuggestions(data1.data.songs.data);
             setAlbumSuggestions(data1.data.albums.data);
             setPlaylistSuggestions(data1.data.playlists.data);
@@ -57,7 +56,7 @@ const NavBar = () => {
                     label: "Songs",
                     options: songSuggestions.map((song) => ({
                         value: song.id,
-                        label: song.name,
+                        label: `${song.title} - ${song.more_info.singers}`,
                         type: "song"
                     }))
                 },
@@ -65,7 +64,7 @@ const NavBar = () => {
                     label: "Albums",
                     options: albumSuggestions.map((album) => ({
                         value: album.id,
-                        label: album.name,
+                        label: `${album.name} - ${album.music}`,
                         type: "album"
                     }))
                 },
@@ -73,7 +72,7 @@ const NavBar = () => {
                     label: "Playlists",
                     options: playlistSuggestions.map((playlist) => ({
                         value: playlist.id,
-                        label: playlist.name,
+                        label: `${playlist.name} - ${playlist.singers}`,
                         type: "playlist"
                     }))
                 }
@@ -105,7 +104,7 @@ const NavBar = () => {
                     image: songData.data.songs[0].image,
                 }
                 setCurrentTrack(trackInfo);
-                console.log(currentTrack);
+
             } catch (error) {
                 console.error('Error fetching song details:', error);
             }
