@@ -47,7 +47,6 @@ const NavBar = () => {
         try {
             const response = await axios(`${import.meta.env.VITE_MUSIC_API}/search?q=${inputValue}`)
             const data1 = response.data;
-            console.log(data1.data.songs.data)
             setSongSuggestions(data1.data.songs.data);
             setAlbumSuggestions(data1.data.albums.data);
             setPlaylistSuggestions(data1.data.playlists.data);
@@ -94,7 +93,7 @@ const NavBar = () => {
     const handleSelect = async (option) => {
         if (option?.type === 'song') {
             try {
-                const response = await axios.get(`http://localhost:3000/song?id=${option.value}`);
+                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
                 const songData = response.data;
                 playTrack(songData.download[4].link);
                 const trackInfo = {
