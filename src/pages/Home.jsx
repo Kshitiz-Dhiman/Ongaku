@@ -33,7 +33,7 @@ const Home = () => {
 
     return (
         <>
-            <div className='flex flex-col h-screen min-w-full text-white'>
+            <div className='flex flex-col bg-[#0a1113] h-screen min-w-full text-white'>
                 <div>
                     <NavBar />
                     {/* <SearchResult /> */}

@@ -79,7 +79,7 @@ const MusicPlayer = () => {
         }
     }, [getPosition, isDragging, playing]);
     return (
-        <div className='bg-[#080c10] text-white rounded-xl fixed bottom-0 w-full h-30 flex items-center justify-between gap-4 px-10'>
+        <div className='bg-[#080c10] text-white rounded-xl fixed bottom-0 w-full h-30 flex flex-col md:flex-row items-center justify-between gap-4 px-4 md:px-10 py-2 md:py-0'>
             <div className='flex items-center gap-4'>
                 <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
                     <img src={currentTrack?.image} alt="" className='w-full h-full object-cover' />
@@ -89,7 +89,7 @@ const MusicPlayer = () => {
                     <h1 className='text-sm text-gray-400'>{trimString(currentTrack?.subtitle, 23) || 'Unknown Artist'}</h1>
                 </div>
             </div>
-            <div className='flex flex-col items-center gap-4'>
+            <div className='flex flex-col items-center gap-4 w-full md:w-auto'>
                 <Slider
                     value={[pos]}
                     max={duration}
@@ -98,13 +98,9 @@ const MusicPlayer = () => {
                     onValueChange={handleSliderChange}
                     onPointerDown={() => setIsDragging(true)}
                     onValueCommit={handleSliderCommit}
-                    className="w-[40rem] h-1 rounded-lg bg-gray-600 cursor-pointer relative"
+                    className="w-full md:w-96 h-1 rounded-lg bg-gray-600 cursor-pointer"
                 />
-                <div
-
-                    className='cursor-pointer hover:opacity-80'
-
-                >
+                <div className='cursor-pointer hover:opacity-80'>
                     <div className='flex justify-center items-center gap-4'>
                         <Shuffle />
                         <SkipBack onClick={() => playPreviousSong()} />

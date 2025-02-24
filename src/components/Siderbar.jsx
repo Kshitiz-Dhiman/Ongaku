@@ -4,7 +4,7 @@ import Divider from './Divider'
 import { Music } from "lucide-react"
 const Sidebar = () => {
     return (
-        <div className='h-screen fixed top-0 left-0 font-bold w-1/5 bg-[#0c1214] items-start flex flex-col text-white p-10 gap-10'>
+        <div className='opacity-0 h-screen fixed top-0 left-0 font-bold w-full md:w-1/5 bg-[#0c1214] items-start flex flex-col text-white p-10 gap-10'>
             <div className='flex items-center justify-center gap-2'>
                 <Music size={34} color='#f2371d' strokeWidth={4} className='mt-2' />
                 <h1 className='text-3xl font-bold'>winamp</h1>

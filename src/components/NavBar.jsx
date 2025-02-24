@@ -111,12 +111,12 @@ const NavBar = () => {
     };
 
     return (
-        <div className='fixed bg-[#0a1113] w-full h-[12vh] flex justify-between items-center px-12 z-[100]'>
-            <div className='flex items-center justify-center gap-2'>
+        <div className='fixed bg-[#0a1113] w-full h-[12vh] flex flex-col md:flex-row justify-between items-center px-4 md:px-12 z-[100]'>
+            <div className='flex items-center justify-center gap-2 mb-2 md:mb-0'>
                 <Music size={34} color='#f2371d' strokeWidth={4} className='mt-2' />
-                <h1 className='text-3xl font-bold'> Ongaku</h1>
+                <h1 className='text-2xl md:text-3xl font-bold'> Ongaku</h1>
             </div>
-            <div className="relative w-1/3 flex items-center">
+            <div className="relative w-full md:w-1/3 flex items-center mb-2 md:mb-0">
                 <FiSearch className="absolute left-3 text-gray-400 w-5 h-5 z-10" />
                 <AsyncSelect
                     cacheOptions
@@ -129,7 +129,7 @@ const NavBar = () => {
                     noOptionsMessage={() => "Start typing to search..."}
                 />
             </div>
-            <div className='flex gap-4'>
+            {/* <div className='flex gap-4'>
                 <Link to='/'>
                     <GoHomeFill size={30} />
                 </Link>
@@ -139,7 +139,7 @@ const NavBar = () => {
                 <Link to='/library'>
                     <MdLibraryMusic size={30} />
                 </Link>
-            </div>
+            </div> */}
         </div>
     );
 };
