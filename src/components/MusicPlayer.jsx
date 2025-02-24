@@ -104,7 +104,7 @@ const MusicPlayer = () => {
                     onValueCommit={handleSliderCommit}
                     className="w-full md:w-96 h-1 rounded-lg bg-gray-600 cursor-pointer"
                 />
-                <div className='cursor-pointer hover:opacity-80'>
+                <div className='cursor-pointer hover:opacity-80 mt-3 md:m-0'>
                     <div className='flex justify-center items-center gap-4'>
                         <Shuffle />
                         <SkipBack onClick={() => playPreviousSong()} />
