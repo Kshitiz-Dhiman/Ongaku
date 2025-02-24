@@ -31,8 +31,14 @@ const AudioPlayerContext = ({ children }) => {
 
     const playTrack = async (song, songId, addToQueue = true) => {
         try {
-            // Only get recommendations if addToQueue is true (initial play)
+            // Clear queue and history when playing a new searched song
             if (addToQueue) {
+                // Reset queue and history
+                queueRef.current = [];
+                setQueue([]);
+                playHistoryRef.current = [];
+                setPlayHistory([]);
+                // Get new recommendations
                 await getRecommendations(songId);
             }
 
@@ -87,27 +93,44 @@ const AudioPlayerContext = ({ children }) => {
     const playPreviousSong = async () => {
         try {
             if (playHistoryRef.current.length > 0) {
+                // Get the last song from history
                 const previousSong = playHistoryRef.current[playHistoryRef.current.length - 1];
+
+                // Remove it from history
                 playHistoryRef.current = playHistoryRef.current.slice(0, -1);
                 setPlayHistory(playHistoryRef.current);
 
+                // Add current track to the start of queue instead of history
                 if (currentTrack.id) {
                     queueRef.current = [currentTrack, ...queueRef.current];
                     setQueue(queueRef.current);
                 }
 
-                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${previousSong.id}`);
-                const songData = response.data;
+                try {
+                    const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${previousSong.id}`);
+                    const songData = response.data;
 
-                setCurrentTrack({
-                    id: previousSong.id,
-                    title: previousSong.title,
-                    subtitle: previousSong.artists?.map(artist => artist.name).join(", "),
-                    image: previousSong.image,
-                    download_url: songData.download
-                });
+                    // Update current track
+                    setCurrentTrack({
+                        id: previousSong.id,
+                        title: previousSong.title,
+                        subtitle: previousSong.artists?.map(artist => artist.name).join(", "),
+                        image: previousSong.image,
+                        download_url: songData.download
+                    });
 
-                playTrack(songData.download[4].link, previousSong.id, false);
+                    // Important: Don't add to history when playing previous song
+                    load(songData.download[4].link, {
+                        autoplay: true,
+                        initialVolume: volume,
+                        crossOrigin: 'anonymous',
+                        format: 'mp3',
+                        onend: playNextSong,
+                        onplay: () => setIsPlaying(true)
+                    });
+                } catch (error) {
+                    console.error('Error fetching song details:', error);
+                }
             }
         } catch (error) {
             console.error('Error playing previous song:', error);
