@@ -1,6 +1,6 @@
-import { React, createContext, useRef, useEffect, useState } from 'react'
+import { React, createContext, useEffect, useRef, useState } from 'react';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
-
+import axios from 'axios';
 
 export const AudioPlayerData = createContext();
 
@@ -12,35 +12,105 @@ const AudioPlayerContext = ({ children }) => {
     const [volume, setVolume] = useState(0.5);
     const audioRef = useRef(null);
     const progressRef = useRef(null);
-
+    const [queue, setQueue] = useState([]);
     const { load } = useGlobalAudioPlayer();
+    const queueRef = useRef([]);
+    const [playHistory, setPlayHistory] = useState([]);
+    const playHistoryRef = useRef([]);
 
-    const playTrack = async (song) => {
-        const audioElement = audioRef.current;
+    const getRecommendations = async (songID) => {
         try {
-            setCurrentTrack(song);
-            // audioElement.src = `${import.meta.env.VITE_MUSIC_API}/stream/${song.videoId}`;
-            // audioElement.src = "https://aac.saavncdn.com/807/f0044bbd3aa18ad6b5b3360dd1b8ed78_320.mp4";
-            // audioElement.src = "https://aac.saavncdn.com/796/55e78f64b3abecafec7d55f09b85f7b4_160.mp4";
-            audioElement.src = song;
-            load(
-                audioElement.src,
-                {
-                    autoplay: true,
-                    initialVolume: volume,
-                    crossOrigin: 'anonymous',
-                    format: 'mp3',
-                    onend: () => {
-                        console.log('Track ended');
-                    },
-                    onplay: () => {
-                        console.log('Track started playing');
-                    },
-                }
-            );
-            setIsPlaying(true);
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song/recommend?id=${songID}`);
+            const songData = response.data;
+            setQueue(prevQueue => [...prevQueue, ...songData.data]);
+            queueRef.current = [...queueRef.current, ...songData.data];
+        } catch (error) {
+            console.error('Error fetching recommendations:', error);
+        }
+    };
+
+    const playTrack = async (song, songId, addToQueue = true) => {
+        try {
+            // Only get recommendations if addToQueue is true (initial play)
+            if (addToQueue) {
+                await getRecommendations(songId);
+            }
+
+            // Add current song to history before changing
+            if (currentTrack.id) {
+                playHistoryRef.current = [...playHistoryRef.current, currentTrack];
+                setPlayHistory(playHistoryRef.current);
+            }
+
+            load(song, {
+                autoplay: true,
+                initialVolume: volume,
+                crossOrigin: 'anonymous',
+                format: 'mp3',
+                onend: playNextSong,
+                onplay: () => setIsPlaying(true)
+            });
         } catch (error) {
             console.error('Error playing track:', error);
+        }
+    };
+
+    const playNextSong = async () => {
+        try {
+            if (queueRef.current.length > 0) {
+                const nextSong = queueRef.current[0];
+                queueRef.current = queueRef.current.slice(1);
+                setQueue(queueRef.current);
+
+                if (queueRef.current.length < 5) {
+                    getRecommendations(nextSong.id);
+                }
+
+                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.id}`);
+                const songData = response.data;
+
+                setCurrentTrack({
+                    id: nextSong.id,
+                    title: nextSong.title,
+                    subtitle: nextSong.artists?.map(artist => artist.name).join(", "),
+                    image: nextSong.image,
+                    download_url: songData.download
+                });
+
+                playTrack(songData.download[4].link, nextSong.id, false);
+            }
+        } catch (error) {
+            console.error('Error playing next song:', error);
+        }
+    };
+
+    const playPreviousSong = async () => {
+        try {
+            if (playHistoryRef.current.length > 0) {
+                const previousSong = playHistoryRef.current[playHistoryRef.current.length - 1];
+                playHistoryRef.current = playHistoryRef.current.slice(0, -1);
+                setPlayHistory(playHistoryRef.current);
+
+                if (currentTrack.id) {
+                    queueRef.current = [currentTrack, ...queueRef.current];
+                    setQueue(queueRef.current);
+                }
+
+                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${previousSong.id}`);
+                const songData = response.data;
+
+                setCurrentTrack({
+                    id: previousSong.id,
+                    title: previousSong.title,
+                    subtitle: previousSong.artists?.map(artist => artist.name).join(", "),
+                    image: previousSong.image,
+                    download_url: songData.download
+                });
+
+                playTrack(songData.download[4].link, previousSong.id, false);
+            }
+        } catch (error) {
+            console.error('Error playing previous song:', error);
         }
     };
 
@@ -52,42 +122,16 @@ const AudioPlayerContext = ({ children }) => {
         }
         setIsPlaying(!isPlaying);
     };
-    const handleProgressChange = (e) => {
-        if (!audioRef.current) return;
 
-        const slider = e.target;
-        const percentage = slider.value;
-        const audioTime = (percentage / 100) * audioRef.current.duration;
-
-        audioRef.current.currentTime = audioTime;
-        setTrackTime(audioTime);
-    };
-    // Add time update listener
+    // Sync refs with state
+    useEffect(() => {
+        queueRef.current = queue;
+    }, [queue]);
 
     useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
+        playHistoryRef.current = playHistory;
+    }, [playHistory]);
 
-        const handleTimeUpdate = () => {
-            setTrackTime(audio.currentTime);
-            const percentage = (audio.currentTime / audio.duration) * 100;
-            if (progressRef.current) {
-                progressRef.current.value = percentage;
-            }
-        };
-
-        const handleLoadedMetadata = () => {
-            setDuration(audio.duration);
-        };
-
-        audio.addEventListener('timeupdate', handleTimeUpdate);
-        audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-        return () => {
-            audio.removeEventListener('timeupdate', handleTimeUpdate);
-            audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        };
-    }, []);
     const contextValue = {
         currentTrack,
         setCurrentTrack,
@@ -101,19 +145,24 @@ const AudioPlayerContext = ({ children }) => {
         setVolume,
         audioRef,
         progressRef,
+        queue,
+        setQueue,
+        playHistory,
         playTrack,
+        playNextSong,
+        playPreviousSong,
         togglePlayPause,
-        handleProgressChange,
-    }
+        getRecommendations
+    };
 
     return (
         <AudioPlayerData.Provider value={contextValue}>
-            <audio ref={audioRef} type="audio/mpeg" >
+            <audio ref={audioRef} type="audio/mpeg">
                 <track kind="captions" />
             </audio>
             {children}
         </AudioPlayerData.Provider>
-    )
-}
+    );
+};
 
-export default AudioPlayerContext
+export default AudioPlayerContext;

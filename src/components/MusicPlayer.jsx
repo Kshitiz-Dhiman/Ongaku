@@ -15,11 +15,9 @@ import { trimString } from '../utils/utils';
 const MusicPlayer = () => {
 
     const {
-        playTrack,
         currentTrack,
-        isPlaying,
-        trackTime,
-        handleProgressChange
+        playNextSong,
+        playPreviousSong
     } = useContext(AudioPlayerData);
     const {
         load,
@@ -109,11 +107,11 @@ const MusicPlayer = () => {
                 >
                     <div className='flex justify-center items-center gap-4'>
                         <Shuffle />
-                        <SkipBack />
+                        <SkipBack onClick={() => playPreviousSong()} />
                         <div onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }} className='p-2 rounded-full bg-white' onClick={togglePlayPause}>
                             {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={24} /> : <Play color='black' size={24} />}
                         </div>
-                        <SkipForward />
+                        <SkipForward onClick={() => playNextSong()} />
                         <Repeat />
                     </div>
                 </div>

@@ -39,7 +39,7 @@ const customStyles = {
 };
 
 const NavBar = () => {
-    console.log(import.meta.env.VITE_MUSIC_API)
+    // console.log(import.meta.env.VITE_MUSIC_API)
     const [songSuggestions, setSongSuggestions] = useState([]);
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
     const [playlistSuggestions, setPlaylistSuggestions] = useState([]);
@@ -76,16 +76,16 @@ const NavBar = () => {
                     }))
                 }
             ];
-            // console.log(suggestions)
+
             return suggestions;
         } catch (e) {
             console.log(e);
         }
     };
-
     const {
         playTrack,
         currentTrack,
+        setQueue,
         setCurrentTrack
     } = useContext(AudioPlayerData);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -95,15 +95,15 @@ const NavBar = () => {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
                 const songData = response.data;
-                playTrack(songData.download[4].link);
+                playTrack(songData.download[4].link, songData.data.songs[0].id);
                 const trackInfo = {
                     id: songData.data.songs[0].id,
                     title: songData.data.songs[0].title,
                     subtitle: songData.data.songs[0].subtitle,
                     image: songData.data.songs[0].image,
+                    download_url: songData.download
                 }
                 setCurrentTrack(trackInfo);
-
             } catch (error) {
                 console.error('Error fetching song details:', error);
             }
