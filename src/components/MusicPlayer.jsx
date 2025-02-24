@@ -79,7 +79,7 @@ const MusicPlayer = () => {
         }
     }, [getPosition, isDragging, playing]);
     return (
-        <div className='bg-[#080c10] text-white rounded-xl fixed bottom-0 w-full h-30 flex flex-col md:flex-row items-center justify-between gap-4 px-4 md:px-10 py-2 md:py-0'>
+        <div className='bg-[#080c10] text-white rounded-xl fixed md:bottom-0 bottom-25 w-full h-30 flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'>
             <div className='flex items-center gap-4'>
                 <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
                     <img src={currentTrack?.image} alt="" className='w-full h-full object-cover' />
@@ -90,6 +90,10 @@ const MusicPlayer = () => {
                 </div>
             </div>
             <div className='flex flex-col items-center gap-4 w-full md:w-auto'>
+                <div className='flex justify-between items-center w-full tracking-wider'>
+                    <h1>{formatTime(pos)}</h1>
+                    <h1>{formatTime(duration)}</h1>
+                </div>
                 <Slider
                     value={[pos]}
                     max={duration}
@@ -105,14 +109,14 @@ const MusicPlayer = () => {
                         <Shuffle />
                         <SkipBack onClick={() => playPreviousSong()} />
                         <div onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }} className='p-2 rounded-full bg-white' onClick={togglePlayPause}>
-                            {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={24} /> : <Play color='black' size={24} />}
+                            {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={35} /> : <Play color='black' size={35} />}
                         </div>
                         <SkipForward onClick={() => playNextSong()} />
                         <Repeat />
                     </div>
                 </div>
             </div>
-            <div className='flex items-center gap-3'>
+            <div className=' items-center gap-3 md:flex hidden'>
                 <h1 className='tracking-wider'>
                     {formatTime(pos)}/{formatTime(duration)}
                 </h1>
