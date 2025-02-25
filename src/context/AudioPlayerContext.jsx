@@ -32,6 +32,9 @@ const AudioPlayerContext = ({ children }) => {
     const playTrack = async (song, songId, addToQueue = true) => {
         try {
             // Clear queue and history when playing a new searched song
+            console.log("Song :" + song);
+            console.log("SongId :" + songId);
+            console.log("addToQueue :" + addToQueue);
             if (addToQueue) {
                 // Reset queue and history
                 queueRef.current = [];
@@ -62,6 +65,7 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playNextSong = async () => {
+        console.log('Playing next song...');
         try {
             if (queueRef.current.length > 0) {
                 const nextSong = queueRef.current[0];
@@ -76,14 +80,15 @@ const AudioPlayerContext = ({ children }) => {
                 const songData = response.data;
 
                 setCurrentTrack({
-                    id: nextSong.id,
-                    title: nextSong.title,
-                    subtitle: nextSong.artists?.map(artist => artist.name).join(", "),
-                    image: nextSong.image,
-                    download_url: songData.download
+                    id: songData.data.id,
+                    title: songData.data.title,
+                    subtitle: songData.data.artists?.map(artist => artist.name).join(", "),
+                    image: songData.data.image,
+                    download_url: songData.data.download
                 });
 
-                playTrack(songData.download[4].link, nextSong.id, false);
+
+                await playTrack(songData.data.download[4].link, nextSong.id, false);
             }
         } catch (error) {
             console.error('Error playing next song:', error);
@@ -91,16 +96,14 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playPreviousSong = async () => {
+        console.log('Playing previous song...');
         try {
             if (playHistoryRef.current.length > 0) {
-                // Get the last song from history
                 const previousSong = playHistoryRef.current[playHistoryRef.current.length - 1];
-
-                // Remove it from history
+                console.log('Previous song:', previousSong); // Debug log
                 playHistoryRef.current = playHistoryRef.current.slice(0, -1);
                 setPlayHistory(playHistoryRef.current);
 
-                // Add current track to the start of queue instead of history
                 if (currentTrack.id) {
                     queueRef.current = [currentTrack, ...queueRef.current];
                     setQueue(queueRef.current);
@@ -110,17 +113,16 @@ const AudioPlayerContext = ({ children }) => {
                     const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${previousSong.id}`);
                     const songData = response.data;
 
-                    // Update current track
+                    // Update current track - Fix for subtitle/artist
                     setCurrentTrack({
                         id: previousSong.id,
                         title: previousSong.title,
-                        subtitle: previousSong.artists?.map(artist => artist.name).join(", "),
+                        subtitle: previousSong.subtitle || songData.data.artists?.map(artist => artist.name).join(", ") || "Unknown Artist",
                         image: previousSong.image,
-                        download_url: songData.download
+                        download_url: songData.data.download
                     });
 
-                    // Important: Don't add to history when playing previous song
-                    load(songData.download[4].link, {
+                    load(songData.data.download[4].link, {
                         autoplay: true,
                         initialVolume: volume,
                         crossOrigin: 'anonymous',

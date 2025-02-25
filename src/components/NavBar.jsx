@@ -95,14 +95,16 @@ const NavBar = () => {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
                 const songData = response.data;
-                playTrack(songData.download[4].link, songData.data.songs[0].id);
+
+                playTrack(songData.data.download[4].link, songData.data.id);
                 const trackInfo = {
-                    id: songData.data.songs[0].id,
-                    title: songData.data.songs[0].title,
-                    subtitle: songData.data.songs[0].subtitle,
-                    image: songData.data.songs[0].image,
-                    download_url: songData.download
+                    id: songData.data.id,
+                    title: songData.data.title,
+                    subtitle: songData.data.artists?.map(artist => artist.name).join(", "),
+                    image: songData.data.image,
+                    download_url: songData.data.download[4].link
                 }
+
                 setCurrentTrack(trackInfo);
             } catch (error) {
                 console.error('Error fetching song details:', error);
