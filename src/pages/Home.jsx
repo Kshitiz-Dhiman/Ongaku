@@ -36,10 +36,8 @@ const Home = () => {
             <div className='flex flex-col bg-[#0a1113] h-screen min-w-full text-white'>
                 <div>
                     <NavBar />
-                    {/* <SearchResult /> */}
                 </div>
                 <div className="flex w-full ">
-                    <Siderbar />
                     <PlaylistHome />
                 </div>
                 <MusicPlayer />

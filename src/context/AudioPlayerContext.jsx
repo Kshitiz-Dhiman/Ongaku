@@ -31,21 +31,14 @@ const AudioPlayerContext = ({ children }) => {
 
     const playTrack = async (song, songId, addToQueue = true) => {
         try {
-            // Clear queue and history when playing a new searched song
-            console.log("Song :" + song);
-            console.log("SongId :" + songId);
-            console.log("addToQueue :" + addToQueue);
             if (addToQueue) {
-                // Reset queue and history
                 queueRef.current = [];
                 setQueue([]);
                 playHistoryRef.current = [];
                 setPlayHistory([]);
-                // Get new recommendations
                 await getRecommendations(songId);
             }
 
-            // Add current song to history before changing
             if (currentTrack.id) {
                 playHistoryRef.current = [...playHistoryRef.current, currentTrack];
                 setPlayHistory(playHistoryRef.current);
@@ -113,7 +106,6 @@ const AudioPlayerContext = ({ children }) => {
                     const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${previousSong.id}`);
                     const songData = response.data;
 
-                    // Update current track - Fix for subtitle/artist
                     setCurrentTrack({
                         id: previousSong.id,
                         title: previousSong.title,
