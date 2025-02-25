@@ -24,8 +24,8 @@ function MusicCard({ key, song }) {
                     src={song.image.large}
                     alt={song.title}
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 bg-black/40 group-hover:opacity-100 transition-all duration-300">
-                    <div className='bg-[#202020] p-2 md:p-3 rounded-full transform transition-transform duration-200 hover:scale-110 active:scale-95' onClick={playthehomesong} onKeyUp={(e) => { if (e.key === 'Enter') playthehomesong(); }} >
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 bg-black/40 group-hover:opacity-100 focus-within:opacity-100 transition-all duration-300">
+                    <div className='bg-[#202020] p-2 md:p-3 rounded-full transform transition-transform duration-200 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white' onClick={playthehomesong} onKeyUp={(e) => { if (e.key === 'Enter') playthehomesong(); }} >
                         <Play className="text-white w-6 h-6 md:w-8 md:h-8" strokeWidth={3} />
                     </div>
                 </div>
