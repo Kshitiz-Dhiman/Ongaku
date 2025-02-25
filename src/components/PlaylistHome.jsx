@@ -1,29 +1,37 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import MusicCard from "./MusicCard";
 import axios from 'axios';
+import { AudioPlayerData } from '../context/AudioPlayerContext';
 
 const PlaylistHome = () => {
 
-    // const [homesongs, setHomesongs] = useState([]);
-    // const url = "http://localhost:4000/get/trending?lang=english&type=album";
-    // const getHomeSongs = async () => {
-    //     try {
-    //         const res = await axios.get(url);
-    //         setHomesongs(res.data.data);
-    //         // console.log(res.data.data);
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
-    // }
-    // useEffect(() => { getHomeSongs() }, [])
+
+    const [homesongs, setHomesongs] = useState([]);
+    const type = "song";
+    const language = "english";
+    const getHomeSongs = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/get/trending?lang=${language}&type=${type}`);
+            const homeSongs = response.data.data;
+            setHomesongs(homeSongs);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    useEffect(() => { getHomeSongs() }, [])
+
+
     return (
-        //bg-[#0a1113]
-        <div className='w-5/6 min-h-screen ml-[20%] mt-[6.6%] bg-[#0a1113]'>
-            <h1 className='text-4xl font-bold text-[#6e7273]'>Home</h1>
-            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mt-5'>
-                {/* {homesongs.map((song) => (
-                    <MusicCard key={song.id} song={song} />
-                ))} */}
+        <div className='w-full min-h-screen bg-[#0a1113] px-4 sm:px-6 md:px-8 lg:px-10 py-20 md:py-24'>
+            <div className='max-w-7xl mx-auto'>
+                <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-[#6e7273] mb-6 md:mb-8'>
+                    Home
+                </h1>
+                <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5'>
+                    {homesongs.map((song) => (
+                        <MusicCard key={song.id} song={song} />
+                    ))}
+                </div>
             </div>
         </div>
     )

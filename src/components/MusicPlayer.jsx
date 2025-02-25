@@ -79,7 +79,7 @@ const MusicPlayer = () => {
         }
     }, [getPosition, isDragging, playing]);
     return (
-        <div className='bg-[#080c10] text-white rounded-xl fixed md:bottom-0 bottom-25 w-full h-30 flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'>
+        <div className='bg-[#080c10] text-white rounded-xl md:h-30 fixed bottom-0 w-full  flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'>
             <div className='flex items-center gap-4'>
                 <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
                     <img src={currentTrack?.image} alt="" className='w-full h-full object-cover' />
@@ -90,7 +90,7 @@ const MusicPlayer = () => {
                 </div>
             </div>
             <div className='flex flex-col items-center gap-4 w-full md:w-auto'>
-                <div className='flex justify-between items-center w-full tracking-wider'>
+                <div className='flex justify-between items-center w-full tracking-wider md:hidden'>
                     <h1>{formatTime(pos)}</h1>
                     <h1>{formatTime(duration)}</h1>
                 </div>
