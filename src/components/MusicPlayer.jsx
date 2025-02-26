@@ -143,7 +143,7 @@ const MusicPlayer = () => {
                 onClick={expandMusicPlayer}
                 onKeyDown={(e) => { if (e.key === 'Enter') expandMusicPlayer(); }}
                 ref={playerRef}
-                className='bg-[#080c10] text-white rounded-t-xl md:h-30 fixed bottom-0 w-full flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'
+                className='bg-black border-t-1 border-gray-700 text-white rounded-t-xl md:h-30 fixed bottom-0 w-full flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'
             >
                 <div className='flex w-full md:w-[15%] justify-between items-center gap-4'>
                     <div className='flex items-center gap-2'>

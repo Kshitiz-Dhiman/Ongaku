@@ -122,7 +122,7 @@ const NavBar = ({ onAlbumSelect }) => {
         }
     };
     return (
-        <div className='fixed bg-[#0a1113] w-full h-[12vh] flex flex-col md:flex-row justify-between items-center px-4  md:px-12 z-[100] pt-2'>
+        <div className='fixed bg-black w-full h-[12vh] flex flex-col md:flex-row justify-between items-center px-4  md:px-12 z-[100] pt-2'>
             <div className='flex items-center justify-center gap-2 mb-2 md:mb-0'>
                 <Music size={34} color='#f2371d' strokeWidth={4} className='mt-2' />
                 <h1 className='text-2xl md:text-3xl font-bold'> Ongaku</h1>

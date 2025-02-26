@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 // import { Divider } from './ui/Divider'
 const Sidebar = () => {
     return (
-        <div className='hidden md:flex h-screen fixed top-0 left-0 w-1/6 bg-[#0c1214] flex-col text-white p-6 pt-20 gap-8 mt-10'>
+        <div className='hidden md:flex h-screen fixed top-0 left-0 w-1/6 bg-black flex-col text-white p-6 pt-20 gap-8 mt-10'>
 
             {Menu('Main', [
                 { icon: <Home size={20} />, title: 'Home' },

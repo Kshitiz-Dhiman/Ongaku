@@ -79,7 +79,7 @@ const Album = ({ id, onClose }) => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-[#0a1113] px-4 py-20 md:py-24'>
+        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-24'>
             <div className='max-w-7xl mx-auto md:mt-5'>
                 {albumData && (
                     <div className='flex flex-col gap-8'>
