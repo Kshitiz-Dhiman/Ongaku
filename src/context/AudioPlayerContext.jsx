@@ -100,7 +100,6 @@ const AudioPlayerContext = ({ children }) => {
         try {
             if (playHistoryRef.current.length > 0) {
                 const previousSong = playHistoryRef.current[playHistoryRef.current.length - 1];
-                console.log('Previous song:', previousSong);
                 playHistoryRef.current = playHistoryRef.current.slice(0, -1);
                 setPlayHistory(playHistoryRef.current);
 
