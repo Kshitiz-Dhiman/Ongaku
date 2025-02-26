@@ -239,7 +239,6 @@ const AudioPlayerContext = ({ children }) => {
                 }
 
                 seek(details.seekTime);
-                // Update position state after seeking
                 navigator.mediaSession.setPositionState({
                     duration: duration || 0,
                     playbackRate: 1,
@@ -247,7 +246,6 @@ const AudioPlayerContext = ({ children }) => {
                 });
             });
 
-            // Add position state updates
             navigator.mediaSession.setActionHandler('seekbackward', (details) => {
                 const skipTime = details.seekOffset || 10;
                 const newPosition = Math.max(getPosition() - skipTime, 0);
