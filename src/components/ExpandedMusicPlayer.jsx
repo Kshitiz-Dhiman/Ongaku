@@ -3,9 +3,10 @@ import { ChevronDown, Shuffle, SkipBack, Play, Pause, SkipForward, Repeat, Volum
 import { Slider } from "./ui/slider";
 import { LoadingSpinner } from './LoadingSpinner';
 import { trimString } from '../utils/utils';
-import { useGSAP } from '@gsap/react';
-import gsap from "gsap";
+
 const ExpandedMusicPlayer = ({
+    expandedPlayerRef,
+    isExpanded,
     currentTrack,
     isLoading,
     playing,
@@ -22,18 +23,10 @@ const ExpandedMusicPlayer = ({
     formatTime,
     onClose
 }) => {
-    const playerRef = useRef(null);
-    useGSAP(() => {
-        gsap.from(playerRef.current, {
-            y: 1000,
-            duration: 0.2,
-            ease: "power3.out",
-            opacity: 0
-        });
-    })
 
     return (
-        <div ref={playerRef} className="fixed z-[1000] inset-0 bg-[#080c10] text-white">
+        <div ref={expandedPlayerRef}
+            className="fixed z-[1000] inset-0 bg-[#080c10] text-white">
             <button
                 type='button'
                 onClick={onClose}
@@ -47,7 +40,7 @@ const ExpandedMusicPlayer = ({
                 <div className="flex-1 flex items-center justify-center">
                     <div className="w-full max-w-md aspect-square rounded-lg overflow-hidden">
                         <img
-                            src={currentTrack?.image}
+                            src={currentTrack?.images?.medium}
                             alt={currentTrack?.title}
                             className="w-full h-full object-cover"
                         />
