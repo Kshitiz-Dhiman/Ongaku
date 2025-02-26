@@ -83,14 +83,15 @@ const Album = ({ id, onClose }) => {
             <div className='max-w-7xl mx-auto md:mt-5'>
                 {albumData && (
                     <div className='flex flex-col gap-8'>
-                        {/* Album Header */}
-                        <div className='flex md:flex-row flex-col items-center md:items-end gap-6 bg-gradient-to-b from-[#1a1a1a] to-[#0a1113] pt-14 md:p-8 rounded-xl'>
+                        {/* bg-gradient-to-b from-[#1a1a1a] to-[#0a1113]  */}
+
+                        <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl '>
                             <img
                                 src={albumData.image.large}
                                 alt={albumData.title}
                                 className='w-48 h-48 shadow-xl rounded-xl'
                             />
-                            <div>
+                            <div className='text-center md:text-start'>
                                 <h4 className='text-sm font-bold uppercase text-white'>Album</h4>
                                 <h1 className='text-5xl font-bold mt-2 text-white'>{albumData.title}</h1>
                                 <p className='text-gray-400 mt-4'>{albumData.description}</p>
