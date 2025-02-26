@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { GoHomeFill } from "react-icons/go";
+
 import { FiSearch } from "react-icons/fi";
-import { MdLibraryMusic } from "react-icons/md";
-import { Link } from 'react-router-dom';
+
 import { Music } from "lucide-react"
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
 import { AudioPlayerData } from '../context/AudioPlayerContext';
+import { useNavigate } from 'react-router-dom';
 const customStyles = {
     control: (base) => ({
         ...base,
@@ -38,8 +38,8 @@ const customStyles = {
     })
 };
 
-const NavBar = () => {
-    // console.log(import.meta.env.VITE_MUSIC_API)
+const NavBar = ({ onAlbumSelect }) => {
+    const navigate = useNavigate();
     const [songSuggestions, setSongSuggestions] = useState([]);
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
     const [playlistSuggestions, setPlaylistSuggestions] = useState([]);
@@ -96,7 +96,6 @@ const NavBar = () => {
                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
                 const songData = response.data;
 
-                // Create track info using the new API response structure
                 const trackInfo = {
                     id: songData.data.id,
                     title: songData.data.title,
@@ -114,8 +113,10 @@ const NavBar = () => {
                 setCurrentTrack(trackInfo);
                 await playTrack(songData.data.download[4].link, songData.data.id);
             } catch (error) {
-                console.error('Error fetching song details:', error);
+                console.error('Error playing song:', error);
             }
+        } else if (option?.type === 'album') {
+            onAlbumSelect(option.value);
         }
     };
     return (
