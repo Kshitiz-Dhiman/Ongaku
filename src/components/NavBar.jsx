@@ -43,6 +43,7 @@ const NavBar = ({ onAlbumSelect }) => {
     const [songSuggestions, setSongSuggestions] = useState([]);
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
     const [playlistSuggestions, setPlaylistSuggestions] = useState([]);
+    const [artistSuggestions, setArtistSuggestions] = useState([]);
     const loadSuggestions = async (inputValue) => {
         try {
             const response = await axios(`${import.meta.env.VITE_MUSIC_API}/search?q=${inputValue}`)
@@ -50,6 +51,7 @@ const NavBar = ({ onAlbumSelect }) => {
             setSongSuggestions(data1.data.songs.data);
             setAlbumSuggestions(data1.data.albums.data);
             setPlaylistSuggestions(data1.data.playlists.data);
+            setArtistSuggestions(data1.data.artists.data);
             const suggestions = [
                 {
                     label: "Songs",
@@ -68,11 +70,11 @@ const NavBar = ({ onAlbumSelect }) => {
                     }))
                 },
                 {
-                    label: "Playlists",
-                    options: playlistSuggestions.map((playlist) => ({
-                        value: playlist.id,
-                        label: `${playlist.title} - ${playlist.more_info.firstname}`,
-                        type: "playlist"
+                    label: "Artists",
+                    options: artistSuggestions.map((artist) => ({
+                        value: artist.id,
+                        label: `${artist.title}`,
+                        type: "artist"
                     }))
                 }
             ];
