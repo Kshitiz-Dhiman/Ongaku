@@ -8,13 +8,26 @@ const AudioPlayerContext = ({ children }) => {
     const [currentTrack, setCurrentTrack] = useState({});
     const [isPlaying, setIsPlaying] = useState(false);
     const [trackTime, setTrackTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [volume, setVolume] = useState(0.5);
+
     const audioRef = useRef(null);
     const progressRef = useRef(null);
     const [queue, setQueue] = useState([]);
-    const { load } = useGlobalAudioPlayer();
-    const queueRef = useRef([]);
+    const {
+        load,
+        playing,
+        togglePlayPause,
+        getPosition,
+        isLoading,
+        duration,
+        loop,
+        looping,
+        mute,
+        muted,
+        volume,
+        setVolume,
+        seek,
+        isReady,
+    } = useGlobalAudioPlayer(); const queueRef = useRef([]);
     const [playHistory, setPlayHistory] = useState([]);
     const playHistoryRef = useRef([]);
 
@@ -143,14 +156,7 @@ const AudioPlayerContext = ({ children }) => {
         }
     };
 
-    const togglePlayPause = () => {
-        if (isPlaying) {
-            audioRef.current.pause();
-        } else {
-            audioRef.current.play();
-        }
-        setIsPlaying(!isPlaying);
-    };
+
 
     // Sync refs with state
     useEffect(() => {
@@ -169,7 +175,6 @@ const AudioPlayerContext = ({ children }) => {
         trackTime,
         setTrackTime,
         duration,
-        setDuration,
         volume,
         setVolume,
         audioRef,
@@ -180,10 +185,108 @@ const AudioPlayerContext = ({ children }) => {
         playTrack,
         playNextSong,
         playPreviousSong,
-        togglePlayPause,
         getRecommendations
     };
+    // Media Session api for controlling music player from lock screen
+    useEffect(() => {
+        if ('mediaSession' in navigator) {
+            // Set metadata
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: currentTrack?.title || 'Unknown Title',
+                artist: currentTrack?.subtitle || 'Unknown Artist',
+                album: currentTrack?.album?.name || 'Unknown Album',
+                artwork: [
+                    {
+                        src: currentTrack?.images?.small || '',
+                        sizes: '96x96',
+                        type: 'image/jpeg'
+                    },
+                    {
+                        src: currentTrack?.images?.medium || '',
+                        sizes: '256x256',
+                        type: 'image/jpeg'
+                    },
+                    {
+                        src: currentTrack?.images?.large || '',
+                        sizes: '512x512',
+                        type: 'image/jpeg'
+                    }
+                ]
+            });
 
+            navigator.mediaSession.setActionHandler('play', () => {
+                if (!playing) {
+                    togglePlayPause();
+                }
+            });
+
+
+            navigator.mediaSession.setActionHandler('pause', () => {
+                if (playing) {
+                    togglePlayPause();
+                }
+            });
+
+
+            navigator.mediaSession.setActionHandler('previoustrack', playPreviousSong);
+            navigator.mediaSession.setActionHandler('nexttrack', playNextSong);
+
+            navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+                if (details.fastSeek && 'fastSeek' in audioRef.current) {
+                    audioRef.current.fastSeek(details.seekTime);
+                    return;
+                }
+
+                seek(details.seekTime);
+                // Update position state after seeking
+                navigator.mediaSession.setPositionState({
+                    duration: duration || 0,
+                    playbackRate: 1,
+                    position: details.seekTime
+                });
+            });
+
+            // Add position state updates
+            navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+                const skipTime = details.seekOffset || 10;
+                const newPosition = Math.max(getPosition() - skipTime, 0);
+                seek(newPosition);
+            });
+
+            navigator.mediaSession.setActionHandler('seekforward', (details) => {
+                const skipTime = details.seekOffset || 10;
+                const newPosition = Math.min(getPosition() + skipTime, duration || 0);
+                seek(newPosition);
+            });
+
+            // Update position state periodically
+            const updatePositionState = () => {
+                if (duration) {
+                    navigator.mediaSession.setPositionState({
+                        duration: duration,
+                        playbackRate: 1,
+                        position: getPosition()
+                    });
+                }
+            };
+
+            const positionUpdateInterval = setInterval(updatePositionState, 1000);
+
+
+            return () => {
+                clearInterval(positionUpdateInterval);
+                const actions = ['seekto', 'seekbackward', 'seekforward'];
+                for (const action of actions) {
+                    try {
+                        navigator.mediaSession.setActionHandler(action, null);
+                    } catch (error) {
+                        console.warn(`${action} is not supported`);
+                    }
+                }
+            };
+        }
+    }, [currentTrack, playing, togglePlayPause]);
     return (
         <AudioPlayerData.Provider value={contextValue}>
             <audio ref={audioRef} type="audio/mpeg">
