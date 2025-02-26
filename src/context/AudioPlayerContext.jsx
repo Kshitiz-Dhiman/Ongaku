@@ -30,6 +30,9 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playTrack = async (song, songId, addToQueue = true) => {
+        console.log('Playing track:', song); // Debug log
+        console.log('Song ID:', songId); // Debug log
+        console.log("Add to queue:", addToQueue); // Debug log
         try {
             if (addToQueue) {
                 queueRef.current = [];
@@ -71,16 +74,20 @@ const AudioPlayerContext = ({ children }) => {
 
                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.id}`);
                 const songData = response.data;
-
                 setCurrentTrack({
                     id: songData.data.id,
                     title: songData.data.title,
-                    subtitle: songData.data.artists?.map(artist => artist.name).join(", "),
-                    image: songData.data.image,
-                    download_url: songData.data.download
+                    subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
+                    images: songData.data.images,
+                    download_url: songData.data.download,
+                    artists: songData.data.artists,
+                    album: songData.data.album,
+                    duration: songData.data.duration,
+                    releaseDate: songData.data.releaseDate,
+                    label: songData.data.label,
+                    copyright: songData.data.copyright
                 });
-
-
+                console.log(songData);
                 await playTrack(songData.data.download[4].link, nextSong.id, false);
             }
         } catch (error) {
@@ -93,7 +100,7 @@ const AudioPlayerContext = ({ children }) => {
         try {
             if (playHistoryRef.current.length > 0) {
                 const previousSong = playHistoryRef.current[playHistoryRef.current.length - 1];
-                console.log('Previous song:', previousSong); // Debug log
+                console.log('Previous song:', previousSong);
                 playHistoryRef.current = playHistoryRef.current.slice(0, -1);
                 setPlayHistory(playHistoryRef.current);
 
@@ -109,9 +116,15 @@ const AudioPlayerContext = ({ children }) => {
                     setCurrentTrack({
                         id: previousSong.id,
                         title: previousSong.title,
-                        subtitle: previousSong.subtitle || songData.data.artists?.map(artist => artist.name).join(", ") || "Unknown Artist",
-                        image: previousSong.image,
-                        download_url: songData.data.download
+                        subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || previousSong.subtitle,
+                        images: songData.data.images,
+                        download_url: songData.data.download,
+                        artists: songData.data.artists,
+                        album: songData.data.album,
+                        duration: songData.data.duration,
+                        releaseDate: songData.data.releaseDate,
+                        label: songData.data.label,
+                        copyright: songData.data.copyright
                     });
 
                     load(songData.data.download[4].link, {

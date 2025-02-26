@@ -20,15 +20,36 @@ gsap.registerPlugin(useGSAP);
 const MusicPlayer = () => {
 
     const playerRef = useRef(null);
+    const expandedPlayerRef = useRef(null);
     const [isExpanded, setIsExpanded] = useState(false);
     useGSAP(() => {
+
         gsap.from(playerRef.current, {
             y: 200,
             duration: 0.5,
             ease: "power3.out",
             opacity: 0
         });
-    })
+
+        if (isExpanded) {
+            gsap.from(expandedPlayerRef.current, {
+                y: 1000,
+                duration: 0.7,
+                ease: "power3.out",
+                opacity: 1
+            });
+        } else {
+            gsap.fromTo(expandedPlayerRef.current, {
+                y: 1000,
+                opacity: 0
+            }, {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out"
+            });
+        }
+    }, [isExpanded]);
     const expandMusicPlayer = () => {
         setIsExpanded(!isExpanded);
     };
@@ -99,6 +120,8 @@ const MusicPlayer = () => {
         <>
             {isExpanded && (
                 <ExpandedMusicPlayer
+                    expandedPlayerRef={expandedPlayerRef}
+                    isExpanded={isExpanded}
                     currentTrack={currentTrack}
                     isLoading={isLoading}
                     playing={playing}
@@ -125,7 +148,7 @@ const MusicPlayer = () => {
                 <div className='flex w-full md:w-[15%] justify-between items-center gap-4'>
                     <div className='flex items-center gap-2'>
                         <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
-                            <img src={currentTrack?.image} alt="" className='w-full h-full object-cover' />
+                            <img src={currentTrack?.images?.large} alt="" className='w-full h-full object-cover' />
                         </div>
                         <div className='flex flex-col'>
                             <h1 className='text-lg'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>

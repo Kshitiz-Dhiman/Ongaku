@@ -63,7 +63,7 @@ const NavBar = () => {
                     label: "Albums",
                     options: albumSuggestions.map((album) => ({
                         value: album.id,
-                        label: `${album.name} - ${album.music}`,
+                        label: `${album.title} - ${album.more_info.music}`,
                         type: "album"
                     }))
                 },
@@ -71,7 +71,7 @@ const NavBar = () => {
                     label: "Playlists",
                     options: playlistSuggestions.map((playlist) => ({
                         value: playlist.id,
-                        label: `${playlist.name} - ${playlist.singers}`,
+                        label: `${playlist.title} - ${playlist.more_info.firstname}`,
                         type: "playlist"
                     }))
                 }
@@ -96,22 +96,28 @@ const NavBar = () => {
                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
                 const songData = response.data;
 
-                playTrack(songData.data.download[4].link, songData.data.id);
+                // Create track info using the new API response structure
                 const trackInfo = {
                     id: songData.data.id,
                     title: songData.data.title,
-                    subtitle: songData.data.artists?.map(artist => artist.name).join(", "),
-                    image: songData.data.image,
-                    download_url: songData.data.download[4].link
-                }
+                    subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
+                    image: songData.data.images,
+                    download_url: songData.data.download[4].link,
+                    artists: songData.data.artists,
+                    album: songData.data.album,
+                    duration: songData.data.duration,
+                    releaseDate: songData.data.releaseDate,
+                    label: songData.data.label,
+                    copyright: songData.data.copyright
+                };
 
                 setCurrentTrack(trackInfo);
+                await playTrack(songData.data.download[4].link, songData.data.id);
             } catch (error) {
                 console.error('Error fetching song details:', error);
             }
         }
     };
-
     return (
         <div className='fixed bg-[#0a1113] w-full h-[12vh] flex flex-col md:flex-row justify-between items-center px-4  md:px-12 z-[100] pt-2'>
             <div className='flex items-center justify-center gap-2 mb-2 md:mb-0'>

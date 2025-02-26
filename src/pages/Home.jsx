@@ -1,12 +1,10 @@
 import { React, useEffect, useState } from 'react'
-import PlaylistHome from '../components/PlaylistHome'
-import MadeForYou from '../components/MadeForYou';
-import { BsThreeDots } from "react-icons/bs";
+import TrendingHome from '../components/TrendingHome'
 import NavBar from '../components/NavBar';
 import axios from 'axios';
 import Siderbar from '@/components/Siderbar';
-import SearchResult from '@/components/SearchableDropdown';
 import MusicPlayer from '@/components/MusicPlayer';
+import Album from '@/components/Album';
 const Home = () => {
     const [homesongs, setHomesongs] = useState([]);
     const [albumSongs, setAlbumSongs] = useState([]);
@@ -25,24 +23,24 @@ const Home = () => {
             const res = await axios.get(`${musicUrl}/album/homepagetopalbums`);
             setAlbumSongs(res.data.content);
             setOtherAlbumSongs(res.data.content);
-            // console.log(res.data.content);
+
         } catch (e) {
             console.log(e);
         }
     }
 
     return (
-        <>
-            <div className='flex flex-col bg-[#0a1113] h-screen min-w-full text-white'>
-                <div>
-                    <NavBar />
-                </div>
-                <div className="flex w-full ">
-                    <PlaylistHome />
-                </div>
-                <MusicPlayer />
+        <div className='flex flex-col min-h-screen bg-[#0a1113] text-white'>
+            <NavBar />
+            <div className="flex flex-1 relative">
+                <Siderbar />
+                <main className="flex-1 md:ml-[12%]">
+                    <TrendingHome />
+                    {/* <Album /> */}
+                </main>
             </div>
-        </>
+            <MusicPlayer />
+        </div>
     )
 }
 
