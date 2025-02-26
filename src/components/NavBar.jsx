@@ -101,7 +101,7 @@ const NavBar = () => {
                     id: songData.data.id,
                     title: songData.data.title,
                     subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
-                    image: songData.data.images,
+                    images: songData.data.images,
                     download_url: songData.data.download[4].link,
                     artists: songData.data.artists,
                     album: songData.data.album,
