@@ -51,107 +51,14 @@ const manifestForPlugin = {
         scope: "/",
         start_url: "/",
         orientation: "portrait"
-    },
-    strategies: 'generateSW', // Changed from 'injectManifest'
-    srcDir: 'src',
-    filename: 'sw.js',
-    injectRegister: 'auto',
-    workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,mp3}'],
-        runtimeCaching: [
-            {
-                urlPattern: /^https:\/\/c\.saavncdn\.com/,
-                handler: 'CacheFirst',
-                options: {
-                    cacheName: 'image-cache',
-                    expiration: {
-                        maxEntries: 100,
-                        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-                    },
-                },
-            },
-            {
-                urlPattern: /\/song\?id=/,
-                handler: 'NetworkFirst',
-                options: {
-                    cacheName: 'audio-cache',
-                    expiration: {
-                        maxEntries: 50,
-                        maxAgeSeconds: 24 * 60 * 60, // 24 hours
-                    },
-                },
-            },
-        ],
-        // Add media session support
-        navigationPreload: true,
-        cleanupOutdatedCaches: true,
-        sourcemap: true,
-        injectManifest: {
-            injectionPoint: null
-        }
-    },
-    // Add Media Session API support
-    injectManifest: {
-        injectionPoint: null,
-        swSrc: 'src/sw.js',
-        swDest: 'dist/sw.js',
-        additionalManifestEntries: [],
-        rollupFormat: 'iife',
     }
 };
 
 export default defineConfig({
-    plugins: [
-        react(),
-        tailwindcss(),
-        VitePWA({
-            strategies: 'generateSW',
-            registerType: 'autoUpdate',
-            filename: 'sw.js',
-            manifestFilename: 'manifest.json',
-            workbox: {
-                globPatterns: ['**/*.{js,css,html,ico,png,svg,json,mp3}'],
-                runtimeCaching: [
-                    {
-                        urlPattern: /^https:\/\/c\.saavncdn\.com/,
-                        handler: 'CacheFirst',
-                        options: {
-                            cacheName: 'image-cache',
-                            expiration: {
-                                maxEntries: 100,
-                                maxAgeSeconds: 30 * 24 * 60 * 60,
-                            },
-                        },
-                    },
-                    {
-                        urlPattern: /\/song\?id=/,
-                        handler: 'NetworkFirst',
-                        options: {
-                            cacheName: 'audio-cache',
-                            expiration: {
-                                maxEntries: 50,
-                                maxAgeSeconds: 24 * 60 * 60,
-                            },
-                        },
-                    },
-                ],
-                navigationPreload: true,
-                cleanupOutdatedCaches: true,
-            },
-            devOptions: {
-                enabled: true,
-                type: 'module'
-            }
-        })
-    ],
+    plugins: [react(), tailwindcss(), VitePWA(manifestForPlugin)],
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
         },
     },
-    server: {
-        headers: {
-            'Service-Worker-Allowed': '/'
-        }
-    }
 })

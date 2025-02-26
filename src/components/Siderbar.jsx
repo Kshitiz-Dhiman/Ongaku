@@ -1,5 +1,6 @@
 import React from 'react'
 import { Home, ListMusic, Album } from "lucide-react"
+import { Link } from 'react-router-dom'
 // import { Divider } from './ui/Divider'
 const Sidebar = () => {
     return (

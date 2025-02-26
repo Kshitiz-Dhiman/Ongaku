@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useState } from 'react'
 import MusicCard from "./MusicCard";
 import axios from 'axios';
 import { AudioPlayerData } from '../context/AudioPlayerContext';
-
+import { LoadingSpinner } from './LoadingSpinner';
 const PlaylistHome = () => {
 
 
-    const [homesongs, setHomesongs] = useState([]);
+    const [homesongs, setHomesongs] = useState(null);
     const type = "song";
     const language = "english";
     const getHomeSongs = async () => {
@@ -20,6 +20,9 @@ const PlaylistHome = () => {
     }
     useEffect(() => { getHomeSongs() }, [])
 
+    if (!homesongs) {
+        return <LoadingSpinner />
+    }
 
     return (
         <div className='w-full min-h-screen bg-[#0a1113] px-4 py-20 md:py-24'>
