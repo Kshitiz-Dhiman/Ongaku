@@ -55,7 +55,7 @@ const NavBar = ({ onAlbumSelect }) => {
                     label: "Songs",
                     options: songSuggestions.map((song) => ({
                         value: song.id,
-                        label: `${song.title} - ${song.more_info.singers}`,
+                        label: `${song.title} - ${song.more_info.primary_artists}`,
                         type: "song"
                     }))
                 },
