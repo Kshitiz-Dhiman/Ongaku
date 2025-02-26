@@ -26,7 +26,7 @@ const PlaylistHome = () => {
 
 
     return (
-        <div className='w-full min-h-screen bg-[#0a1113] px-4 py-20 md:py-24 '>
+        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-24 '>
             <div className='max-w-7xl mx-auto mt-12 md:mt-5'>
                 <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-[#6e7273] mb-6 md:mb-8'>
                     Trending
