@@ -1,10 +1,28 @@
-import React, { useContext } from 'react'
+import React, { useContext, useRef } from 'react'
 import { Play } from "lucide-react"
 import { trimString } from "../utils/utils"
 import { AudioPlayerData } from '../context/AudioPlayerContext'
 import axios from "axios"
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 function MusicCard({ key, song }) {
+    const cardRef = useRef(null);
 
+    gsap.registerPlugin(useGSAP);
+    useGSAP(() => {
+        gsap.from(cardRef.current, {
+            y: 50,
+            opacity: 0,
+            duration: 0.5,
+            delay: 0.1,
+            ease: 'power3.inOut',
+            stagger: {
+                each: 1,
+                yoyo: true,
+                ease: 'power2.inOut',
+            }
+        });
+    }, [])
     const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
     const playthehomesong = async () => {
         try {
@@ -17,7 +35,7 @@ function MusicCard({ key, song }) {
         }
     }
     return (
-        <div key={key} className="w-full sm:max-w-[250px] rounded-xl cursor-pointer p-2 md:p-3">
+        <div ref={cardRef} key={key} className="w-full sm:max-w-[250px] rounded-xl cursor-pointer p-2 md:p-3">
             <div className='relative group aspect-square overflow-hidden rounded-2xl'>
                 <img
                     className="w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-110 rounded-2xl"
