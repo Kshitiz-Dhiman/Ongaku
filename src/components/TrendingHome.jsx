@@ -5,6 +5,7 @@ import MusicCardSkeleton from './MusicCardSkeleton';
 
 const PlaylistHome = ({ key }) => {
     const [homesongs, setHomesongs] = useState([]);
+
     const type = "song";
     const language = "english";
     const getHomeSongs = async () => {

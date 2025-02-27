@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, {  useState } from 'react'
 import TrendingHome from '../components/TrendingHome'
 import NavBar from '../components/NavBar';
 import Siderbar from '@/components/Siderbar';
@@ -20,7 +20,7 @@ const Home = () => {
         <div className='flex flex-col min-h-screen  bg-black text-white'>
             <NavBar onAlbumSelect={handleAlbumSelect} />
             <div className="flex flex-1 relative">
-                <Siderbar />
+                <Siderbar onClose={handleAlbumClose} />
                 <main className="flex-1 md:ml-[12%]">
                     {selectedAlbumId ? (
                         <Album id={selectedAlbumId} onClose={handleAlbumClose} />
