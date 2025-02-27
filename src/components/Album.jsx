@@ -5,7 +5,7 @@ import { Play, Clock3, XIcon } from 'lucide-react';
 import axios from 'axios';
 import { trimString } from '../utils/utils';
 import { LoadingSpinner } from './LoadingSpinner';
-
+import { Skeleton } from './ui/skeleton';
 const Album = ({ id, onClose }) => {
     const [albumData, setAlbumData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -71,13 +71,8 @@ const Album = ({ id, onClose }) => {
         const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes}:${remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}`;
     }
-
     if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <LoadingSpinner />
-            </div>
-        );
+        return <AlbumSkeleton />;
     }
 
     return (
@@ -157,5 +152,60 @@ const Album = ({ id, onClose }) => {
         </div>
     );
 };
+const AlbumSkeleton = () => (
+    <div className='w-full min-h-screen bg-black px-4 py-20 md:py-24'>
+        <div className='max-w-7xl mx-auto md:mt-5'>
+            <div className='flex flex-col gap-8'>
+                {/* Album Header Skeleton */}
+                <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl'>
+                    <Skeleton className="bg-[#080c10] w-48 h-48 rounded-xl" />
+                    <div className='text-center md:text-start w-full md:w-1/3'>
+                        <Skeleton className="h-4 bg-[#080c10] w-16 mb-2" />
+                        <Skeleton className="h-12 bg-[#080c10] w-full mb-4" />
+                        <Skeleton className="h-4 bg-[#080c10] w-3/4" />
+                    </div>
+                </div>
+
+                {/* Songs List Skeleton */}
+                <div className='mt-8'>
+                    <table className='w-full'>
+                        <thead className='border-b border-[#262626]'>
+                            <tr>
+                                <th className='pb-3 w-12'><Skeleton className="h-4 w-4" /></th>
+                                <th className='pb-3'><Skeleton className="h-4 w-20" /></th>
+                                <th className='pb-3 hidden md:table-cell'><Skeleton className="h-4 w-20" /></th>
+                                <th className='pb-3 w-12'><Skeleton className="h-4 w-4" /></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[...Array(8)].map((_, index) => (
+                                <tr key={index} className="border-b border-[#262626]">
+                                    <td className='py-3 pl-2'>
+                                        <Skeleton className="h-4 bg-[#080c10] w-4" />
+                                    </td>
+                                    <td className='py-3'>
+                                        <div className='flex items-center gap-3'>
+                                            <Skeleton className="bg-[#080c10] w-10 h-10 rounded" />
+                                            <div className='w-full'>
+                                                <Skeleton className="h-4 bg-[#080c10] w-40 mb-2" />
+                                                <Skeleton className="h-3 bg-[#080c10] w-24" />
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className='py-3 hidden md:table-cell'>
+                                        <Skeleton className="h-4 bg-[#080c10] w-32" />
+                                    </td>
+                                    <td className='py-3'>
+                                        <Skeleton className="h-4 bg-[#080c10] w-12" />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+);
 
 export default Album;
