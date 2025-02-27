@@ -14,6 +14,8 @@ const Album = ({ id, onClose }) => {
         const fetchAlbumData = async () => {
             try {
                 setIsLoading(true);
+                // 885533 -> Sports Artists
+                // 16657194 -> Sports Album
                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/album?id=${id}`);
                 setAlbumData(response.data.data);
             } catch (error) {

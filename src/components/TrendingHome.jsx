@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import MusicCard from "./MusicCard";
 import axios from 'axios';
-import { AudioPlayerData } from '../context/AudioPlayerContext';
-import { LoadingSpinner } from './LoadingSpinner';
-const PlaylistHome = () => {
+import MusicCardSkeleton from './MusicCardSkeleton';
 
-
-    const [homesongs, setHomesongs] = useState(null);
+const PlaylistHome = ({ key }) => {
+    const [homesongs, setHomesongs] = useState([]);
     const type = "song";
     const language = "english";
     const getHomeSongs = async () => {
@@ -20,10 +18,6 @@ const PlaylistHome = () => {
     }
     useEffect(() => { getHomeSongs() }, [])
 
-    if (!homesongs) {
-        return <LoadingSpinner />
-    }
-
 
     return (
         <div className='w-full min-h-screen bg-black px-4 py-20 md:py-24 '>
@@ -32,8 +26,10 @@ const PlaylistHome = () => {
                     Trending
                 </h1>
                 <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6'>
-                    {homesongs.map((song) => (
+                    {homesongs.length > 0 ? homesongs.map((song) => (
                         <MusicCard key={song.id} song={song} />
+                    )) : Array(10).fill().map((_, index) => (
+                        <MusicCardSkeleton key={index} />
                     ))}
                 </div>
             </div>
