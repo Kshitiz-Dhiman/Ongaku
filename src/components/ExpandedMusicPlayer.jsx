@@ -26,7 +26,7 @@ const ExpandedMusicPlayer = ({
 
     return (
         <div ref={expandedPlayerRef}
-            className="fixed z-[1000] inset-0 bg-black text-white">
+            className="fixed z-[1000] md:hidden inset-0 bg-black text-white">
             <button
                 type='button'
                 onClick={onClose}

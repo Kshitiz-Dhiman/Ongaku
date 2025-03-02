@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-
 import { FiSearch } from "react-icons/fi";
-
 import { Music } from "lucide-react"
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
@@ -39,10 +37,8 @@ const customStyles = {
 };
 
 const NavBar = ({ onAlbumSelect }) => {
-    const navigate = useNavigate();
     const [songSuggestions, setSongSuggestions] = useState([]);
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
-    const [playlistSuggestions, setPlaylistSuggestions] = useState([]);
     const [artistSuggestions, setArtistSuggestions] = useState([]);
     const loadSuggestions = async (inputValue) => {
         try {
@@ -50,7 +46,6 @@ const NavBar = ({ onAlbumSelect }) => {
             const data1 = response.data;
             setSongSuggestions(data1.data.songs.data);
             setAlbumSuggestions(data1.data.albums.data);
-            setPlaylistSuggestions(data1.data.playlists.data);
             setArtistSuggestions(data1.data.artists.data);
             const suggestions = [
                 {
@@ -86,7 +81,6 @@ const NavBar = ({ onAlbumSelect }) => {
     };
     const {
         playTrack,
-        currentTrack,
         setQueue,
         setCurrentTrack
     } = useContext(AudioPlayerData);
@@ -140,17 +134,6 @@ const NavBar = ({ onAlbumSelect }) => {
                     noOptionsMessage={() => "Start typing to search..."}
                 />
             </div>
-            {/* <div className='flex gap-4'>
-                <Link to='/'>
-                    <GoHomeFill size={30} />
-                </Link>
-                <Link to='/search'>
-                    <FiSearch size={30} />
-                </Link>
-                <Link to='/library'>
-                    <MdLibraryMusic size={30} />
-                </Link>
-            </div> */}
         </div>
     );
 };
