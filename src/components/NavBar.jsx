@@ -36,7 +36,7 @@ const customStyles = {
     })
 };
 
-const NavBar = ({ onAlbumSelect }) => {
+const NavBar = ({ onAlbumSelect, onArtistSelect }) => {
     const [songSuggestions, setSongSuggestions] = useState([]);
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
     const [artistSuggestions, setArtistSuggestions] = useState([]);
@@ -113,8 +113,11 @@ const NavBar = ({ onAlbumSelect }) => {
             }
         } else if (option?.type === 'album') {
             onAlbumSelect(option.value);
+        } else if (option?.type === 'artist') {
+            onArtistSelect(option.value);
         }
     };
+
     return (
         <div className='fixed bg-black w-full h-[12vh] flex flex-col md:flex-row justify-between items-center px-4  md:px-12 z-[100] pt-2'>
             <div className='flex items-center justify-center gap-2 mb-2 md:mb-0'>
