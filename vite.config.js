@@ -1,13 +1,12 @@
-// client/vite.config.js
-
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa'
+// https://vite.dev/config/
 
 const manifestForPlugin = {
-    registerType: "autoUpdate",
+    registerType: "prompt",
     includeAssets: [
         'favicon.ico',
         'favicon.png',
@@ -51,68 +50,7 @@ const manifestForPlugin = {
         display: "standalone",
         scope: "/",
         start_url: "/",
-        orientation: "portrait",
-        categories: ["music", "entertainment"],
-        screenshots: [],
-        shortcuts: [],
-        share_target: {
-            action: "/share",
-            method: "GET",
-            params: {
-                title: "title",
-                text: "text",
-                url: "url"
-            }
-        },
-        // Add media session features
-        media_session: {
-            actions: [
-                "play",
-                "pause",
-                "seekbackward",
-                "seekforward",
-                "previoustrack",
-                "nexttrack"
-            ]
-        }
-    },
-    workbox: {
-        sourcemap: true,
-        swDest: 'dist/sw.js', // Make sure it's output to the correct location
-        inlineWorkboxRuntime: true,
-        // Add media session handling
-        runtimeCaching: [
-            {
-                urlPattern: /^https:\/\/.*\.(?:png|jpg|jpeg|svg|gif)$/,
-                handler: 'CacheFirst',
-                options: {
-                    cacheName: 'images',
-                    expiration: {
-                        maxEntries: 60,
-                        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-                    },
-                },
-            },
-            {
-                urlPattern: /\.mp3$/,
-                handler: 'CacheFirst',
-                options: {
-                    cacheName: 'audio',
-                    expiration: {
-                        maxEntries: 60,
-                        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
-                    },
-                    rangeRequests: true,
-                },
-            },
-        ],
-        strategies: 'injectManifest',
-        injectManifest: {
-            swSrc: './src/sw.js',
-            swDest: 'sw.js',
-            globDirectory: 'dist',
-            maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
-        },
+        orientation: "portrait"
     }
 };
 
