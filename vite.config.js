@@ -7,7 +7,7 @@ import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa'
 
 const manifestForPlugin = {
-    registerType: "autoUpdate",  // Changed from "prompt" to "autoUpdate"
+    registerType: "autoUpdate",
     includeAssets: [
         'favicon.ico',
         'favicon.png',
@@ -78,7 +78,7 @@ const manifestForPlugin = {
     },
     workbox: {
         sourcemap: true,
-        swDest: 'sw.js',
+        swDest: 'dist/sw.js', // Make sure it's output to the correct location
         inlineWorkboxRuntime: true,
         // Add media session handling
         runtimeCaching: [
@@ -106,6 +106,13 @@ const manifestForPlugin = {
                 },
             },
         ],
+        strategies: 'injectManifest',
+        injectManifest: {
+            swSrc: './src/sw.js',
+            swDest: 'sw.js',
+            globDirectory: 'dist',
+            maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
+        },
     }
 };
 
