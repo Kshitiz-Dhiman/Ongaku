@@ -1,39 +1,49 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AudioPlayerData } from '../context/AudioPlayerContext';
-import { Play, Clock3, XIcon } from 'lucide-react';
+import { Play, Clock3, XIcon, User } from 'lucide-react';
 import axios from 'axios';
 import { trimString } from '../utils/utils';
 import { LoadingSpinner } from './LoadingSpinner';
 import { Skeleton } from './ui/skeleton';
-const Album = ({ id, onClose }) => {
-    const [albumData, setAlbumData] = useState(null);
+
+const Artist = ({ id, onClose }) => {
+    const [artistData, setArtistData] = useState(null);
+    const [artistSongs, setArtistSongs] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
+    const { singleSongs, setSingleSongs } = useState([])
+
+
     useEffect(() => {
-        const fetchAlbumData = async () => {
+        const fetchArtistData = async () => {
             try {
                 setIsLoading(true);
-                // 885533 -> Sports Artists
-                // 16657194 -> Sports Album
-                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/album?id=${id}`);
-                setAlbumData(response.data.data);
+
+                const artistResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/artist?id=${id}`);
+                setArtistData(artistResponse.data.data);
+                // setSingleSongs(artistResponse.data.data.singles);
+                const songsResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/artist/top-songs?id=${id}`);
+                setArtistSongs(songsResponse.data.data);
+                console.log(songsResponse.data.data)
             } catch (error) {
-                console.error('Error fetching album:', error);
+                console.error('Error fetching artist:', error);
             } finally {
                 setIsLoading(false);
             }
         };
 
         if (id) {
-            fetchAlbumData();
+            fetchArtistData();
         }
 
         return () => {
-            setAlbumData(null);
+            setArtistData(null);
+            setArtistSongs([]);
             setIsLoading(true);
         };
     }, [id]);
+
     const handleClose = () => {
         onClose();
     };
@@ -63,6 +73,7 @@ const Album = ({ id, onClose }) => {
             console.error('Error playing song:', error);
         }
     };
+
     const formatTime = (seconds) => {
         if (Number.isNaN(seconds)) {
             return '00:00';
@@ -70,28 +81,35 @@ const Album = ({ id, onClose }) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes}:${remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}`;
-    }
+    };
+
     if (isLoading) {
-        return <AlbumSkeleton />;
+        return <ArtistSkeleton />;
     }
 
     return (
         <div className='w-full min-h-screen bg-black px-4 py-20 md:py-30'>
             <div className='max-w-7xl mx-auto md:mt-5'>
-                {albumData && (
+                {artistData && (
                     <div className='flex flex-col gap-8'>
-                        {/* bg-gradient-to-b from-[#1a1a1a] to-[#0a1113]  */}
-
-                        <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl '>
-                            <img
-                                src={albumData.image.large}
-                                alt={albumData.title}
-                                className='w-48 h-48 shadow-xl rounded-xl'
-                            />
+                        <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl'>
+                            <div className="w-48 h-48 shadow-xl rounded-xl overflow-hidden">
+                                <img
+                                    src={artistData.image.large}
+                                    alt={artistData.title}
+                                    className='w-full h-full object-cover'
+                                />
+                            </div>
                             <div className='text-center md:text-start'>
-                                <h4 className='text-sm font-bold uppercase text-white'>Album</h4>
-                                <h1 className='text-5xl font-bold mt-2 text-white'>{albumData.title}</h1>
-                                <p className='text-gray-400 mt-4'>{albumData.description}</p>
+                                <h4 className='text-sm font-bold uppercase text-white'>Artist</h4>
+                                <h1 className='text-5xl font-bold mt-2 text-white'>{artistData.title}</h1>
+                                <p className='text-gray-400 mt-4'>{artistData.subtitle}</p>
+                                <p className='text-gray-400 mt-2'>
+                                    <span className='flex items-center justify-center md:justify-start gap-2'>
+                                        <User size={16} />
+                                        {artistData.follower_count} followers
+                                    </span>
+                                </p>
                             </div>
                             <button
                                 type='button'
@@ -102,24 +120,26 @@ const Album = ({ id, onClose }) => {
                             </button>
                         </div>
 
-                        {/* Songs List */}
+                        {/* Top Songs List */}
                         <div className='mt-8'>
+                            <h2 className='text-2xl font-bold text-white mb-4'>Popular Songs</h2>
                             <table className='w-full text-left text-white'>
                                 <thead className='border-b border-[#262626]'>
                                     <tr className='text-gray-400'>
                                         <th className='pb-3 w-12'>#</th>
                                         <th className='pb-3'>Title</th>
-                                        <th className='pb-3 hidden md:table-cell'>Album</th>
+                                        <th className='pb-3 hidden md:table-cell'>Plays</th>
                                         <th className='pb-3 w-12'><Clock3 size={16} /></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {albumData.songs.map((song, index) => (
+                                    {artistSongs.map((song, index) => (
                                         <tr
                                             key={song.id}
                                             onClick={() => handlePlaySong(song)}
-                                            onKeyDown={() => handlePlaySong(song)}
-                                            className=' hover:bg-[#262626] cursor-pointer group'
+                                            onKeyDown={(e) => { if (e.key === 'Enter') handlePlaySong(song); }}
+                                            className='hover:bg-[#262626] cursor-pointer group'
+                                            tabIndex={0}
                                         >
                                             <td className='py-3 pl-2'>{index + 1}</td>
                                             <td className='py-3'>
@@ -136,38 +156,63 @@ const Album = ({ id, onClose }) => {
                                                 </div>
                                             </td>
                                             <td className='py-3 text-gray-400 hidden md:table-cell'>
-                                                {albumData.title}
+                                                {song.play_count && Number.parseInt(song.play_count).toLocaleString()}
                                             </td>
                                             <td className='py-3 text-gray-400'>
-                                                {formatTime(song.duration)}
+                                                {song.more_info && formatTime(song.more_info.duration)}
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
+
+                        {/* Similar Artists Section (if present in API response) */}
+                        {artistData.similarArtists && artistData.similarArtists.length > 0 && (
+                            <div className='mt-8'>
+                                <h2 className='text-2xl font-bold text-white mb-4'>Similar Artists</h2>
+                                <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+                                    {artistData.similarArtists.map(artist => (
+                                        <div key={artist.id} className="p-3 hover:bg-[#262626] rounded-xl cursor-pointer">
+                                            <div className="w-full aspect-square rounded-full overflow-hidden mb-2">
+                                                <img
+                                                    src={artist.image}
+                                                    alt={artist.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <h3 className="text-white text-center text-base font-medium">{artist.name}</h3>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                     </div>
                 )}
             </div>
         </div>
     );
 };
-const AlbumSkeleton = () => (
+
+const ArtistSkeleton = () => (
     <div className='w-full min-h-screen bg-black px-4 py-20 md:py-24'>
         <div className='max-w-7xl mx-auto md:mt-5'>
             <div className='flex flex-col gap-8'>
-                {/* Album Header Skeleton */}
+                {/* Artist Header Skeleton */}
                 <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl'>
                     <Skeleton className="bg-[#262626] w-48 h-48 rounded-xl" />
                     <div className='text-center md:text-start w-full md:w-1/3'>
                         <Skeleton className="h-4 bg-[#262626] w-16 mb-2" />
                         <Skeleton className="h-12 bg-[#262626] w-full mb-4" />
                         <Skeleton className="h-4 bg-[#262626] w-3/4" />
+                        <Skeleton className="h-4 bg-[#262626] w-1/4 mt-2" />
                     </div>
                 </div>
 
-                {/* Songs List Skeleton */}
+                {/* Top Songs Skeleton */}
                 <div className='mt-8'>
+                    <Skeleton className="h-8 bg-[#262626] w-40 mb-4" />
                     <table className='w-full'>
                         <thead className='border-b border-[#262626]'>
                             <tr>
@@ -208,4 +253,4 @@ const AlbumSkeleton = () => (
     </div>
 );
 
-export default Album;
+export default Artist;
