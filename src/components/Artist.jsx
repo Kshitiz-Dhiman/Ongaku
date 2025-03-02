@@ -7,13 +7,11 @@ import { trimString } from '../utils/utils';
 import { LoadingSpinner } from './LoadingSpinner';
 import { Skeleton } from './ui/skeleton';
 
-const Artist = ({ id, onClose }) => {
+const Artist = ({ id, onClose, onAlbumClick }) => {
     const [artistData, setArtistData] = useState(null);
     const [artistSongs, setArtistSongs] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
-    const { singleSongs, setSingleSongs } = useState([])
-
 
     useEffect(() => {
         const fetchArtistData = async () => {
@@ -22,10 +20,9 @@ const Artist = ({ id, onClose }) => {
 
                 const artistResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/artist?id=${id}`);
                 setArtistData(artistResponse.data.data);
-                // setSingleSongs(artistResponse.data.data.singles);
+
                 const songsResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/artist/top-songs?id=${id}`);
                 setArtistSongs(songsResponse.data.data);
-                console.log(songsResponse.data.data)
             } catch (error) {
                 console.error('Error fetching artist:', error);
             } finally {
@@ -43,6 +40,7 @@ const Artist = ({ id, onClose }) => {
             setIsLoading(true);
         };
     }, [id]);
+
 
     const handleClose = () => {
         onClose();
@@ -73,7 +71,34 @@ const Artist = ({ id, onClose }) => {
             console.error('Error playing song:', error);
         }
     };
+    const handleSingleClick = async (single) => {
+        try {
+            // Check if onAlbumClick prop is provided (to navigate to album page)
+            if (onAlbumClick) {
+                onAlbumClick(single.id);
+                return;
+            }
 
+            // If we don't have album navigation, then fetch the album and play the first song
+            console.log("Fetching album details for single:", single.id);
+            const albumResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/album?id=${single.id}`);
+            const albumData = albumResponse.data.data;
+
+            // Check if the album has songs
+            if (albumData.songs && albumData.songs.length > 0) {
+                // Get the first song from the album
+                const firstSong = albumData.songs[0];
+                console.log("Playing first song from album:", firstSong.id);
+
+                // Play this song
+                await handlePlaySong(firstSong);
+            } else {
+                console.error("No songs found in this album/single");
+            }
+        } catch (error) {
+            console.error('Error handling single click:', error);
+        }
+    };
     const formatTime = (seconds) => {
         if (Number.isNaN(seconds)) {
             return '00:00';
@@ -110,6 +135,7 @@ const Artist = ({ id, onClose }) => {
                                         {artistData.follower_count} followers
                                     </span>
                                 </p>
+
                             </div>
                             <button
                                 type='button'
@@ -167,6 +193,37 @@ const Artist = ({ id, onClose }) => {
                             </table>
                         </div>
 
+                        {/* Singles Section */}
+                        {artistData.singles && artistData.singles.length > 0 && (
+                            <div className='mt-8'>
+                                <h2 className='text-2xl font-bold text-white mb-4'>Singles & EPs</h2>
+                                <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+                                    {artistData.singles.map(single => (
+                                        <div
+                                            key={single.id}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') handleSingleClick(single); }}
+                                            onClick={() => handleSingleClick(single)}
+                                            className="p-3 hover:bg-[#262626] rounded-xl cursor-pointer transition-colors"
+                                        >
+                                            <div className="w-full aspect-square overflow-hidden mb-2 rounded-lg shadow-md">
+                                                <img
+                                                    src={single.image.large}
+                                                    alt={single.title}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <h3 className="text-white text-base font-medium truncate">
+                                                {single.title}
+                                            </h3>
+                                            <p className="text-gray-400 text-sm truncate">
+                                                {single.subtitle || `${single.year || ""}`}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Similar Artists Section (if present in API response) */}
                         {artistData.similarArtists && artistData.similarArtists.length > 0 && (
                             <div className='mt-8'>
@@ -187,7 +244,6 @@ const Artist = ({ id, onClose }) => {
                                 </div>
                             </div>
                         )}
-
                     </div>
                 )}
             </div>
@@ -247,6 +303,20 @@ const ArtistSkeleton = () => (
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Singles Skeleton */}
+                <div className='mt-8'>
+                    <Skeleton className="h-8 bg-[#262626] w-40 mb-4" />
+                    <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+                        {[...Array(5)].map((_, index) => (
+                            <div key={index} className="p-3">
+                                <Skeleton className="bg-[#262626] w-full aspect-square rounded-lg mb-2" />
+                                <Skeleton className="h-5 bg-[#262626] w-full mb-1" />
+                                <Skeleton className="h-4 bg-[#262626] w-2/3" />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

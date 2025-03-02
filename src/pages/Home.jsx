@@ -38,7 +38,6 @@ const Home = () => {
             <div className="flex flex-1 relative">
                 <Siderbar onClose={handleAlbumClose} />
                 <main className="flex-1 md:ml-[12%]">
-                    {/* Prioritized rendering: Artist > Album > TrendingHome */}
                     {selectedArtistId ? (
                         <Artist id={selectedArtistId} onClose={handleArtistClose} />
                     ) : selectedAlbumId ? (
