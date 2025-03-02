@@ -24,13 +24,14 @@ const MusicPlayer = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     useGSAP(() => {
 
-        gsap.from(playerRef.current, {
-            y: 200,
-            duration: 0.5,
-            ease: "power3.out",
-            opacity: 0
-        });
-
+        gsap.matchMedia("(min-width: 800px)", () => {
+            gsap.from(playerRef.current, {
+                y: 200,
+                duration: 0.5,
+                ease: "power3.out",
+                opacity: 0
+            });
+        })
         if (isExpanded) {
             gsap.from(expandedPlayerRef.current, {
                 y: 1000,

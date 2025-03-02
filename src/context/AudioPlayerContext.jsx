@@ -188,6 +188,10 @@ const AudioPlayerContext = ({ children }) => {
         getRecommendations
     };
     // Media Session api for controlling music player from lock screen
+    // Add this to your AudioPlayerContext.jsx
+
+    // Inside the useEffect where you set up the MediaSession API:
+
     useEffect(() => {
         if ('mediaSession' in navigator) {
             // Set metadata
@@ -214,19 +218,61 @@ const AudioPlayerContext = ({ children }) => {
                 ]
             });
 
+            // Notify service worker about new track
+            if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'INIT_MEDIA_SESSION',
+                    track: {
+                        id: currentTrack?.id,
+                        title: currentTrack?.title,
+                        artist: currentTrack?.subtitle,
+                        artwork: currentTrack?.images?.medium
+                    }
+                });
+            }
+
+            // Listen for messages from the service worker
+            const handleServiceWorkerMessage = (event) => {
+                if (event.data && event.data.type === 'MEDIA_CONTROL') {
+                    switch (event.data.action) {
+                        case 'play':
+                            if (!playing) togglePlayPause();
+                            break;
+                        case 'pause':
+                            if (playing) togglePlayPause();
+                            break;
+                        case 'previoustrack':
+                            playPreviousSong();
+                            break;
+                        case 'nexttrack':
+                            playNextSong();
+                            break;
+                        case 'seekbackward':
+                            seek(Math.max(getPosition() - 10, 0));
+                            break;
+                        case 'seekforward':
+                            seek(Math.min(getPosition() + 10, duration || 0));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            };
+
+            navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+
+            // Set action handlers
             navigator.mediaSession.setActionHandler('play', () => {
                 if (!playing) {
                     togglePlayPause();
                 }
             });
 
-
             navigator.mediaSession.setActionHandler('pause', () => {
                 if (playing) {
                     togglePlayPause();
                 }
             });
-
 
             navigator.mediaSession.setActionHandler('previoustrack', playPreviousSong);
             navigator.mediaSession.setActionHandler('nexttrack', playNextSong);
@@ -271,10 +317,10 @@ const AudioPlayerContext = ({ children }) => {
 
             const positionUpdateInterval = setInterval(updatePositionState, 1000);
 
-
             return () => {
                 clearInterval(positionUpdateInterval);
-                const actions = ['seekto', 'seekbackward', 'seekforward'];
+                navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+                const actions = ['play', 'pause', 'seekto', 'seekbackward', 'seekforward', 'previoustrack', 'nexttrack'];
                 for (const action of actions) {
                     try {
                         navigator.mediaSession.setActionHandler(action, null);
@@ -284,7 +330,7 @@ const AudioPlayerContext = ({ children }) => {
                 }
             };
         }
-    }, [currentTrack, playing, togglePlayPause]);
+    }, [currentTrack, playing, togglePlayPause, duration, getPosition, playNextSong, playPreviousSong, seek]);
     return (
         <AudioPlayerData.Provider value={contextValue}>
             <audio ref={audioRef} type="audio/mpeg">

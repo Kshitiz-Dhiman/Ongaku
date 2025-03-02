@@ -8,12 +8,12 @@ const Sidebar = ({ onClose }) => {
     return (
         <div className='hidden md:flex h-screen fixed top-0 left-0 w-1/6 bg-black flex-col text-white p-6 pt-20 gap-8 mt-10'>
 
-            {Menu('Main', [
-                { icon: <Home size={20} />, title: 'Home' },
-                { icon: <ListMusic size={20} />, title: 'Explore' },
-                { icon: <Album size={20} />, title: 'Top Charts' }
+            {Menu('Trending', [
+                { icon: <Home size={20} />, title: 'Song' },
+                { icon: <ListMusic size={20} />, title: 'Album' },
+                { icon: <Album size={20} />, title: 'Artist' }
             ], AlbumCLose)}
-            
+
 
             {Menu('Library', [
                 { icon: <Home size={20} />, title: 'Songs' },

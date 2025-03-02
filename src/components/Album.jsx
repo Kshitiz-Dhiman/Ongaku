@@ -158,11 +158,11 @@ const AlbumSkeleton = () => (
             <div className='flex flex-col gap-8'>
                 {/* Album Header Skeleton */}
                 <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl'>
-                    <Skeleton className="bg-[#080c10] w-48 h-48 rounded-xl" />
+                    <Skeleton className="bg-[#262626] w-48 h-48 rounded-xl" />
                     <div className='text-center md:text-start w-full md:w-1/3'>
-                        <Skeleton className="h-4 bg-[#080c10] w-16 mb-2" />
-                        <Skeleton className="h-12 bg-[#080c10] w-full mb-4" />
-                        <Skeleton className="h-4 bg-[#080c10] w-3/4" />
+                        <Skeleton className="h-4 bg-[#262626] w-16 mb-2" />
+                        <Skeleton className="h-12 bg-[#262626] w-full mb-4" />
+                        <Skeleton className="h-4 bg-[#262626] w-3/4" />
                     </div>
                 </div>
 
@@ -181,22 +181,22 @@ const AlbumSkeleton = () => (
                             {[...Array(8)].map((_, index) => (
                                 <tr key={index} className="border-b border-[#262626]">
                                     <td className='py-3 pl-2'>
-                                        <Skeleton className="h-4 bg-[#080c10] w-4" />
+                                        <Skeleton className="h-4 bg-[#262626] w-4" />
                                     </td>
                                     <td className='py-3'>
                                         <div className='flex items-center gap-3'>
-                                            <Skeleton className="bg-[#080c10] w-10 h-10 rounded" />
+                                            <Skeleton className="bg-[#262626] w-10 h-10 rounded" />
                                             <div className='w-full'>
-                                                <Skeleton className="h-4 bg-[#080c10] w-40 mb-2" />
-                                                <Skeleton className="h-3 bg-[#080c10] w-24" />
+                                                <Skeleton className="h-4 bg-[#262626] w-40 mb-2" />
+                                                <Skeleton className="h-3 bg-[#262626] w-24" />
                                             </div>
                                         </div>
                                     </td>
                                     <td className='py-3 hidden md:table-cell'>
-                                        <Skeleton className="h-4 bg-[#080c10] w-32" />
+                                        <Skeleton className="h-4 bg-[#262626] w-32" />
                                     </td>
                                     <td className='py-3'>
-                                        <Skeleton className="h-4 bg-[#080c10] w-12" />
+                                        <Skeleton className="h-4 bg-[#262626] w-12" />
                                     </td>
                                 </tr>
                             ))}
