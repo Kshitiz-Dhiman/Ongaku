@@ -43,9 +43,6 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playTrack = async (song, songId, addToQueue = true) => {
-        console.log('Playing track:', song); // Debug log
-        console.log('Song ID:', songId); // Debug log
-        console.log("Add to queue:", addToQueue); // Debug log
         try {
             if (addToQueue) {
                 queueRef.current = [];

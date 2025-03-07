@@ -15,6 +15,7 @@ import { trimString } from '../utils/utils';
 import gsap from "gsap";
 import { useGSAP } from '@gsap/react';
 import ExpandedMusicPlayer from './ExpandedMusicPlayer';
+import { Link } from 'react-router-dom';
 gsap.registerPlugin(useGSAP);
 
 const MusicPlayer = () => {
@@ -153,7 +154,9 @@ const MusicPlayer = () => {
                         </div>
                         <div className='flex flex-col'>
                             <h1 className='text-lg'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
-                            <h1 className='text-sm text-gray-400'>{trimString(currentTrack?.subtitle, 23) || 'Unknown Artist'}</h1>
+                            <Link to={`/artist/${currentTrack?.artists?.primary[0].id}`} className='flex items-center gap-1'>
+                                <h1 className='text-sm text-gray-400'>{trimString(currentTrack?.subtitle, 23) || 'Unknown Artist'}</h1>
+                            </Link>
                         </div>
                     </div>
                     <div onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }} onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }} className='p-2 md:hidden rounded-full bg-white' onClick={togglePlayPause}>

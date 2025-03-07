@@ -3,7 +3,7 @@ import { ChevronDown, Shuffle, SkipBack, Play, Pause, SkipForward, Repeat, Volum
 import { Slider } from "./ui/slider";
 import { LoadingSpinner } from './LoadingSpinner';
 import { trimString } from '../utils/utils';
-
+import { Link } from 'react-router-dom';
 const ExpandedMusicPlayer = ({
     expandedPlayerRef,
     isExpanded,
@@ -53,7 +53,9 @@ const ExpandedMusicPlayer = ({
                         {trimString(currentTrack?.title, 30) || 'No Track Selected'}
                     </h1>
                     <p className="text-gray-400 mt-2">
-                        {trimString(currentTrack?.subtitle, 23) || 'Unknown Artist'}
+                        <Link to={`/artist/${currentTrack?.artists?.primary[0].id}`}>
+                            {trimString(currentTrack?.subtitle, 23) || 'Unknown Artist'}
+                        </Link>
                     </p>
                 </div>
 

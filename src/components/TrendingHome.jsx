@@ -9,7 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-const PlaylistHome = ({ onAlbumClick }) => {
+const PlaylistHome = () => {
     const [homesongs, setHomesongs] = useState([]);
     const [type, setType] = useState("song");
     const [language, setLanguage] = useState("english");
