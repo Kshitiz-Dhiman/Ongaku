@@ -40,14 +40,25 @@ const NavBar = ({ onAlbumSelect, onArtistSelect }) => {
     const [songSuggestions, setSongSuggestions] = useState([]);
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
     const [artistSuggestions, setArtistSuggestions] = useState([]);
+    const [top_query, setTopQuery] = useState([]);
     const loadSuggestions = async (inputValue) => {
         try {
             const response = await axios(`${import.meta.env.VITE_MUSIC_API}/search?q=${inputValue}`)
             const data1 = response.data;
+            // console.log(data1.data.top_query.data);
             setSongSuggestions(data1.data.songs.data);
             setAlbumSuggestions(data1.data.albums.data);
+            setTopQuery(data1.data.top_query.data);
             setArtistSuggestions(data1.data.artists.data);
             const suggestions = [
+                {
+                    label: "Top Search",
+                    options: data1.data.top_query.data.map((query) => ({
+                        value: query.id,
+                        label: query.title,
+                        type: "top_query"
+                    }))
+                },
                 {
                     label: "Songs",
                     options: songSuggestions.map((song) => ({
@@ -86,31 +97,46 @@ const NavBar = ({ onAlbumSelect, onArtistSelect }) => {
     } = useContext(AudioPlayerData);
     const [selectedOption, setSelectedOption] = useState(null);
 
+    const songOptionsFunction = async (option) => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
+            const songData = response.data;
+
+            const trackInfo = {
+                id: songData.data.id,
+                title: songData.data.title,
+                subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
+                images: songData.data.images,
+                download_url: songData.data.download[4].link,
+                artists: songData.data.artists,
+                album: songData.data.album,
+                duration: songData.data.duration,
+                releaseDate: songData.data.releaseDate,
+                label: songData.data.label,
+                copyright: songData.data.copyright
+            };
+
+            setCurrentTrack(trackInfo);
+            await playTrack(songData.data.download[4].link, songData.data.id);
+        } catch (error) {
+            console.error('Error playing song:', error);
+        }
+    }
+
     const handleSelect = async (option) => {
-        if (option?.type === 'song') {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
-                const songData = response.data;
+        if (option?.type === 'top_query') {
+            console.log(top_query[0].type)
 
-                const trackInfo = {
-                    id: songData.data.id,
-                    title: songData.data.title,
-                    subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
-                    images: songData.data.images,
-                    download_url: songData.data.download[4].link,
-                    artists: songData.data.artists,
-                    album: songData.data.album,
-                    duration: songData.data.duration,
-                    releaseDate: songData.data.releaseDate,
-                    label: songData.data.label,
-                    copyright: songData.data.copyright
-                };
-
-                setCurrentTrack(trackInfo);
-                await playTrack(songData.data.download[4].link, songData.data.id);
-            } catch (error) {
-                console.error('Error playing song:', error);
+            if (top_query[0].type === "song") {
+                console.log("This is the song type")
+                await songOptionsFunction(option);
+            } else if (top_query[0].type === "album") {
+                onAlbumSelect(option.value);
+            } else if (top_query[0].type === "artist") {
+                onArtistSelect(option.value);
             }
+        } else if (option?.type === 'song') {
+            await songOptionsFunction(option)
         } else if (option?.type === 'album') {
             onAlbumSelect(option.value);
         } else if (option?.type === 'artist') {

@@ -354,11 +354,11 @@ const Songs = ({ artistId }) => {
 
                 const { data } = response.data;
                 console.log(data);
-                if (page === 1) {
-                    setSongs(data.top_songs.songs);
-                } else {
+
+                if (!data.top_songs.last_page) {
                     setSongs(prev => [...prev, ...data.top_songs.songs]);
                 }
+
 
                 setTotal(data.top_songs.total);
                 setHasMore(!data.top_songs.last_page);
