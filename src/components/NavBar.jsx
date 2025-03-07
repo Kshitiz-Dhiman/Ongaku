@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { FiSearch } from "react-icons/fi";
-import { Music } from "lucide-react"
+import { Music, NavigationOff } from "lucide-react"
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
 import { AudioPlayerData } from '../context/AudioPlayerContext';
@@ -45,7 +45,7 @@ const NavBar = ({ onAlbumSelect, onArtistSelect }) => {
         try {
             const response = await axios(`${import.meta.env.VITE_MUSIC_API}/search?q=${inputValue}`)
             const data1 = response.data;
-            // console.log(data1.data.top_query.data);
+            // console.log(data1.data.top_query);
             setSongSuggestions(data1.data.songs.data);
             setAlbumSuggestions(data1.data.albums.data);
             setTopQuery(data1.data.top_query.data);
@@ -55,7 +55,7 @@ const NavBar = ({ onAlbumSelect, onArtistSelect }) => {
                     label: "Top Search",
                     options: data1.data.top_query.data.map((query) => ({
                         value: query.id,
-                        label: query.title,
+                        label: `${query.title} - ${query.description}`,
                         type: "top_query"
                     }))
                 },
@@ -96,7 +96,7 @@ const NavBar = ({ onAlbumSelect, onArtistSelect }) => {
         setCurrentTrack
     } = useContext(AudioPlayerData);
     const [selectedOption, setSelectedOption] = useState(null);
-
+    const navigate = useNavigate();
     const songOptionsFunction = async (option) => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
@@ -125,22 +125,30 @@ const NavBar = ({ onAlbumSelect, onArtistSelect }) => {
 
     const handleSelect = async (option) => {
         if (option?.type === 'top_query') {
-            console.log(top_query[0].type)
-
+            // console.log(top_query[0])
+            const removeTypes = top_query.filter((item) => item.type === "song" || item.type === "album" || item.type === "artist")
+            if (removeTypes.length === 0) {
+                alert("Shows cant be played")
+                return;
+            }
             if (top_query[0].type === "song") {
                 console.log("This is the song type")
                 await songOptionsFunction(option);
             } else if (top_query[0].type === "album") {
-                onAlbumSelect(option.value);
+                // onAlbumSelect(option.value);
+                navigate(`/album/${option.value}`)
             } else if (top_query[0].type === "artist") {
-                onArtistSelect(option.value);
+                // onArtistSelect(option.value);
+                navigate(`/artist/${option.value}`)
             }
         } else if (option?.type === 'song') {
             await songOptionsFunction(option)
         } else if (option?.type === 'album') {
-            onAlbumSelect(option.value);
+            // onAlbumSelect(option.value);
+            navigate(`/album/${option.value}`)
         } else if (option?.type === 'artist') {
-            onArtistSelect(option.value);
+            // onArtistSelect(option.value);
+            navigate(`/artist/${option.value}`)
         }
     };
 

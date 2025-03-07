@@ -6,17 +6,19 @@ import axios from 'axios';
 import { trimString } from '../utils/utils';
 import { LoadingSpinner } from './LoadingSpinner';
 import { Skeleton } from './ui/skeleton';
-const Album = ({ id, onClose }) => {
+const Album = () => {
     const [albumData, setAlbumData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
+    const { albumId } = useParams();
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchAlbumData = async () => {
             try {
                 setIsLoading(true);
                 // 885533 -> Sports Artists
                 // 16657194 -> Sports Album
-                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/album?id=${id}`);
+                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/album?id=${albumId}`);
                 setAlbumData(response.data.data);
             } catch (error) {
                 console.error('Error fetching album:', error);
@@ -25,7 +27,7 @@ const Album = ({ id, onClose }) => {
             }
         };
 
-        if (id) {
+        if (albumId) {
             fetchAlbumData();
         }
 
@@ -33,9 +35,9 @@ const Album = ({ id, onClose }) => {
             setAlbumData(null);
             setIsLoading(true);
         };
-    }, [id]);
+    }, [albumId]);
     const handleClose = () => {
-        onClose();
+        navigate(-1)
     };
 
     const handlePlaySong = async (song) => {

@@ -7,17 +7,18 @@ import { trimString } from '../utils/utils';
 import { LoadingSpinner } from './LoadingSpinner';
 import { Skeleton } from './ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-const Artist = ({ id, onClose, onAlbumClick }) => {
+//{ id, onClose, onAlbumClick }
+const Artist = () => {
     const [artistData, setArtistData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
-
+    const { artistId } = useParams();
     useEffect(() => {
         const fetchArtistData = async () => {
             try {
                 setIsLoading(true);
 
-                const artistResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/artist?id=${id}`);
+                const artistResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/artist?id=${artistId}`);
                 setArtistData(artistResponse.data.data);
             } catch (error) {
                 console.error('Error fetching artist:', error);
@@ -26,7 +27,7 @@ const Artist = ({ id, onClose, onAlbumClick }) => {
             }
         };
 
-        if (id) {
+        if (artistId) {
             fetchArtistData();
         }
 
@@ -34,12 +35,16 @@ const Artist = ({ id, onClose, onAlbumClick }) => {
             setArtistData(null);
             setIsLoading(true);
         };
-    }, [id]);
-
+    }, [artistId]);
+    const navigate = useNavigate();
 
     const handleClose = () => {
-        onClose();
+        navigate(-1)
     };
+
+    const handleAlbumClick = (album) => {
+        navigate(`/album/${album.id}`);
+    }
 
     const handlePlaySong = async (song) => {
         try {
@@ -68,12 +73,6 @@ const Artist = ({ id, onClose, onAlbumClick }) => {
     };
     const handleSingleClick = async (single) => {
         try {
-            if (onAlbumClick) {
-                onAlbumClick(single.id);
-                return;
-            }
-
-            console.log("Fetching album details for single:", single.id);
             const albumResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/album?id=${single.id}`);
             const albumData = albumResponse.data.data;
 
@@ -132,7 +131,7 @@ const Artist = ({ id, onClose, onAlbumClick }) => {
                     </button>
                 </div>
                 <Tabs defaultValue="overview">
-                    <TabsList className="bg-[#080c10] w-full">
+                    <TabsList className="bg-[#080c10] w-full mt-4">
                         <TabsTrigger value="overview">Overview</TabsTrigger>
                         <TabsTrigger value="songs">Songs</TabsTrigger>
                         <TabsTrigger value="albums">Albums</TabsTrigger>
@@ -148,10 +147,10 @@ const Artist = ({ id, onClose, onAlbumClick }) => {
                         />
                     </TabsContent>
                     <TabsContent value="songs">
-                        <Songs artistId={id} />
+                        <Songs artistId={artistId} />
                     </TabsContent>
                     <TabsContent value="albums">
-                        <Albums artistId={id} onAlbumClick={onAlbumClick} />
+                        <Albums artistId={artistId} handleAlbumClick={handleAlbumClick} />
                     </TabsContent>
                 </Tabs>
             </div>
@@ -353,7 +352,6 @@ const Songs = ({ artistId }) => {
                 );
 
                 const { data } = response.data;
-                console.log(data);
 
                 if (!data.top_songs.last_page) {
                     setSongs(prev => [...prev, ...data.top_songs.songs]);
@@ -490,7 +488,7 @@ const Songs = ({ artistId }) => {
         </div>
     );
 };
-const Albums = ({ artistId, onAlbumClick }) => {
+const Albums = ({ artistId, handleAlbumClick }) => {
     const [albums, setAlbums] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
@@ -506,14 +504,12 @@ const Albums = ({ artistId, onAlbumClick }) => {
 
                 const { data } = response.data;
 
-                if (data.topAlbums && data.topAlbums.albums) {
+                if (data?.topAlbums && data?.topAlbums?.albums) {
                     if (page === 1) {
                         setAlbums(data.topAlbums.albums);
                     } else {
                         setAlbums(prev => [...prev, ...data.topAlbums.albums]);
                     }
-
-                    // Check if we have more albums to load
                     setHasMore(!data.topAlbums.last_page);
                 }
             } catch (error) {
@@ -537,11 +533,11 @@ const Albums = ({ artistId, onAlbumClick }) => {
             <h2 className='text-2xl font-bold text-white mb-4'>All Albums</h2>
 
             <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
-                {albums.map(album => (
+                {albums.map((album) => (
                     <div
-                        onkeydown={(e) => { if (e.key === 'Enter') onAlbumClick(album.id); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleAlbumClick(album); }}
+                        onClick={() => handleAlbumClick(album)}
                         key={album.id}
-                        onClick={() => onAlbumClick(album.id)}
                         className="p-3 hover:bg-[#262626] rounded-xl cursor-pointer transition-colors"
                     >
                         <div className="w-full aspect-square overflow-hidden mb-2 rounded-lg shadow-md">
@@ -570,6 +566,7 @@ const Albums = ({ artistId, onAlbumClick }) => {
             {!loading && hasMore && (
                 <div className="flex justify-center my-6">
                     <button
+                        type="button"
                         onClick={loadMore}
                         className="bg-[#262626] hover:bg-[#333] px-6 py-2 rounded-full text-white"
                     >
