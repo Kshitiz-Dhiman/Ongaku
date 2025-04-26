@@ -3,7 +3,7 @@ import { Home, ListMusic, Album } from "lucide-react"
 
 const Sidebar = ({ onClose }) => {
     const AlbumCLose = () => {
-        onClose()
+        onClose();
     }
     return (
         <div className='hidden md:flex h-screen fixed top-0 left-0 bg-black flex-col text-white p-6 pt-20 gap-8 mt-10'>

@@ -16,7 +16,9 @@ import gsap from "gsap";
 import { useGSAP } from '@gsap/react';
 import ExpandedMusicPlayer from './ExpandedMusicPlayer';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 gsap.registerPlugin(useGSAP);
+
 
 const MusicPlayer = () => {
 
@@ -57,25 +59,21 @@ const MusicPlayer = () => {
     };
 
     const {
+        playTrack,
+        setCurrentTrack,
         currentTrack,
         playNextSong,
         playPreviousSong
     } = useContext(AudioPlayerData);
     const {
-        load,
         playing,
         togglePlayPause,
         getPosition,
         isLoading,
         duration,
-        loop,
-        looping,
-        mute,
-        muted,
         volume,
         setVolume,
         seek,
-        isReady,
     } = useGlobalAudioPlayer();
     const frameRef = useRef(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -100,7 +98,45 @@ const MusicPlayer = () => {
         const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes}:${remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}`;
     }
+    useEffect(() => {
+        if (currentTrack?.id) {
+            localStorage.setItem('musicId', currentTrack.id);
+        }
+    }, [currentTrack]);
+    useEffect(() => {
+        const fetchTrack = async () => {
+            try {
+                const musicId = localStorage.getItem('musicId');
+                if (musicId) {
+                    const getTrack = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${musicId}`);
+                    const songData = getTrack.data;
+                    const track = {
+                        id: songData.data.id,
+                        title: songData.data.title,
+                        subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
+                        images: songData.data.images,
+                        download_url: songData.data.download,
+                        artists: songData.data.artists,
+                        album: songData.data.album,
+                        duration: songData.data.duration,
+                        releaseDate: songData.data.releaseDate,
+                        label: songData.data.label,
+                        copyright: songData.data.copyright
+                    };
+                    setCurrentTrack(track);
 
+                    // Play the track after setting it
+                    playTrack(track.download_url[4].link, track.id, false);
+                } else {
+                    console.warn('No musicId found in localStorage');
+                }
+            } catch (error) {
+                console.error('Error fetching track:', error);
+            }
+        };
+
+        fetchTrack();
+    }, []);
     useEffect(() => {
 
         if (!isDragging && playing) {

@@ -1,4 +1,4 @@
-import { React, createContext, useEffect, useRef, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import axios from 'axios';
 
@@ -17,16 +17,10 @@ const AudioPlayerContext = ({ children }) => {
         playing,
         togglePlayPause,
         getPosition,
-        isLoading,
         duration,
-        loop,
-        looping,
-        mute,
-        muted,
         volume,
         setVolume,
         seek,
-        isReady,
     } = useGlobalAudioPlayer(); const queueRef = useRef([]);
     const [playHistory, setPlayHistory] = useState([]);
     const playHistoryRef = useRef([]);
@@ -44,6 +38,7 @@ const AudioPlayerContext = ({ children }) => {
 
     const playTrack = async (song, songId, addToQueue = true) => {
         try {
+            localStorage.setItem('musicId', songId);
             if (addToQueue) {
                 queueRef.current = [];
                 setQueue([]);
@@ -155,7 +150,6 @@ const AudioPlayerContext = ({ children }) => {
 
 
 
-    // Sync refs with state
     useEffect(() => {
         queueRef.current = queue;
     }, [queue]);

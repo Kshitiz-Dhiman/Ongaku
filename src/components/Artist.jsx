@@ -504,14 +504,18 @@ const Albums = ({ artistId, handleAlbumClick }) => {
 
                 const { data } = response.data;
 
+
                 if (data?.topAlbums && data?.topAlbums?.albums) {
-                    if (page === 1) {
+                    if (page === 0) {
                         setAlbums(data.topAlbums.albums);
                     } else {
                         setAlbums(prev => [...prev, ...data.topAlbums.albums]);
                     }
                     setHasMore(!data.topAlbums.last_page);
                 }
+
+
+
             } catch (error) {
                 console.error('Error fetching albums:', error);
             } finally {
