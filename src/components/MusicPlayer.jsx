@@ -56,7 +56,7 @@ const MusicPlayer = () => {
             tl.fromTo(
                 expandedPlayerRef.current.querySelectorAll('.animate-item'),
                 { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.4, stagger: 0.05 },
+                { opacity: 1, y: 0, duration: 0.3, stagger: 0.05 },
                 "-=0.3"
             );
         }
@@ -67,7 +67,7 @@ const MusicPlayer = () => {
                 y: window.innerHeight,
                 opacity: 1,
                 scale: 0.95,
-                duration: 0.5,
+                duration: 0.3,
                 ease: "power3.in",
                 onComplete: () => setIsExpanded(false)
             });
