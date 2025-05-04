@@ -6,7 +6,7 @@ const Sidebar = ({ onClose }) => {
         onClose();
     }
     return (
-        <div className='hidden md:flex h-screen fixed top-0 left-0 bg-black flex-col text-white p-6 pt-20 gap-8 mt-10'>
+        <div className='hidden md:flex h-screen fixed top-0 left-0 bg-black flex-col text-white p-6 pt-20 gap-8 mt-15 mx-5'>
 
             {Menu('Trending', [
                 { icon: <Home size={20} />, title: 'Song' },

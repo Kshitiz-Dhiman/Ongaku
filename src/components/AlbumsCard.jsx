@@ -14,11 +14,11 @@ const AlbumsCard = ({ key, album }) => {
             <div
                 onClick={openAlbum}
                 key={key}
-                className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 transition-colors duration-200 rounded-xl hover:bg-[#262626] cursor-pointer bg-[#202020]"
+                className="flex items-center gap-2 sm:gap-4  transition-colors duration-200 rounded-xl hover:bg-[#262626] cursor-pointer bg-[#151515]"
             >
                 <div className="relative group">
                     <img
-                        className="w-15 h-15 sm:w-15 sm:h-15 rounded-xl object-cover transition-transform duration-300 ease-in-out group-hover:scale-110"
+                        className="w-17 h-17 rounded-xl object-cover transition-transform duration-300 ease-in-out group-hover:scale-110"
                         src={album.image.large}
                         alt={album.title}
                     />
