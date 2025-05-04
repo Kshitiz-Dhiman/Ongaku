@@ -48,7 +48,7 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 {/* Track Info */}
-                <div className="mt-8 text-center">
+                <div className="mt-1 text-center">
                     <h1 className="text-2xl font-bold">
                         {trimString(currentTrack?.title, 30) || 'No Track Selected'}
                     </h1>
@@ -105,7 +105,7 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 {/* Volume */}
-                <div className="mt-8 flex items-center justify-center gap-4">
+                <div className="mt-10 mb-5 flex items-center justify-center gap-4">
                     {volume !== 0 ? volume > 0.5 ? <Volume2 /> : <Volume1 /> : <VolumeOff />}
                     <Slider
                         value={[volume]}

@@ -26,36 +26,54 @@ const MusicPlayer = () => {
     const expandedPlayerRef = useRef(null);
     const [isExpanded, setIsExpanded] = useState(false);
     useGSAP(() => {
-
         gsap.matchMedia("(min-width: 800px)", () => {
             gsap.from(playerRef.current, {
-                y: 200,
-                duration: 0.5,
-                ease: "power3.out",
-                opacity: 0
+                y: 100,
+                duration: 0.8,
+                ease: "power2.out",
+                opacity: 0,
+                clearProps: "all"
             });
-        })
-        if (isExpanded) {
-            gsap.from(expandedPlayerRef.current, {
-                y: 1000,
-                duration: 0.7,
-                ease: "power3.out",
-                opacity: 1
-            });
-        } else {
-            gsap.fromTo(expandedPlayerRef.current, {
-                y: 1000,
-                opacity: 0
-            }, {
-                y: 0,
-                opacity: 1,
-                duration: 1,
-                ease: "power3.out"
-            });
+        });
+        if (isExpanded && expandedPlayerRef.current) {
+            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+            tl.fromTo(expandedPlayerRef.current,
+                {
+                    y: window.innerHeight,
+                    opacity: 0,
+                    scale: 0.95
+                },
+                {
+                    y: 0,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.6,
+                    ease: "back.out(1.2)"
+                }
+            );
+
+            tl.fromTo(
+                expandedPlayerRef.current.querySelectorAll('.animate-item'),
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.4, stagger: 0.05 },
+                "-=0.3"
+            );
         }
     }, [isExpanded]);
-    const expandMusicPlayer = () => {
-        setIsExpanded(!isExpanded);
+    const expandMusicPlayer = (e) => {
+        if (isExpanded && expandedPlayerRef.current) {
+            gsap.to(expandedPlayerRef.current, {
+                y: window.innerHeight,
+                opacity: 1,
+                scale: 0.95,
+                duration: 0.5,
+                ease: "power3.in",
+                onComplete: () => setIsExpanded(false)
+            });
+        } else {
+            setIsExpanded(true);
+        }
     };
 
     const {
@@ -98,6 +116,8 @@ const MusicPlayer = () => {
         const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes}:${remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}`;
     }
+
+
     useEffect(() => {
         if (currentTrack?.id) {
             localStorage.setItem('musicId', currentTrack.id);
@@ -125,7 +145,6 @@ const MusicPlayer = () => {
                     };
                     setCurrentTrack(track);
 
-                    // Play the track after setting it
                     playTrack(track.download_url[4].link, track.id, false);
                 } else {
                     console.warn('No musicId found in localStorage');
@@ -139,6 +158,18 @@ const MusicPlayer = () => {
     }, []);
     useEffect(() => {
 
+        const handleKeyPress = (e) => {
+            if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                togglePlayPause();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [togglePlayPause]);
+
+    useEffect(() => {
         if (!isDragging && playing) {
             const animate = () => {
                 setPos(getPosition());
@@ -156,7 +187,7 @@ const MusicPlayer = () => {
     }, [getPosition, isDragging, playing]);
     return (
         <>
-            {isExpanded && (
+            <div className={`${isExpanded ? 'block' : 'hidden'}`}>
                 <ExpandedMusicPlayer
                     expandedPlayerRef={expandedPlayerRef}
                     isExpanded={isExpanded}
@@ -176,29 +207,46 @@ const MusicPlayer = () => {
                     formatTime={formatTime}
                     onClose={expandMusicPlayer}
                 />
-            )}
+            </div>
             <div
-                onClick={expandMusicPlayer}
-                onKeyDown={(e) => { if (e.key === 'Enter') expandMusicPlayer(); }}
                 ref={playerRef}
-                className='bg-black border-t-1 border-gray-700 text-white rounded-t-xl md:h-30 fixed bottom-0 w-full flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'
+                className='parentMusicClass bg-black border-t-1 border-gray-700 text-white rounded-t-xl md:h-30 fixed bottom-0 w-full flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'
             >
-                <div className='flex w-full md:w-[15%] justify-between items-center gap-4'>
+                {/* Info section - clickable to expand */}
+                <div
+                    className='parentMusicClass flex w-full md:w-[15%] justify-between items-center gap-4'
+                    onClick={expandMusicPlayer}
+                    onKeyDown={(e) => { if (e.key === 'Enter') expandMusicPlayer(); }}
+                >
                     <div className='flex items-center gap-2'>
                         <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
                             <img src={currentTrack?.images?.large} alt="" className='w-full h-full object-cover' />
                         </div>
                         <div className='flex flex-col'>
                             <h1 className='text-lg'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
-                            <Link to={`/artist/${currentTrack?.artists?.primary[0].id}`} className='flex items-center gap-1'>
+                            <Link
+                                to={`/artist/${currentTrack?.artists?.primary[0].id}`}
+                                className='flex items-center gap-1'
+                                onClick={(e) => e.stopPropagation()} // Prevent expandMusicPlayer when clicking on artist link
+                            >
                                 <h1 className='text-sm text-gray-400'>{trimString(currentTrack?.subtitle, 23) || 'Unknown Artist'}</h1>
                             </Link>
                         </div>
                     </div>
-                    <div onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }} onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }} className='p-2 md:hidden rounded-full bg-white' onClick={togglePlayPause}>
+                    <div
+                        onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
+                        onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }}
+                        className='p-2 md:hidden rounded-full bg-white'
+                        onClick={(e) => {
+                            e.stopPropagation(); // Prevent expandMusicPlayer
+                            togglePlayPause();
+                        }}
+                    >
                         {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={30} /> : <Play color='black' size={30} />}
                     </div>
                 </div>
+
+                {/* Controls and Slider - not clickable to expand */}
                 <div className='flex flex-col items-center gap-4 w-full md:w-auto'>
                     <Slider
                         value={[pos]}
@@ -210,19 +258,27 @@ const MusicPlayer = () => {
                         onValueCommit={handleSliderCommit}
                         className="w-9/10 top-0 md:w-96 h-1 rounded-lg bg-gray-600 md:relative absolute cursor-pointer"
                     />
+                    {/* Controls */}
                     <div className='cursor-pointer hover:opacity-80 mt-3 md:m-0'>
                         <div className='md:flex justify-center items-center gap-4 hidden'>
                             <Shuffle />
-                            <SkipBack onClick={() => playPreviousSong()} />
-                            <div onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }} onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }} className='p-2 rounded-full bg-white' onClick={togglePlayPause}>
+                            <SkipBack onClick={(e) => { playPreviousSong(); }} />
+                            <div
+                                onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
+                                onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }}
+                                className='p-2 rounded-full bg-white'
+                                onClick={(e) => { togglePlayPause(); }}
+                            >
                                 {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={35} /> : <Play color='black' size={35} />}
                             </div>
-                            <SkipForward onClick={() => playNextSong()} />
+                            <SkipForward onClick={(e) => { playNextSong(); }} />
                             <Repeat />
                         </div>
                     </div>
                 </div>
-                <div className=' items-center gap-3 md:flex hidden'>
+
+                {/* Volume controls - not clickable to expand */}
+                <div className='items-center gap-3 md:flex hidden'>
                     <h1 className='tracking-wider'>
                         {formatTime(pos)}/{formatTime(duration)}
                     </h1>
@@ -235,6 +291,13 @@ const MusicPlayer = () => {
                         className="w-24 h-1 rounded-lg bg-gray-600 cursor-pointer"
                     />
                 </div>
+
+                {/* Empty div to make the parent div clickable for expand */}
+                <div
+                    className="absolute inset-0 -z-10 cursor-pointer"
+                    onClick={expandMusicPlayer}
+                    onKeyDown={(e) => { if (e.key === 'Enter') expandMusicPlayer(); }}
+                />
             </div>
         </>
     );

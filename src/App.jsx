@@ -1,4 +1,3 @@
-import  {useEffect , useContext} from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Album from './components/Album'
 import MusicPlayer from './components/MusicPlayer'
@@ -6,8 +5,10 @@ import Navbar from './components/NavBar'
 import Sidebar from './components/Siderbar'
 import TrendingHome from './components/TrendingHome'
 import Artist from './components/Artist'
+import React, { useEffect } from 'react'
 
 const App = () => {
+
     return (
         <div className='flex flex-col min-h-screen bg-black text-white'>
             <Navbar />
