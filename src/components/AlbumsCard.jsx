@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { trimString } from '@/utils/utils'
-
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
 const AlbumsCard = ({ key, album }) => {
     console.log(key + " " + album)
     const navigate = useNavigate();
@@ -9,8 +10,21 @@ const AlbumsCard = ({ key, album }) => {
         navigate(`/album/${album.id}`);
     }
 
+    const albumRef = useRef(null);
+    gsap.registerPlugin(useGSAP);
+
+    useGSAP(() => {
+        gsap.from(albumRef.current, {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.out",
+            y: 20,
+        });
+    }, [])
+
+
     return (
-        <div className="w-full max-w-sm">
+        <div ref={albumRef} className="w-full max-w-sm">
             <div
                 onClick={openAlbum}
                 key={key}
