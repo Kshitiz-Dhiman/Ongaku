@@ -224,13 +224,26 @@ const MusicPlayer = () => {
                         </div>
                         <div className='flex flex-col'>
                             <h1 className='text-lg'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
-                            <Link
-                                to={`/artist/${currentTrack?.artists?.primary[0].id}`}
-                                className='flex items-center gap-1'
-                                onClick={(e) => e.stopPropagation()} // Prevent expandMusicPlayer when clicking on artist link
-                            >
-                                <h1 className='text-sm text-gray-400'>{trimString(currentTrack?.subtitle, 23) || 'Unknown Artist'}</h1>
-                            </Link>
+                            <div className='flex items-center gap-1 flex-wrap'>
+                                {currentTrack?.artists?.primary ? (
+                                    currentTrack.artists.primary.map((artist, index) => (
+                                        <React.Fragment key={artist.id}>
+                                            <Link
+                                                to={`/artist/${artist.id}`}
+                                                className='text-sm text-gray-400 underline hover:text-gray-300'
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                {trimString(artist.name, Math.floor(23 / currentTrack.artists.primary.length))}
+                                            </Link>
+                                            {index < currentTrack.artists.primary.length - 1 && (
+                                                <span className='text-sm text-gray-400'>, </span>
+                                            )}
+                                        </React.Fragment>
+                                    ))
+                                ) : (
+                                    <span className='text-sm text-gray-400'>Unknown Artist</span>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div

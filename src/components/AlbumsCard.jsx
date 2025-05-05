@@ -4,7 +4,6 @@ import { trimString } from '@/utils/utils'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 const AlbumsCard = ({ key, album }) => {
-    console.log(key + " " + album)
     const navigate = useNavigate();
     const openAlbum = () => {
         navigate(`/album/${album.id}`);

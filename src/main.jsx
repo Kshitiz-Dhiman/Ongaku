@@ -5,8 +5,8 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import AudioPlayerContext from './context/AudioPlayerContext';
+import { AuthUserInfoProvider } from './context/AuthUserInfoContext';
 
-// Register service worker with better error handling
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
@@ -16,7 +16,6 @@ if ('serviceWorker' in navigator) {
             .catch(error => {
                 console.error('Service Worker registration failed:', error);
 
-                // Fallback: Try alternative path if main registration fails
                 if (error.message.includes('404')) {
                     console.log('Attempting to register service worker from alternative path...');
                     return navigator.serviceWorker.register('./sw.js')
@@ -28,11 +27,13 @@ if ('serviceWorker' in navigator) {
 }
 
 createRoot(document.getElementById('root')).render(
-    <AudioPlayerContext>
-        <StrictMode>
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
-        </StrictMode>
-    </AudioPlayerContext>
+    <AuthUserInfoProvider>
+        <BrowserRouter>
+            <StrictMode>
+                <AudioPlayerContext>
+                    <App />
+                </AudioPlayerContext>
+            </StrictMode>
+        </BrowserRouter>
+    </AuthUserInfoProvider>
 )
