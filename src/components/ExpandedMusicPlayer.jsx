@@ -10,6 +10,7 @@ import { ListMusic } from 'lucide-react';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import axios from 'axios';
 import LyricsSkeleton from './LyricsSkeleton';
+import { useGlobalAudioPlayer } from 'react-use-audio-player';
 const ExpandedMusicPlayer = ({
     expandedPlayerRef,
     isExpanded,
@@ -29,7 +30,10 @@ const ExpandedMusicPlayer = ({
     formatTime,
     onClose
 }) => {
-
+    const {
+        looping,
+        loop
+    } = useGlobalAudioPlayer();
     const [isliked, setIsLiked] = useState(false);
     const [lyrics, setLyrics] = useState('');
     const [lyricsMenuOpen, setLyricsMenuOpen] = useState(false);
@@ -79,6 +83,20 @@ const ExpandedMusicPlayer = ({
             fetchLryics();
         }
     }
+
+    const [loopOnOrOff, setLoopOnOrOff] = useState(false);
+
+
+    const startLoop = () => {
+        if (looping) {
+            loop(false);
+            setLoopOnOrOff(false);
+        } else {
+            loop(true);
+            setLoopOnOrOff(true);
+        }
+    }
+
     return (
         <div ref={expandedPlayerRef}
             className="fixed z-[1000] md:hidden inset-0 bg-black text-white">
@@ -201,7 +219,7 @@ const ExpandedMusicPlayer = ({
                         className="w-8 h-8 hover:text-gray-300 cursor-pointer"
                         onClick={playNextSong}
                     />
-                    <Repeat className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+                    <Repeat onClick={() => startLoop()} className={!loopOnOrOff ? "w-6 h-6 text-gray-400 hover:text-white cursor-pointer" : "w-7 h-7 text-white cursor-pointer"} />
                 </div>
 
                 {/* Volume */}
