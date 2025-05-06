@@ -31,7 +31,7 @@ const ExpandedMusicPlayer = ({
 }) => {
 
     const [isliked, setIsLiked] = useState(false);
-    const [lyrics, setLyrics] = useState('Lyrics not available');
+    const [lyrics, setLyrics] = useState('');
     const [lyricsMenuOpen, setLyricsMenuOpen] = useState(false);
     const [lyricsLoading, setLyricsLoading] = useState(false);
     const toggleLiked = () => {
@@ -57,7 +57,7 @@ const ExpandedMusicPlayer = ({
 
         } catch (error) {
             console.log(error);
-            setLyrics('Lyrics not available');
+            setLyrics('Lyrics are not available at this moment');
         } finally {
             setLyricsLoading(false);
         }
@@ -67,7 +67,7 @@ const ExpandedMusicPlayer = ({
             setLyrics('Fetching lyrics...');
             fetchLryics();
         } else {
-            setLyrics('Lyrics not available');
+            setLyrics('Lyrics are not available at this moment');
         }
     }, [currentTrack]);
 
@@ -118,7 +118,7 @@ const ExpandedMusicPlayer = ({
                             </div>
                         ) : (lyricsLoading ? <LyricsSkeleton /> : (
                             <div>
-                                <p className='text-[22px] font-bold text-gray-400 text-center mb-2 h-[400px] overflow-scroll whitespace-pre-line'>
+                                <p className='text-[22px]  font-bold  text-gray-400 text-center mb-2 h-[400px] overflow-scroll whitespace-pre-line'>
                                     {lyrics}
                                 </p>
                             </div>
