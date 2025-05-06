@@ -100,7 +100,7 @@ const Artist = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-30'>
+        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-30 md:mt-0 mt-10'>
             <div className='max-w-7xl mx-auto md:mt-5'>
                 <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl'>
                     <div className="w-48 h-48 shadow-xl rounded-xl overflow-hidden">
@@ -125,7 +125,7 @@ const Artist = () => {
                     <button
                         type='button'
                         onClick={handleClose}
-                        className='absolute top-30 right-8 p-2 rounded-full hover:bg-gray-800'
+                        className='absolute md:top-30 top-36 right-8 p-2 rounded-full hover:bg-gray-800'
                     >
                         <XIcon className="w-6 h-6 text-white" />
                     </button>

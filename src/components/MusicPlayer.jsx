@@ -17,6 +17,9 @@ import { useGSAP } from '@gsap/react';
 import ExpandedMusicPlayer from './ExpandedMusicPlayer';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Heart } from 'lucide-react';
+import { toast } from 'sonner';
+
 gsap.registerPlugin(useGSAP);
 
 
@@ -49,7 +52,7 @@ const MusicPlayer = () => {
                     opacity: 1,
                     scale: 1,
                     duration: 0.6,
-                    ease: "back.out(1.2)"
+                    ease: "back.out(0)"
                 }
             );
 
@@ -103,6 +106,7 @@ const MusicPlayer = () => {
             seek(newPosition);
         }
     };
+    const [isliked, setIsLiked] = useState(false);
 
     const handleSliderCommit = () => {
         seek(pos);
@@ -146,6 +150,7 @@ const MusicPlayer = () => {
                     setCurrentTrack(track);
 
                     playTrack(track.download_url[4].link, track.id, false);
+                    // togglePlayPause();
                 } else {
                     console.warn('No musicId found in localStorage');
                 }
@@ -155,7 +160,9 @@ const MusicPlayer = () => {
         };
 
         fetchTrack();
-    }, []);
+    }, [
+
+    ]);
     useEffect(() => {
 
         const handleKeyPress = (e) => {
@@ -185,6 +192,16 @@ const MusicPlayer = () => {
             };
         }
     }, [getPosition, isDragging, playing]);
+
+    const toggleLiked = () => {
+        if (isliked) {
+            setIsLiked(false);
+            toast("Song removed from liked songs")
+        } else {
+            setIsLiked(true);
+            toast("Song added to liked songs")
+        }
+    };
     return (
         <>
             <div className={`${isExpanded ? 'block' : 'hidden'}`}>
@@ -218,12 +235,12 @@ const MusicPlayer = () => {
                     onClick={expandMusicPlayer}
                     onKeyDown={(e) => { if (e.key === 'Enter') expandMusicPlayer(); }}
                 >
-                    <div className='flex items-center gap-2'>
+                    <div className='flex items-center gap-2 text-xl'>
                         <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
                             <img src={currentTrack?.images?.large} alt="" className='w-full h-full object-cover' />
                         </div>
                         <div className='flex flex-col'>
-                            <h1 className='text-lg'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
+                            <h1 className='text-lg/5'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
                             <div className='flex items-center gap-1 flex-wrap'>
                                 {currentTrack?.artists?.primary ? (
                                     currentTrack.artists.primary.map((artist, index) => (
@@ -231,7 +248,7 @@ const MusicPlayer = () => {
                                             <Link
                                                 to={`/artist/${artist.id}`}
                                                 className='text-sm text-gray-400 underline hover:text-gray-300'
-                                                onClick={(e) => e.stopPropagation()}
+                                                onClick={(e) => { e.stopPropagation(); }}
                                             >
                                                 {trimString(artist.name, Math.floor(23 / currentTrack.artists.primary.length))}
                                             </Link>
@@ -245,6 +262,17 @@ const MusicPlayer = () => {
                                 )}
                             </div>
                         </div>
+                        {isliked ? (
+                            <Heart
+                                className="hidden md:block w-6 h-6 text-red-500 fill-red-500 hover:text-red-600 cursor-pointer"
+                                onClick={toggleLiked}
+                            />
+                        ) : (
+                            <Heart
+                                className="hidden md:block w-6 h-6 text-gray-400 hover:text-white cursor-pointer"
+                                onClick={toggleLiked}
+                            />
+                        )}
                     </div>
                     <div
                         onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
@@ -311,6 +339,49 @@ const MusicPlayer = () => {
                     onClick={expandMusicPlayer}
                     onKeyDown={(e) => { if (e.key === 'Enter') expandMusicPlayer(); }}
                 />
+            </div>
+            <div className='parentMusicClass flex w-full md:w-[15%] justify-between items-center gap-4'>
+                <div className='flex items-center gap-2'>
+                    <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
+                        <img src={currentTrack?.images?.large} alt="" className='w-full h-full object-cover' />
+                    </div>
+                    <div className='flex flex-col'>
+                        <h1 className='text-lg'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
+                        <div className='flex items-center gap-1 flex-wrap'>
+                            {currentTrack?.artists?.primary ? (
+                                currentTrack.artists.primary.map((artist, index) => (
+                                    <React.Fragment key={artist.id}>
+                                        <Link
+                                            to={`/artist/${artist.id}`}
+                                            className='text-sm text-gray-400 underline hover:text-gray-300'
+                                            onClick={(e) => { e.stopPropagation(); }}
+                                        >
+                                            {trimString(artist.name, Math.floor(23 / currentTrack.artists.primary.length))}
+                                        </Link>
+                                        {index < currentTrack.artists.primary.length - 1 && (
+                                            <span className='text-sm text-gray-400'>, </span>
+                                        )}
+                                    </React.Fragment>
+                                ))
+                            ) : (
+                                <span className='text-sm text-gray-400'>Unknown Artist</span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <div className='flex items-center gap-2'>
+                    <div
+                        onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
+                        onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }}
+                        className='p-2 md:hidden rounded-full bg-white'
+                        onClick={(e) => {
+                            e.stopPropagation(); // Prevent expandMusicPlayer
+                            togglePlayPause();
+                        }}
+                    >
+                        {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={30} /> : <Play color='black' size={30} />}
+                    </div>
+                </div>
             </div>
         </>
     );

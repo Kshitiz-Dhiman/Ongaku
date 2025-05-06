@@ -9,6 +9,7 @@ import SampleLogin from './pages/LoginBtn'
 import SampleDashBoard from './pages/SampleDashBoard'
 import ErrorPage from './pages/ErrorPage'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+
 const App = () => {
     const GoogleAuthWrapper = () => {
         return (
@@ -38,7 +39,6 @@ const App = () => {
                 <MusicPlayer />
             </div>
         </GoogleOAuthProvider>
-
     )
 }
 
