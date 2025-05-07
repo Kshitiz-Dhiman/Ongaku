@@ -200,6 +200,9 @@ const NavBar = () => {
                                 <DropdownMenuItem className="hover:bg-[#1a1a1a] cursor-pointer">
                                     Profile
                                 </DropdownMenuItem>
+                                <DropdownMenuItem className="hover:bg-[#1a1a1a] cursor-pointer">
+                                    History
+                                </DropdownMenuItem>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator className="bg-[#202020]" />
                             <DropdownMenuItem onClick={() => logoutAuthUser()} className="cursor-pointer text-red-500">

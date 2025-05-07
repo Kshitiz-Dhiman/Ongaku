@@ -10,7 +10,7 @@ import SampleDashBoard from './pages/SampleDashBoard'
 import ErrorPage from './pages/ErrorPage'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import Library from './pages/Library'
-
+import Profile from './pages/Profile'
 const App = () => {
     const GoogleAuthWrapper = () => {
         return (
@@ -35,6 +35,7 @@ const App = () => {
                             <Route path='/dashboard' element={<SampleDashBoard />} />
                             <Route path='*' element={<ErrorPage />} />
                             <Route path='/library' element={<Library />} />
+                            <Route path='/profile' element={<Profile />} />
                         </Routes>
                     </main>
                 </div>

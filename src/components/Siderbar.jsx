@@ -38,7 +38,7 @@ const Sidebar = ({ onClose }) => {
                         { icon: <Home size={20} />, title: 'Settings' },
                         { icon: <Home size={20} />, title: 'Logout' }
                     ]}
-                    handleNavClick={handleNavClick}
+                    handleNavClick={() => navigate('/profile')}
                 />
             </div>
 
@@ -56,7 +56,7 @@ const Sidebar = ({ onClose }) => {
                 <NavItem
                     icon={<User size={24} />}
                     label="Profile"
-                    onClick={handleNavClick}
+                    onClick={() => navigate('/profile')}
                 />
             </div>
         </>

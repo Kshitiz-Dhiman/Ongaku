@@ -181,7 +181,7 @@ const ExpandedMusicPlayer = ({
                             </div>
                         ) : (lyricsLoading ? <LyricsSkeleton /> : (
                             <div>
-                                <p className='text-[22px]  font-bold  text-gray-400 text-center mb-2 h-[400px] overflow-scroll whitespace-pre-line'>
+                                <p className='text-[22px]  font-bold  text-gray-400 text-center mb-2 h-[300px] overflow-scroll whitespace-pre-line'>
                                     {lyrics}
                                 </p>
                             </div>

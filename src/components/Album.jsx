@@ -4,7 +4,6 @@ import { AudioPlayerData } from '../context/AudioPlayerContext';
 import { Play, Clock3, XIcon } from 'lucide-react';
 import axios from 'axios';
 import { trimString } from '../utils/utils';
-import { LoadingSpinner } from './LoadingSpinner';
 import { Skeleton } from './ui/skeleton';
 const Album = () => {
     const [albumData, setAlbumData] = useState(null);
