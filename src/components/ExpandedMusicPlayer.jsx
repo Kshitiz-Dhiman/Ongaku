@@ -38,14 +38,55 @@ const ExpandedMusicPlayer = ({
     const [lyrics, setLyrics] = useState('');
     const [lyricsMenuOpen, setLyricsMenuOpen] = useState(false);
     const [lyricsLoading, setLyricsLoading] = useState(false);
-    const toggleLiked = () => {
-        if (isliked) {
-            setIsLiked(false);
-            toast("Song removed from liked songs")
-        } else {
-            setIsLiked(true);
-            toast("Song added to liked songs")
+
+    const checkIftheSongisLiked = async () => {
+        if (!currentTrack || !localStorage.getItem('token')) {
+            return;
         }
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/liked/song`, {
+                params: { songId: currentTrack.id },
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+
+            if (response.data.liked) {
+                setIsLiked(true);
+            } else {
+                setIsLiked(false);
+            }
+
+        } catch (error) {
+            console.error('Error checking liked status:', error);
+        }
+    }
+
+    useEffect(() => {
+        checkIftheSongisLiked();
+    }, [currentTrack]);
+    const toggleLiked = () => {
+        if (!currentTrack || !localStorage.getItem('token')) {
+            toast("Please login to like songs");
+            return;
+        }
+
+        axios.post(`${import.meta.env.VITE_MUSIC_API}/liked/song`,
+            { songId: currentTrack.id },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        )
+            .then(response => {
+                setIsLiked(response.data.liked);
+                toast(response.data.message);
+            })
+            .catch(error => {
+                console.error('Error toggling like status:', error);
+                toast("Error updating liked status");
+            });
     };
     const fetchLryics = async () => {
         setLyricsLoading(true);
