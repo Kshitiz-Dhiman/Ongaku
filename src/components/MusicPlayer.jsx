@@ -228,7 +228,12 @@ const MusicPlayer = () => {
         }
 
         axios.post(`${import.meta.env.VITE_MUSIC_API}/liked/song`,
-            { songId: currentTrack.id },
+            {
+                songId: currentTrack.id,
+                title: currentTrack.title,
+                artist: currentTrack.subtitle || currentTrack.artists?.primary?.[0]?.name,
+                image: currentTrack.images?.medium
+            },
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
