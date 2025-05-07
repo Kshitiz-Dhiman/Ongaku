@@ -44,8 +44,7 @@ const ExpandedMusicPlayer = ({
             return;
         }
         try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/liked/song`, {
-                params: { songId: currentTrack.id },
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/liked/song?id=${currentTrack.id}`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
