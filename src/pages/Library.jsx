@@ -27,7 +27,7 @@ const Library = () => {
                 setlikedSongs("No Liked Songs");
             }
             setlikedSongs(response.data.likedSongs.reverse());
-            // setLoading(false);
+            setLoading(false);
         } catch (e) {
             console.log(e);
         }
