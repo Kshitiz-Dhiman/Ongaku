@@ -193,14 +193,56 @@ const MusicPlayer = () => {
         }
     }, [getPosition, isDragging, playing]);
 
-    const toggleLiked = () => {
-        if (isliked) {
-            setIsLiked(false);
-            toast("Song removed from liked songs")
-        } else {
-            setIsLiked(true);
-            toast("Song added to liked songs")
+    const checkIftheSongisLiked = async () => {
+        if (!currentTrack || !localStorage.getItem('token')) {
+            return;
         }
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/liked/song?id=${currentTrack.id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+
+            if (response.data.liked) {
+                setIsLiked(true);
+            } else {
+                setIsLiked(false);
+            }
+
+        } catch (error) {
+            console.error('Error checking liked status:', error);
+        }
+    }
+
+    useEffect(() => {
+        checkIftheSongisLiked();
+    }, [currentTrack]);
+
+    const toggleLiked = (e) => {
+        e.stopPropagation(); // Prevent expandMusicPlayer from being triggered
+
+        if (!currentTrack || !localStorage.getItem('token')) {
+            toast("Please login to like songs");
+            return;
+        }
+
+        axios.post(`${import.meta.env.VITE_MUSIC_API}/liked/song`,
+            { songId: currentTrack.id },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        )
+            .then(response => {
+                setIsLiked(response.data.liked);
+                toast(response.data.message);
+            })
+            .catch(error => {
+                console.error('Error toggling like status:', error);
+                toast("Error updating liked status");
+            });
     };
     return (
         <>
@@ -227,7 +269,7 @@ const MusicPlayer = () => {
             </div>
             <div
                 ref={playerRef}
-                className='parentMusicClass bg-black border-t-1 border-gray-700 text-white rounded-t-xl md:h-30 fixed bottom-0 w-full flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'
+                className='parentMusicClass bg-black border-t-1 border-gray-700 text-white rounded-t-xl md:h-30 fixed md:bottom-0 bottom-15 w-full flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'
             >
                 {/* Info section - clickable to expand */}
                 <div

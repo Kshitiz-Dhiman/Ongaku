@@ -78,7 +78,7 @@ const Album = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-30'>
+        <div className='w-full min-h-screen bg-black px-4 py-20 md:mt-0 mt-10 md:py-30'>
             <div className='max-w-7xl mx-auto md:mt-5'>
                 {albumData && (
                     <div className='flex flex-col gap-8'>
@@ -98,7 +98,7 @@ const Album = () => {
                             <button
                                 type='button'
                                 onClick={handleClose}
-                                className='absolute top-30 right-8 p-2 rounded-full hover:bg-gray-800'
+                                className='absolute top-36 md:top-30 right-8 p-2 rounded-full hover:bg-gray-800'
                             >
                                 <XIcon className="w-6 h-6 text-white" />
                             </button>

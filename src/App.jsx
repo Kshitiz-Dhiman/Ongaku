@@ -9,6 +9,7 @@ import SampleLogin from './pages/LoginBtn'
 import SampleDashBoard from './pages/SampleDashBoard'
 import ErrorPage from './pages/ErrorPage'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import Library from './pages/Library'
 
 const App = () => {
     const GoogleAuthWrapper = () => {
@@ -33,6 +34,7 @@ const App = () => {
                             <Route path='/login' element={<GoogleAuthWrapper />} />
                             <Route path='/dashboard' element={<SampleDashBoard />} />
                             <Route path='*' element={<ErrorPage />} />
+                            <Route path='/library' element={<Library />} />
                         </Routes>
                     </main>
                 </div>
