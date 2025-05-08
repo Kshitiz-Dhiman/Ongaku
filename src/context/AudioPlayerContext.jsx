@@ -21,35 +21,43 @@ const AudioPlayerContext = ({ children }) => {
         volume,
         setVolume,
         seek,
-    } = useGlobalAudioPlayer(); const queueRef = useRef([]);
-    const [playHistory, setPlayHistory] = useState([]);
-    const playHistoryRef = useRef([]);
+        looping,
+        loop
+    } = useGlobalAudioPlayer();
+    const queueRef = useRef([]);
+    const [currentSongsList, setCurrentSongsList] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     const getRecommendations = async (songID) => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song/recommend?id=${songID}`);
             const songData = response.data;
-            setQueue(prevQueue => [...prevQueue, ...songData.data]);
-            queueRef.current = [...queueRef.current, ...songData.data];
+            setCurrentSongsList(songData.data);
+            setQueue(songData.data);
+            queueRef.current = songData.data;
         } catch (error) {
             console.error('Error fetching recommendations:', error);
         }
     };
 
-    const playTrack = async (song, songId, addToQueue = true) => {
+    const playTrack = async (song, songId, addToQueue = true, songsList = null) => {
         try {
             localStorage.setItem('musicId', songId);
-            if (addToQueue) {
-                queueRef.current = [];
-                setQueue([]);
-                playHistoryRef.current = [];
-                setPlayHistory([]);
-                await getRecommendations(songId);
-            }
 
-            if (currentTrack.id) {
-                playHistoryRef.current = [...playHistoryRef.current, currentTrack];
-                setPlayHistory(playHistoryRef.current);
+            // Set the current songs list
+            if (songsList) {
+                setCurrentSongsList(songsList);
+                const index = songsList.findIndex(song => song.id === songId);
+                setCurrentIndex(index);
+
+                // Set the queue to be the remaining songs
+                const remainingSongs = songsList.slice(index + 1);
+                queueRef.current = remainingSongs;
+                setQueue(remainingSongs);
+            } else if (addToQueue) {
+                // If no songsList provided, get recommendations
+                await getRecommendations(songId);
+                setCurrentIndex(0); // First song in recommendations
             }
 
             load(song, {
@@ -57,7 +65,7 @@ const AudioPlayerContext = ({ children }) => {
                 initialVolume: volume,
                 crossOrigin: 'anonymous',
                 format: 'mp3',
-                onend: playNextSong,
+                onend: looping ? null : playNextSong, // Don't play next song if loop is enabled
                 onplay: () => setIsPlaying(true)
             });
         } catch (error) {
@@ -66,61 +74,31 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playNextSong = async () => {
-        console.log('Playing next song...');
+        // Don't play next song if loop is enabled
+        if (looping) return;
+
         try {
-            if (queueRef.current.length > 0) {
-                const nextSong = queueRef.current[0];
-                queueRef.current = queueRef.current.slice(1);
-                setQueue(queueRef.current);
+            if (currentSongsList.length > 0) {
+                const nextIndex = currentIndex + 1;
 
-                if (queueRef.current.length < 5) {
-                    getRecommendations(nextSong.id);
-                }
+                if (nextIndex < currentSongsList.length) {
+                    // Play the next song in the list
+                    const nextSong = currentSongsList[nextIndex];
+                    setCurrentIndex(nextIndex);
 
-                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.id}`);
-                const songData = response.data;
-                setCurrentTrack({
-                    id: songData.data.id,
-                    title: songData.data.title,
-                    subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
-                    images: songData.data.images,
-                    download_url: songData.data.download,
-                    artists: songData.data.artists,
-                    album: songData.data.album,
-                    duration: songData.data.duration,
-                    releaseDate: songData.data.releaseDate,
-                    label: songData.data.label,
-                    copyright: songData.data.copyright
-                });
-                console.log(songData);
-                await playTrack(songData.data.download[4].link, nextSong.id, false);
-            }
-        } catch (error) {
-            console.error('Error playing next song:', error);
-        }
-    };
+                    // Update queue
+                    const remainingSongs = currentSongsList.slice(nextIndex + 1);
+                    queueRef.current = remainingSongs;
+                    setQueue(remainingSongs);
 
-    const playPreviousSong = async () => {
-        console.log('Playing previous song...');
-        try {
-            if (playHistoryRef.current.length > 0) {
-                const previousSong = playHistoryRef.current[playHistoryRef.current.length - 1];
-                playHistoryRef.current = playHistoryRef.current.slice(0, -1);
-                setPlayHistory(playHistoryRef.current);
-
-                if (currentTrack.id) {
-                    queueRef.current = [currentTrack, ...queueRef.current];
-                    setQueue(queueRef.current);
-                }
-
-                try {
-                    const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${previousSong.id}`);
+                    // Fetch and play the song
+                    const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.id}`);
                     const songData = response.data;
 
                     setCurrentTrack({
-                        id: previousSong.id,
-                        title: previousSong.title,
-                        subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || previousSong.subtitle,
+                        id: songData.data.id,
+                        title: songData.data.title,
+                        subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
                         images: songData.data.images,
                         download_url: songData.data.download,
                         artists: songData.data.artists,
@@ -136,27 +114,72 @@ const AudioPlayerContext = ({ children }) => {
                         initialVolume: volume,
                         crossOrigin: 'anonymous',
                         format: 'mp3',
-                        onend: playNextSong,
+                        onend: looping ? null : playNextSong, // Don't play next song if loop is enabled
                         onplay: () => setIsPlaying(true)
                     });
-                } catch (error) {
-                    console.error('Error fetching song details:', error);
+                } else if (queueRef.current.length < 5) {
+                    // If we're at the end of the list, get more recommendations
+                    const lastSongId = currentSongsList[currentSongsList.length - 1].id;
+                    await getRecommendations(lastSongId);
+                    setCurrentIndex(0);
+                    playNextSong(); // Try again with new recommendations
                 }
+            }
+        } catch (error) {
+            console.error('Error playing next song:', error);
+        }
+    };
+
+    const playPreviousSong = async () => {
+        // Don't play previous song if loop is enabled
+        if (looping) return;
+
+        try {
+            if (currentSongsList.length > 0 && currentIndex > 0) {
+                const prevIndex = currentIndex - 1;
+                const prevSong = currentSongsList[prevIndex];
+                setCurrentIndex(prevIndex);
+
+                // Update queue to include current song and remaining songs
+                const remainingSongs = currentSongsList.slice(prevIndex + 1);
+                queueRef.current = remainingSongs;
+                setQueue(remainingSongs);
+
+                // Fetch and play the previous song
+                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${prevSong.id}`);
+                const songData = response.data;
+
+                setCurrentTrack({
+                    id: prevSong.id,
+                    title: prevSong.title,
+                    subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || prevSong.subtitle,
+                    images: songData.data.images,
+                    download_url: songData.data.download,
+                    artists: songData.data.artists,
+                    album: songData.data.album,
+                    duration: songData.data.duration,
+                    releaseDate: songData.data.releaseDate,
+                    label: songData.data.label,
+                    copyright: songData.data.copyright
+                });
+
+                load(songData.data.download[4].link, {
+                    autoplay: true,
+                    initialVolume: volume,
+                    crossOrigin: 'anonymous',
+                    format: 'mp3',
+                    onend: playNextSong,
+                    onplay: () => setIsPlaying(true)
+                });
             }
         } catch (error) {
             console.error('Error playing previous song:', error);
         }
     };
 
-
-
     useEffect(() => {
         queueRef.current = queue;
     }, [queue]);
-
-    useEffect(() => {
-        playHistoryRef.current = playHistory;
-    }, [playHistory]);
 
     const contextValue = {
         currentTrack,
@@ -172,16 +195,16 @@ const AudioPlayerContext = ({ children }) => {
         progressRef,
         queue,
         setQueue,
-        playHistory,
+        currentSongsList,
+        currentIndex,
         playTrack,
         playNextSong,
         playPreviousSong,
-        getRecommendations
+        getRecommendations,
+        looping,
+        loop
     };
-    // Media Session api for controlling music player from lock screen
-    // Add this to your AudioPlayerContext.jsx
 
-    // Inside the useEffect where you set up the MediaSession API:
 
     useEffect(() => {
         if ('mediaSession' in navigator) {

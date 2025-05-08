@@ -48,9 +48,9 @@ const Artist = () => {
 
     const handlePlaySong = async (song) => {
         try {
+            console.log(artistData)
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.id}`);
             const songData = response.data.data;
-
             const trackInfo = {
                 id: songData.id,
                 title: songData.title,
@@ -66,7 +66,7 @@ const Artist = () => {
             };
 
             setCurrentTrack(trackInfo);
-            await playTrack(songData.download[4].link, songData.id);
+            await playTrack(songData.download[4].link, songData.id, true, artistData.topSongs);
         } catch (error) {
             console.error('Error playing song:', error);
         }
@@ -374,6 +374,7 @@ const Songs = ({ artistId }) => {
 
     const handlePlaySong = async (song) => {
         try {
+            console.log(songs);
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.id}`);
             const songData = response.data.data;
 
@@ -392,7 +393,7 @@ const Songs = ({ artistId }) => {
             };
 
             setCurrentTrack(trackInfo);
-            await playTrack(songData.download[4].link, songData.id);
+            await playTrack(songData.download[4].link, songData.id, true, songs);
         } catch (error) {
             console.error('Error playing song:', error);
         }

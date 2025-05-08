@@ -96,7 +96,6 @@ const ExpandedMusicPlayer = ({
         setLyricsLoading(true);
         try {
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song/lyrics?title=${currentTrack?.title}&artist=${currentTrack?.artists?.primary?.[0]?.name}`);
-            console.log(response.status);
             if (response.status === 5002) {
                 setLyrics('Lyrics not available');
                 return;
@@ -105,7 +104,6 @@ const ExpandedMusicPlayer = ({
             setLyrics(response.data.lyrics);
 
         } catch (error) {
-            console.log(error);
             setLyrics('Lyrics are not available at this moment');
         } finally {
             setLyricsLoading(false);

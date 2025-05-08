@@ -57,7 +57,15 @@ const Library = () => {
             };
 
             setCurrentTrack(trackInfo);
-            await playTrack(songData.download[4].link, songData.id);
+
+            const formattedSongs = likedSongs.map(likedSong => ({
+                id: likedSong.songId,
+                title: likedSong.title,
+                subtitle: likedSong.artist,
+                image: { small: likedSong.image }
+            }));
+
+            await playTrack(songData.download[4].link, songData.id, true, formattedSongs);
         } catch (error) {
             console.error('Error playing song:', error);
         }
@@ -82,7 +90,7 @@ const Library = () => {
 
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20'>
+        <div className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20 mb-10'>
             <h1 className='text-2xl sm:text-2xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left'>Liked Songs</h1>
             <div className='flex flex-col w-full'>
 

@@ -59,7 +59,7 @@ const Album = () => {
             };
 
             setCurrentTrack(trackInfo);
-            await playTrack(songData.download[4].link, songData.id);
+            await playTrack(songData.download[4].link, songData.id, true, albumData.songs);
         } catch (error) {
             console.error('Error playing song:', error);
         }
@@ -77,7 +77,7 @@ const Album = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 md:mt-0 mt-10 md:py-30'>
+        <div className='w-full min-h-screen bg-black px-4 py-20 md:mt-0 mt-10 md:py-30 mb-10'>
             <div className='max-w-7xl mx-auto md:mt-5'>
                 {albumData && (
                     <div className='flex flex-col gap-8'>
