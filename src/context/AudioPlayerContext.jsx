@@ -26,7 +26,14 @@ const AudioPlayerContext = ({ children }) => {
     } = useGlobalAudioPlayer();
     const queueRef = useRef([]);
     const [currentSongsList, setCurrentSongsList] = useState([]);
+    // Replace state with ref for current index
     const [currentIndex, setCurrentIndex] = useState(0);
+    const currentIndexRef = useRef(0);
+
+    // Update the ref whenever the state changes
+    useEffect(() => {
+        currentIndexRef.current = currentIndex;
+    }, [currentIndex]);
 
     const getRecommendations = async (songID) => {
         try {
@@ -40,24 +47,29 @@ const AudioPlayerContext = ({ children }) => {
         }
     };
 
+    const handleSongEnd = () => {
+        if (!looping) {
+            playNextSong();
+        }
+    };
+
     const playTrack = async (song, songId, addToQueue = true, songsList = null) => {
         try {
             localStorage.setItem('musicId', songId);
 
-            // Set the current songs list
             if (songsList) {
                 setCurrentSongsList(songsList);
                 const index = songsList.findIndex(song => song.id === songId);
                 setCurrentIndex(index);
+                currentIndexRef.current = index;
 
-                // Set the queue to be the remaining songs
                 const remainingSongs = songsList.slice(index + 1);
                 queueRef.current = remainingSongs;
                 setQueue(remainingSongs);
             } else if (addToQueue) {
-                // If no songsList provided, get recommendations
                 await getRecommendations(songId);
-                setCurrentIndex(0); // First song in recommendations
+                setCurrentIndex(0);
+                currentIndexRef.current = 0;
             }
 
             load(song, {
@@ -65,7 +77,7 @@ const AudioPlayerContext = ({ children }) => {
                 initialVolume: volume,
                 crossOrigin: 'anonymous',
                 format: 'mp3',
-                onend: looping ? null : playNextSong, // Don't play next song if loop is enabled
+                onend: looping ? null : handleSongEnd,
                 onplay: () => setIsPlaying(true)
             });
         } catch (error) {
@@ -74,17 +86,15 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playNextSong = async () => {
-        // Don't play next song if loop is enabled
         if (looping) return;
-
         try {
             if (currentSongsList.length > 0) {
-                const nextIndex = currentIndex + 1;
+                const nextIndex = currentIndexRef.current + 1;
 
                 if (nextIndex < currentSongsList.length) {
-                    // Play the next song in the list
                     const nextSong = currentSongsList[nextIndex];
                     setCurrentIndex(nextIndex);
+                    currentIndexRef.current = nextIndex; // Update ref directly
 
                     // Update queue
                     const remainingSongs = currentSongsList.slice(nextIndex + 1);
@@ -114,7 +124,7 @@ const AudioPlayerContext = ({ children }) => {
                         initialVolume: volume,
                         crossOrigin: 'anonymous',
                         format: 'mp3',
-                        onend: looping ? null : playNextSong, // Don't play next song if loop is enabled
+                        onend: looping ? null : handleSongEnd, // Use the handler function
                         onplay: () => setIsPlaying(true)
                     });
                 } else if (queueRef.current.length < 5) {
@@ -122,6 +132,7 @@ const AudioPlayerContext = ({ children }) => {
                     const lastSongId = currentSongsList[currentSongsList.length - 1].id;
                     await getRecommendations(lastSongId);
                     setCurrentIndex(0);
+                    currentIndexRef.current = 0; // Update ref directly
                     playNextSong(); // Try again with new recommendations
                 }
             }
@@ -135,10 +146,12 @@ const AudioPlayerContext = ({ children }) => {
         if (looping) return;
 
         try {
-            if (currentSongsList.length > 0 && currentIndex > 0) {
-                const prevIndex = currentIndex - 1;
+            // Use the ref value for current calculations
+            if (currentSongsList.length > 0 && currentIndexRef.current > 0) {
+                const prevIndex = currentIndexRef.current - 1;
                 const prevSong = currentSongsList[prevIndex];
                 setCurrentIndex(prevIndex);
+                currentIndexRef.current = prevIndex; // Update ref directly
 
                 // Update queue to include current song and remaining songs
                 const remainingSongs = currentSongsList.slice(prevIndex + 1);
@@ -168,7 +181,7 @@ const AudioPlayerContext = ({ children }) => {
                     initialVolume: volume,
                     crossOrigin: 'anonymous',
                     format: 'mp3',
-                    onend: playNextSong,
+                    onend: handleSongEnd, // Use the handler function
                     onplay: () => setIsPlaying(true)
                 });
             }
