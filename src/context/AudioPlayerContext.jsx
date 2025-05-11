@@ -25,21 +25,20 @@ const AudioPlayerContext = ({ children }) => {
         loop
     } = useGlobalAudioPlayer();
     const queueRef = useRef([]);
-    const [currentSongsList, setCurrentSongsList] = useState([]);
-    // Replace state with ref for current index
-    const [currentIndex, setCurrentIndex] = useState(0);
+
+    // Replace useState with useRef for currentSongsList and currentIndex
+    const currentSongsListRef = useRef([]);
     const currentIndexRef = useRef(0);
 
-    // Update the ref whenever the state changes
-    useEffect(() => {
-        currentIndexRef.current = currentIndex;
-    }, [currentIndex]);
+    // Helper functions to get current values (for components that need them)
+    const getCurrentSongsList = () => currentSongsListRef.current;
+    const getCurrentIndex = () => currentIndexRef.current;
 
     const getRecommendations = async (songID) => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song/recommend?id=${songID}`);
             const songData = response.data;
-            setCurrentSongsList(songData.data);
+            currentSongsListRef.current = songData.data;
             setQueue(songData.data);
             queueRef.current = songData.data;
         } catch (error) {
@@ -47,20 +46,102 @@ const AudioPlayerContext = ({ children }) => {
         }
     };
 
-    const handleSongEnd = () => {
-        if (!looping) {
-            playNextSong();
+    // Modify the handleSongEnd function to be more robust
+    const handleSongEnd = async () => {
+        if (looping) return;
+
+        try {
+            const nextIndex = currentIndexRef.current + 1;
+
+            // Get the current songs list from ref
+            const songsList = currentSongsListRef.current;
+
+            if (songsList && songsList.length > 0 && nextIndex < songsList.length) {
+                const nextSong = songsList[nextIndex];
+
+                // Update index ref
+                currentIndexRef.current = nextIndex;
+
+                // Update queue
+                const remainingSongs = songsList.slice(nextIndex + 1);
+                queueRef.current = remainingSongs;
+                setQueue(remainingSongs);
+
+                // Fetch and play the song
+                const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.id}`);
+                const songData = response.data;
+
+                setCurrentTrack({
+                    id: songData.data.id,
+                    title: songData.data.title,
+                    subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
+                    images: songData.data.images,
+                    download_url: songData.data.download,
+                    artists: songData.data.artists,
+                    album: songData.data.album,
+                    duration: songData.data.duration,
+                    releaseDate: songData.data.releaseDate,
+                    label: songData.data.label,
+                    copyright: songData.data.copyright
+                });
+
+                // Load the next song with the same callback
+                load(songData.data.download[4].link, {
+                    autoplay: true,
+                    initialVolume: volume,
+                    crossOrigin: 'anonymous',
+                    format: 'mp3',
+                    onend: handleSongEnd,
+                    onplay: () => setIsPlaying(true)
+                });
+            } else if (songsList && songsList.length > 0) {
+                const lastSongId = songsList[songsList.length - 1].id;
+                await getRecommendations(lastSongId);
+                currentIndexRef.current = 0;
+
+                // Try to play the first recommendation
+                if (currentSongsListRef.current && currentSongsListRef.current.length > 0) {
+                    const nextSong = currentSongsListRef.current[0];
+                    const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.id}`);
+                    const songData = response.data;
+
+                    setCurrentTrack({
+                        id: songData.data.id,
+                        title: songData.data.title,
+                        subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
+                        images: songData.data.images,
+                        download_url: songData.data.download,
+                        artists: songData.data.artists,
+                        album: songData.data.album,
+                        duration: songData.data.duration,
+                        releaseDate: songData.data.releaseDate,
+                        label: songData.data.label,
+                        copyright: songData.data.copyright
+                    });
+
+                    load(songData.data.download[4].link, {
+                        autoplay: true,
+                        initialVolume: volume,
+                        crossOrigin: 'anonymous',
+                        format: 'mp3',
+                        onend: handleSongEnd,
+                        onplay: () => setIsPlaying(true)
+                    });
+                }
+            } else {
+                console.log("No songs list available or empty list.");
+            }
+        } catch (error) {
+            console.error('Error in handleSongEnd:', error);
         }
     };
 
     const playTrack = async (song, songId, addToQueue = true, songsList = null) => {
         try {
             localStorage.setItem('musicId', songId);
-
             if (songsList) {
-                setCurrentSongsList(songsList);
+                currentSongsListRef.current = songsList;
                 const index = songsList.findIndex(song => song.id === songId);
-                setCurrentIndex(index);
                 currentIndexRef.current = index;
 
                 const remainingSongs = songsList.slice(index + 1);
@@ -68,7 +149,6 @@ const AudioPlayerContext = ({ children }) => {
                 setQueue(remainingSongs);
             } else if (addToQueue) {
                 await getRecommendations(songId);
-                setCurrentIndex(0);
                 currentIndexRef.current = 0;
             }
 
@@ -88,16 +168,16 @@ const AudioPlayerContext = ({ children }) => {
     const playNextSong = async () => {
         if (looping) return;
         try {
-            if (currentSongsList.length > 0) {
+            const songsList = currentSongsListRef.current;
+            if (songsList.length > 0) {
                 const nextIndex = currentIndexRef.current + 1;
 
-                if (nextIndex < currentSongsList.length) {
-                    const nextSong = currentSongsList[nextIndex];
-                    setCurrentIndex(nextIndex);
+                if (nextIndex < songsList.length) {
+                    const nextSong = songsList[nextIndex];
                     currentIndexRef.current = nextIndex; // Update ref directly
 
                     // Update queue
-                    const remainingSongs = currentSongsList.slice(nextIndex + 1);
+                    const remainingSongs = songsList.slice(nextIndex + 1);
                     queueRef.current = remainingSongs;
                     setQueue(remainingSongs);
 
@@ -129,9 +209,8 @@ const AudioPlayerContext = ({ children }) => {
                     });
                 } else if (queueRef.current.length < 5) {
                     // If we're at the end of the list, get more recommendations
-                    const lastSongId = currentSongsList[currentSongsList.length - 1].id;
+                    const lastSongId = songsList[songsList.length - 1].id;
                     await getRecommendations(lastSongId);
-                    setCurrentIndex(0);
                     currentIndexRef.current = 0; // Update ref directly
                     playNextSong(); // Try again with new recommendations
                 }
@@ -146,15 +225,15 @@ const AudioPlayerContext = ({ children }) => {
         if (looping) return;
 
         try {
+            const songsList = currentSongsListRef.current;
             // Use the ref value for current calculations
-            if (currentSongsList.length > 0 && currentIndexRef.current > 0) {
+            if (songsList.length > 0 && currentIndexRef.current > 0) {
                 const prevIndex = currentIndexRef.current - 1;
-                const prevSong = currentSongsList[prevIndex];
-                setCurrentIndex(prevIndex);
+                const prevSong = songsList[prevIndex];
                 currentIndexRef.current = prevIndex; // Update ref directly
 
                 // Update queue to include current song and remaining songs
-                const remainingSongs = currentSongsList.slice(prevIndex + 1);
+                const remainingSongs = songsList.slice(prevIndex + 1);
                 queueRef.current = remainingSongs;
                 setQueue(remainingSongs);
 
@@ -208,8 +287,8 @@ const AudioPlayerContext = ({ children }) => {
         progressRef,
         queue,
         setQueue,
-        currentSongsList,
-        currentIndex,
+        currentSongsList: getCurrentSongsList(), // Expose getter function result
+        currentIndex: getCurrentIndex(), // Expose getter function result
         playTrack,
         playNextSong,
         playPreviousSong,
@@ -358,6 +437,7 @@ const AudioPlayerContext = ({ children }) => {
             };
         }
     }, [currentTrack, playing, togglePlayPause, duration, getPosition, playNextSong, playPreviousSong, seek]);
+
     return (
         <AudioPlayerData.Provider value={contextValue}>
             <audio ref={audioRef} type="audio/mpeg">

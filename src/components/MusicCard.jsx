@@ -28,8 +28,23 @@ function MusicCard({ key, song }) {
         try {
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.id}`);
             const songData = response.data.data;
-            setCurrentTrack(songData);
-            await playTrack(songData.download[4].link, songData.id);
+
+            const trackInfo = {
+                id: songData.id,
+                title: songData.title,
+                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
+                images: songData.images,
+                download_url: songData.download,
+                artists: songData.artists,
+                album: songData.album,
+                duration: songData.duration,
+                releaseDate: songData.releaseDate,
+                label: songData.label,
+                copyright: songData.copyright
+            };
+
+            setCurrentTrack(trackInfo);
+            await playTrack(songData.download[4].link, songData.id, true);
         } catch (e) {
             console.log(e);
         }
