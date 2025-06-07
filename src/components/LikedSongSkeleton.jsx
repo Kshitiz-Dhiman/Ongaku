@@ -4,7 +4,7 @@ const LikedSongSkeleton = () => {
     return (
         <div className='flex flex-col gap-10 p-2'>
 
-            {Array.from({ length: 5 }).map((_, i) => {
+            {Array.from({ length: 10 }).map((_, i) => {
                 return (
                     <div className='flex w-full gap-4 items-center justify-center' key={i}>
                         <Skeleton className="w-12 h-12 bg-[#202020] " />

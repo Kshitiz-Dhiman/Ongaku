@@ -57,14 +57,14 @@ const Profile = () => {
             '>
                 Profile
             </h1>
-            <div className='w-full bg-[#101010] flex gap-3 items-center rounded-2xl'>
-                <img src={userInfo?.image} alt="" className='w-32 h-32 rounded-full p-3' />
+            <div className='w-full bg-[#101010] flex gap-3 items-center rounded-2xl md:px-2'>
+                <img src={userInfo?.image} alt="" className='w-30 h-30 rounded-full p-3' />
                 <div className='flex flex-col'>
                     <h1 className='
                         text-xl sm:text-xl  md:text-2xl lg:text-3xl font-bold md:mt-10 text-[#6e7273] text-left
                     '>{userInfo?.name}</h1>
                     <h2 className='
-                        text-md sm:text-md  md:text-xl lg:text-2xl font-bold md:mt-10 text-[#6e7273] text-left
+                        text-md   md:text-xl lg:text-2xl font-bold md:mb-10 text-[#6e7273] text-left
                     '>{userInfo?.email}</h2>
                 </div>
             </div>

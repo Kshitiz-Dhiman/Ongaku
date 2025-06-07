@@ -64,10 +64,10 @@ const PlaylistHome = () => {
                     <div className='flex flex-wrap items-center justify-center md:justify-end gap-4 md:gap-6'>
                         <div className='w-full sm:w-auto'>
                             <Select onValueChange={handleLanguageChange} defaultValue={language}>
-                                <SelectTrigger className="w-full sm:w-[180px] text-sm sm:text-base">
+                                <SelectTrigger className="w-full sm:w-[180px] text-sm sm:text-base border-0">
                                     <SelectValue placeholder="Select a language" />
                                 </SelectTrigger>
-                                <SelectContent className="max-h-[300px] overflow-y-auto bg-black">
+                                <SelectContent className="max-h-[300px] overflow-y-auto bg-[#101010] border-0">
                                     <SelectItem className="text-white" value="english">English</SelectItem>
                                     <SelectItem className="text-white" value="hindi">Hindi</SelectItem>
                                     <SelectItem className="text-white" value="punjabi">Punjabi</SelectItem>

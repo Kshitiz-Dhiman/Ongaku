@@ -4,7 +4,13 @@ import { toast } from 'react-toastify';
 import { EllipsisVertical } from 'lucide-react';
 import LikedSongSkeleton from '@/components/LikedSongSkeleton';
 import { AudioPlayerData } from '../context/AudioPlayerContext';
-
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 
 const Library = () => {
     const [loading, setLoading] = useState(false);
@@ -88,12 +94,28 @@ const Library = () => {
         )
     }
 
+    const songMenu = () => {
+
+    }
+    const handleRemoveFromLiked = async (songId) => {
+        try {
+            await axios.delete(`${import.meta.env.VITE_MUSIC_API}/liked/songs/${songId}`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            getLikedSongs(); // Refresh the list
+            toast.success("Song removed from liked songs");
+        } catch (error) {
+            console.error('Error removing song:', error);
+            toast.error("Failed to remove song");
+        }
+    };
 
     return (
         <div className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20 mb-10'>
             <h1 className='text-2xl sm:text-2xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left'>Liked Songs</h1>
             <div className='flex flex-col w-full'>
-
                 {loading ? (
                     <LikedSongSkeleton />
                 ) : likedSongs.map((song) => {
@@ -114,7 +136,28 @@ const Library = () => {
                                     <h2 className="text-gray-400 text-sm">{song.artist}</h2>
                                 </div>
                             </div>
-                            <h1 className="text-gray-400 text-sm"><EllipsisVertical /></h1>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <EllipsisVertical />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-48 bg-[#101010] border-[#202020] text-white">
+                                    <DropdownMenuItem>
+                                        Add to the Queue
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="bg-[#202020]" />
+
+                                    <DropdownMenuItem
+                                        className="hover:bg-[#1a1a1a] cursor-pointer text-red-500"
+                                    >
+                                        Remove from Liked
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     )
                 })}
