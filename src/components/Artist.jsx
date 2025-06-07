@@ -374,7 +374,6 @@ const Songs = ({ artistId }) => {
 
     const handlePlaySong = async (song) => {
         try {
-            console.log(songs);
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.id}`);
             const songData = response.data.data;
 

@@ -67,23 +67,23 @@ const PlaylistHome = () => {
                                 <SelectTrigger className="w-full sm:w-[180px] text-sm sm:text-base">
                                     <SelectValue placeholder="Select a language" />
                                 </SelectTrigger>
-                                <SelectContent className="max-h-[300px] overflow-y-auto">
-                                    <SelectItem value="english">English</SelectItem>
-                                    <SelectItem value="hindi">Hindi</SelectItem>
-                                    <SelectItem value="punjabi">Punjabi</SelectItem>
-                                    <SelectItem value="tamil">Tamil</SelectItem>
-                                    <SelectItem value="telugu">Telugu</SelectItem>
-                                    <SelectItem value="malayalam">Malayalam</SelectItem>
-                                    <SelectItem value="kannada">Kannada</SelectItem>
-                                    <SelectItem value="bengali">Bengali</SelectItem>
-                                    <SelectItem value="marathi">Marathi</SelectItem>
-                                    <SelectItem value="gujarati">Gujarati</SelectItem>
-                                    <SelectItem value="odia">Odia</SelectItem>
-                                    <SelectItem value="assamese">Assamese</SelectItem>
-                                    <SelectItem value="rajasthani">Rajasthani</SelectItem>
-                                    <SelectItem value="haryanvi">Haryanvi</SelectItem>
-                                    <SelectItem value="bhojpuri">Bhojpuri</SelectItem>
-                                    <SelectItem value="urdu">Urdu</SelectItem>
+                                <SelectContent className="max-h-[300px] overflow-y-auto bg-black">
+                                    <SelectItem className="text-white" value="english">English</SelectItem>
+                                    <SelectItem className="text-white" value="hindi">Hindi</SelectItem>
+                                    <SelectItem className="text-white" value="punjabi">Punjabi</SelectItem>
+                                    <SelectItem className="text-white" value="tamil">Tamil</SelectItem>
+                                    <SelectItem className="text-white" value="telugu">Telugu</SelectItem>
+                                    <SelectItem className="text-white" value="malayalam">Malayalam</SelectItem>
+                                    <SelectItem className="text-white" value="kannada">Kannada</SelectItem>
+                                    <SelectItem className="text-white" value="bengali">Bengali</SelectItem>
+                                    <SelectItem className="text-white" value="marathi">Marathi</SelectItem>
+                                    <SelectItem className="text-white" value="gujarati">Gujarati</SelectItem>
+                                    <SelectItem className="text-white" value="odia">Odia</SelectItem>
+                                    <SelectItem className="text-white" value="assamese">Assamese</SelectItem>
+                                    <SelectItem className="text-white" value="rajasthani">Rajasthani</SelectItem>
+                                    <SelectItem className="text-white" value="haryanvi">Haryanvi</SelectItem>
+                                    <SelectItem className="text-white" value="bhojpuri">Bhojpuri</SelectItem>
+                                    <SelectItem className="text-white" value="urdu">Urdu</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

@@ -287,8 +287,8 @@ const AudioPlayerContext = ({ children }) => {
         progressRef,
         queue,
         setQueue,
-        currentSongsList: getCurrentSongsList(), // Expose getter function result
-        currentIndex: getCurrentIndex(), // Expose getter function result
+        currentSongsList: getCurrentSongsList(),
+        currentIndex: getCurrentIndex(),
         playTrack,
         playNextSong,
         playPreviousSong,

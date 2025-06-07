@@ -11,6 +11,8 @@ import { ToastContainer, toast, Slide } from 'react-toastify';
 import axios from 'axios';
 import LyricsSkeleton from './LyricsSkeleton';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
+import MusicQueue from './MusicQueue';
+
 const ExpandedMusicPlayer = ({
     expandedPlayerRef,
     isExpanded,
@@ -64,6 +66,7 @@ const ExpandedMusicPlayer = ({
     useEffect(() => {
         checkIftheSongisLiked();
     }, [currentTrack]);
+
     const toggleLiked = () => {
         if (!currentTrack || !localStorage.getItem('token')) {
             toast("Please login to like songs");
@@ -92,6 +95,7 @@ const ExpandedMusicPlayer = ({
                 toast("Error updating liked status");
             });
     };
+
     const fetchLryics = async () => {
         setLyricsLoading(true);
         try {
@@ -109,6 +113,7 @@ const ExpandedMusicPlayer = ({
             setLyricsLoading(false);
         }
     }
+
     useEffect(() => {
         if (currentTrack) {
             setLyrics('Fetching lyrics...');
@@ -127,8 +132,16 @@ const ExpandedMusicPlayer = ({
         }
     }
 
-    const [loopOnOrOff, setLoopOnOrOff] = useState(false);
+    const [queueOpen, setQueueOpen] = useState(false);
+    const openQueue = () => {
+        if (queueOpen) {
+            setQueueOpen(false);
+        } else {
+            setQueueOpen(true);
+        }
+    }
 
+    const [loopOnOrOff, setLoopOnOrOff] = useState(false);
 
     const startLoop = () => {
         if (looping) {
@@ -142,7 +155,10 @@ const ExpandedMusicPlayer = ({
 
     return (
         <div ref={expandedPlayerRef}
-            className="fixed z-[1000] md:hidden inset-0 bg-black text-white">
+            className="fixed z-[1000] inset-0 bg-black text-white">
+
+            {queueOpen && <MusicQueue onClose={() => setQueueOpen(false)} />}
+
             <ToastContainer
                 position="top-left"
                 autoClose={500}
@@ -156,15 +172,16 @@ const ExpandedMusicPlayer = ({
                 theme="dark"
                 transition={Slide}
             />
+
             <button
                 type='button'
                 onClick={onClose}
-                className="absolute right-4 top-4 p-2 hover:bg-gray-800 rounded-full"
+                className="pt-5 pl-5 flex items-center w-full rounded-full"
             >
                 <ChevronDown size={24} />
             </button>
 
-            <div className="h-full flex flex-col px-4 pt-16 pb-8">
+            <div className="h-full flex flex-col px-4 pb-20">
                 {/* Album Art */}
                 <div className="flex-1 flex items-center justify-center p-2 leading-7">
 
@@ -188,7 +205,7 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 {/* Track Info */}
-                <div className="mt-1 text-center">
+                <div className="text-center">
                     <h1 className="text-2xl font-bold">
                         {trimString(currentTrack?.title, 30) || 'No Track Selected'}
                     </h1>
@@ -215,7 +232,7 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mt-8 px-4">
+                <div className="mt-4 px-4">
                     <div className="flex justify-between text-sm mb-2">
                         <span>{formatTime(pos)}</span>
                         <span>{formatTime(duration)}</span>
@@ -268,14 +285,15 @@ const ExpandedMusicPlayer = ({
                 {/* Volume */}
                 <div className="mt-10 mb-5 flex items-center justify-center gap-10">
                     <MicVocal onClick={() => openLyricsMenu()} className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
-                    <ListMusic className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+                    <ListMusic
+                        onClick={() => openQueue()}
+                        className={`w-6 h-6 cursor-pointer ${queueOpen ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+                    />
                     <Shuffle className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
                 </div>
             </div>
         </div>
     );
-
-
 };
 
 export default ExpandedMusicPlayer;
