@@ -39,7 +39,7 @@ const MusicPlayer = () => {
             });
         });
         if (isExpanded && expandedPlayerRef.current) {
-            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+            const tl = gsap.timeline();
 
             tl.fromTo(expandedPlayerRef.current,
                 {
@@ -52,7 +52,6 @@ const MusicPlayer = () => {
                     opacity: 1,
                     scale: 1,
                     duration: 0.6,
-                    ease: "back.out(0)"
                 }
             );
 
@@ -68,10 +67,10 @@ const MusicPlayer = () => {
         if (isExpanded && expandedPlayerRef.current) {
             gsap.to(expandedPlayerRef.current, {
                 y: window.innerHeight,
-                opacity: 1,
-                scale: 0.95,
-                duration: 0.3,
-                ease: "power3.in",
+                // opacity: 1,
+                // scale: 0.95,
+                // duration: 0.3,
+                // ease: "power3.in",
                 onComplete: () => setIsExpanded(false)
             });
         } else {

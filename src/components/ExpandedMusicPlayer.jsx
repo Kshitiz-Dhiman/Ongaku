@@ -36,10 +36,131 @@ const ExpandedMusicPlayer = ({
         looping,
         loop
     } = useGlobalAudioPlayer();
+
+    // Existing states
     const [isliked, setIsLiked] = useState(false);
     const [lyrics, setLyrics] = useState('');
     const [lyricsMenuOpen, setLyricsMenuOpen] = useState(false);
     const [lyricsLoading, setLyricsLoading] = useState(false);
+    const [queueOpen, setQueueOpen] = useState(false);
+    const [loopOnOrOff, setLoopOnOrOff] = useState(false);
+
+    // Swipe gesture states
+    const [isClosing, setIsClosing] = useState(false);
+    const [startY, setStartY] = useState(0);
+    const [currentY, setCurrentY] = useState(0);
+    const [isDraggingSwipe, setIsDraggingSwipe] = useState(false);
+    const [velocity, setVelocity] = useState(0);
+    const lastMoveTime = useRef(Date.now());
+    const lastY = useRef(0);
+
+    // Touch/Mouse event handlers for swipe gesture
+    const handleSwipeStart = (clientY) => {
+        setStartY(clientY);
+        setIsDraggingSwipe(true);
+        setVelocity(0);
+        lastMoveTime.current = Date.now();
+        lastY.current = clientY;
+    };
+
+    const handleSwipeMove = (clientY) => {
+        if (!isDraggingSwipe) return;
+
+        const now = Date.now();
+        const deltaY = clientY - startY;
+        const timeDelta = now - lastMoveTime.current;
+        const positionDelta = clientY - lastY.current;
+
+        // Only allow downward swipes
+        if (deltaY > 0) {
+            setCurrentY(deltaY);
+
+            // Calculate velocity for momentum
+            if (timeDelta > 0) {
+                setVelocity(positionDelta / timeDelta);
+            }
+        }
+
+        lastMoveTime.current = now;
+        lastY.current = clientY;
+    };
+
+    const handleSwipeEnd = () => {
+        if (!isDraggingSwipe) return;
+
+        // Determine if should close based on distance or velocity
+        const shouldClose = currentY > 150 || velocity > 0.5;
+
+        if (shouldClose) {
+            setIsClosing(true);
+            setTimeout(() => {
+                onClose();
+                // Reset states after closing
+                setTimeout(() => {
+                    setCurrentY(0);
+                    setIsClosing(false);
+                    setIsDraggingSwipe(false);
+                }, 100);
+            }, 300);
+        } else {
+            setCurrentY(0);
+        }
+
+        setIsDraggingSwipe(false);
+        setVelocity(0);
+    };
+
+    // Touch events
+    const handleTouchStart = (e) => {
+        // Prevent swipe when interacting with sliders or buttons
+        if (e.target.closest('.slider-container') ||
+            e.target.closest('button') ||
+            e.target.closest('.control-button')) {
+            return;
+        }
+        handleSwipeStart(e.touches[0].clientY);
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isDraggingSwipe) return;
+        e.preventDefault(); // Prevent scrolling
+        handleSwipeMove(e.touches[0].clientY);
+    };
+
+    const handleTouchEnd = () => {
+        handleSwipeEnd();
+    };
+
+    // Mouse events (for desktop testing)
+    const handleMouseDown = (e) => {
+        if (e.target.closest('.slider-container') ||
+            e.target.closest('button') ||
+            e.target.closest('.control-button')) {
+            return;
+        }
+        handleSwipeStart(e.clientY);
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDraggingSwipe) return;
+        handleSwipeMove(e.clientY);
+    };
+
+    const handleMouseUp = () => {
+        handleSwipeEnd();
+    };
+
+    // Add mouse event listeners
+    useEffect(() => {
+        if (isDraggingSwipe) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            return () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            };
+        }
+    }, [isDraggingSwipe]);
 
     const checkIftheSongisLiked = async () => {
         if (!currentTrack || !localStorage.getItem('token')) {
@@ -132,7 +253,6 @@ const ExpandedMusicPlayer = ({
         }
     }
 
-    const [queueOpen, setQueueOpen] = useState(false);
     const openQueue = () => {
         if (queueOpen) {
             setQueueOpen(false);
@@ -140,8 +260,6 @@ const ExpandedMusicPlayer = ({
             setQueueOpen(true);
         }
     }
-
-    const [loopOnOrOff, setLoopOnOrOff] = useState(false);
 
     const startLoop = () => {
         if (looping) {
@@ -154,9 +272,19 @@ const ExpandedMusicPlayer = ({
     }
 
     return (
-        <div ref={expandedPlayerRef}
-            className="fixed z-[1000] inset-0 bg-black text-white">
-
+        <div
+            ref={expandedPlayerRef}
+            className="fixed z-[1000] inset-0 bg-black text-white"
+            style={{
+                transform: `translateY(${currentY}px)`,
+                transition: isDraggingSwipe ? 'none' : isClosing ? 'transform 0.3s ease-out' : 'transform 0.2s ease-out',
+                opacity: Math.max(0.3, 1 - (currentY / 400)) // Fade out as sliding
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+        >
             {queueOpen && <MusicQueue onClose={() => setQueueOpen(false)} />}
 
             <ToastContainer
@@ -173,10 +301,13 @@ const ExpandedMusicPlayer = ({
                 transition={Slide}
             />
 
+            {/* Swipe indicator */}
+            <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mt-2 mb-3"></div>
+
             <button
                 type='button'
                 onClick={onClose}
-                className="pt-5 pl-5 flex items-center w-full rounded-full"
+                className="pt-2 pl-5 flex items-center w-full rounded-full control-button"
             >
                 <ChevronDown size={24} />
             </button>
@@ -184,10 +315,9 @@ const ExpandedMusicPlayer = ({
             <div className="h-full flex flex-col px-4 pb-20">
                 {/* Album Art */}
                 <div className="flex-1 flex items-center justify-center p-2 leading-7">
-
                     {!lyricsMenuOpen ?
                         (
-                            <div className="max-w-md aspect-square  rounded-lg overflow-hidden">
+                            <div className="max-w-md aspect-square rounded-lg overflow-hidden">
                                 <img
                                     src={currentTrack?.images?.medium}
                                     alt={currentTrack?.title}
@@ -196,7 +326,7 @@ const ExpandedMusicPlayer = ({
                             </div>
                         ) : (lyricsLoading ? <LyricsSkeleton /> : (
                             <div>
-                                <p className='text-[22px]  font-bold  text-gray-400 text-center mb-2 h-[300px] overflow-scroll whitespace-pre-line'>
+                                <p className='text-[22px] font-bold text-gray-400 text-center mb-2 h-[300px] overflow-scroll whitespace-pre-line'>
                                     {lyrics}
                                 </p>
                             </div>
@@ -232,7 +362,7 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mt-4 px-4">
+                <div className="mt-4 px-4 slider-container">
                     <div className="flex justify-between text-sm mb-2">
                         <span>{formatTime(pos)}</span>
                         <span>{formatTime(duration)}</span>
@@ -250,7 +380,7 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 {/* Controls */}
-                <div className="mt-8 flex justify-center items-center gap-8">
+                <div className="mt-8 flex justify-center items-center gap-8 control-button">
                     {
                         isliked ? (
                             <Heart className="w-6 h-6 text-red-500 fill-red-500 hover:text-red-600 cursor-pointer" onClick={toggleLiked} />
@@ -283,7 +413,7 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 {/* Volume */}
-                <div className="mt-10 mb-5 flex items-center justify-center gap-10">
+                <div className="mt-10 mb-5 flex items-center justify-center gap-10 control-button">
                     <MicVocal onClick={() => openLyricsMenu()} className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
                     <ListMusic
                         onClick={() => openQueue()}
