@@ -43,7 +43,6 @@ const MusicPlayer = () => {
 
             tl.fromTo(expandedPlayerRef.current,
                 {
-                    y: window.innerHeight,
                     opacity: 0,
                     scale: 0.95
                 },
