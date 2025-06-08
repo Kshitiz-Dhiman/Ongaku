@@ -86,7 +86,7 @@ const ExpandedMusicPlayer = ({
 
                 // Check if dragged halfway
                 const screenHeight = window.innerHeight;
-                const halfwayPoint = screenHeight * 0.5;
+                const halfwayPoint = screenHeight * 0.1;
 
                 if (deltaY > halfwayPoint) {
                     // Animate out of screen
@@ -271,9 +271,8 @@ const ExpandedMusicPlayer = ({
 
     return (
         <div ref={expandedPlayerRef}
-            className={`fixed z-[1000] inset-0 bg-black text-white select-none ${
-                isDragActive ? 'cursor-grabbing' : 'cursor-grab'
-            }`}>
+            className={`fixed z-[1000] inset-0 bg-black text-white select-none ${isDragActive ? 'cursor-grabbing' : 'cursor-grab'
+                }`}>
 
             {queueOpen && <MusicQueue onClose={() => setQueueOpen(false)} />}
 
