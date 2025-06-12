@@ -10,7 +10,7 @@ const ErrorPage = () => {
                 <h1 className="text-9xl font-bold text-white">404</h1>
                 <div className="space-y-2">
                     <h2 className="text-2xl font-semibold text-white">Page not found</h2>
-                    <p className="text-[#6e7273]">The page you're looking for doesn't exist.</p>
+                    <p className="text-[#6e7273]">The page you're looking for doesn't exist or you might be offline.</p>
                 </div>
                 <button
                     onClick={() => navigate('/')}
