@@ -11,12 +11,15 @@ import ErrorPage from './pages/ErrorPage'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import Library from './pages/Library'
 import Profile from './pages/Profile'
-import isOnline from './pages/IsOnline';
+import { IsOnline } from './pages/IsOnline';
+
 const App = () => {
+    const isOnline = IsOnline();
 
     if (!isOnline) {
         return <ErrorPage />
     }
+
     const GoogleAuthWrapper = () => {
         return (
             <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
@@ -24,8 +27,6 @@ const App = () => {
             </GoogleOAuthProvider>
         )
     }
-
-
 
     return (
         <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>

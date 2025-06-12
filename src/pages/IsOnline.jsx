@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
 const IsOnline = () => {
-    const [isOnline, setisOnline] = useState(true);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
 
     const updateNetworkStatus = () => {
-        setisOnline(navigator.online);
+        setIsOnline(navigator.onLine);
     }
 
     useEffect(() => {
@@ -12,15 +12,15 @@ const IsOnline = () => {
     }, [])
 
     useEffect(() => {
-        window.addEventListener("load", updateNetworkStatus);
         window.addEventListener("online", updateNetworkStatus);
         window.addEventListener("offline", updateNetworkStatus);
         return () => {
-            window.removeEventListener("load", updateNetworkStatus);
             window.removeEventListener("online", updateNetworkStatus);
             window.removeEventListener("offline", updateNetworkStatus);
         }
     }, [])
+
+    return isOnline;
 }
 
 export default IsOnline
