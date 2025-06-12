@@ -11,7 +11,7 @@ import ErrorPage from './pages/ErrorPage'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import Library from './pages/Library'
 import Profile from './pages/Profile'
-import { IsOnline } from './pages/IsOnline';
+import IsOnline from './pages/IsOnline';
 
 const App = () => {
     const isOnline = IsOnline();
