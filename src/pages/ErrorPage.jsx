@@ -13,10 +13,10 @@ const ErrorPage = () => {
                     <p className="text-[#6e7273]">The page you're looking for doesn't exist or you might be offline.</p>
                 </div>
                 <button
-                    onClick={() => navigate('/')}
+                    onClick={() => window.location.reload()}
                     className="px-6 py-3 bg-red-600 text-white font-semibold rounded-full hover:scale-105 transition-transform"
                 >
-                    Go Home
+                    Reload
                 </button>
             </div>
         </div>
