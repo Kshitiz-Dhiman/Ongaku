@@ -9,17 +9,15 @@ import SampleLogin from './pages/LoginBtn'
 import SampleDashBoard from './pages/SampleDashBoard'
 import ErrorPage from './pages/ErrorPage'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import Library from './pages/Library'
+import LikedSong from './pages/LikedSong'
 import Profile from './pages/Profile'
-import IsOnline from './pages/IsOnline';
-
+import History from './pages/History'
+import isOnline from './pages/IsOnline';
 const App = () => {
-    const isOnline = IsOnline();
 
     if (!isOnline) {
         return <ErrorPage />
     }
-
     const GoogleAuthWrapper = () => {
         return (
             <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
@@ -27,6 +25,8 @@ const App = () => {
             </GoogleOAuthProvider>
         )
     }
+
+
 
     return (
         <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
@@ -36,14 +36,19 @@ const App = () => {
                     <Sidebar />
                     <main className="flex-1 md:ml-[12%]">
                         <Routes>
+                            {/* To set element as entry point use this  */}
+                            {/* <Route path='/' element={<Navigate to="/trending/default" replace />} /> */}
                             <Route path='/' element={<TrendingHome />} />
+                            {/* <Route index element={<TrendingHome />} /> */}
+                            <Route path='/trending/:trend' element={<TrendingHome />} />
                             <Route path='/album/:albumId' element={<Album />} />
                             <Route path='/artist/:artistId' element={<Artist />} />
                             <Route path='/login' element={<GoogleAuthWrapper />} />
                             <Route path='/dashboard' element={<SampleDashBoard />} />
+                            <Route path='/library/:lib' element={<LikedSong />} />
+                            <Route path='/account/:profile' element={<Profile />} />
+                            <Route path='/account/history' element={<History />} />
                             <Route path='*' element={<ErrorPage />} />
-                            <Route path='/library' element={<Library />} />
-                            <Route path='/profile' element={<Profile />} />
                         </Routes>
                     </main>
                 </div>

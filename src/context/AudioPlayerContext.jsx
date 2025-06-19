@@ -26,11 +26,9 @@ const AudioPlayerContext = ({ children }) => {
     } = useGlobalAudioPlayer();
     const queueRef = useRef([]);
 
-    // Replace useState with useRef for currentSongsList and currentIndex
     const currentSongsListRef = useRef([]);
     const currentIndexRef = useRef(0);
 
-    // Helper functions to get current values (for components that need them)
     const getCurrentSongsList = () => currentSongsListRef.current;
     const getCurrentIndex = () => currentIndexRef.current;
 
@@ -46,31 +44,21 @@ const AudioPlayerContext = ({ children }) => {
         }
     };
 
-    // Modify the handleSongEnd function to be more robust
     const handleSongEnd = async () => {
         if (looping) return;
 
         try {
             const nextIndex = currentIndexRef.current + 1;
-
-            // Get the current songs list from ref
             const songsList = currentSongsListRef.current;
 
             if (songsList && songsList.length > 0 && nextIndex < songsList.length) {
                 const nextSong = songsList[nextIndex];
-
-                // Update index ref
                 currentIndexRef.current = nextIndex;
-
-                // Update queue
                 const remainingSongs = songsList.slice(nextIndex + 1);
                 queueRef.current = remainingSongs;
                 setQueue(remainingSongs);
-
-                // Fetch and play the song
                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.id}`);
                 const songData = response.data;
-
                 setCurrentTrack({
                     id: songData.data.id,
                     title: songData.data.title,
@@ -137,8 +125,27 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playTrack = async (song, songId, addToQueue = true, songsList = null) => {
+
         try {
             localStorage.setItem('musicId', songId);
+            const songDetailsResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${songId}`);
+            const songData = songDetailsResponse.data.data;
+
+            const trackInfo = {
+                id: songData.id,
+                title: songData.title,
+                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
+                images: songData.images,
+                download_url: songData.download,
+                artists: songData.artists,
+                album: songData.album,
+                duration: songData.duration,
+                releaseDate: songData.releaseDate,
+                label: songData.label,
+                copyright: songData.copyright
+            };
+            setCurrentTrack(trackInfo);
+
             if (songsList) {
                 currentSongsListRef.current = songsList;
                 const index = songsList.findIndex(song => song.id === songId);
@@ -151,7 +158,6 @@ const AudioPlayerContext = ({ children }) => {
                 await getRecommendations(songId);
                 currentIndexRef.current = 0;
             }
-
             load(song, {
                 autoplay: true,
                 initialVolume: volume,
@@ -160,6 +166,22 @@ const AudioPlayerContext = ({ children }) => {
                 onend: looping ? null : handleSongEnd,
                 onplay: () => setIsPlaying(true)
             });
+            // Add history api
+            // if (localStorage.getItem("token")) {
+            //     const response = await axios.post(`${import.meta.env.VITE_MUSIC_API}/song/addhistory`, {
+            //         songId: trackInfo.id, // Use trackInfo directly
+            //         title: trackInfo.title,
+            //         artist: trackInfo.artists?.primary?.map(artist => artist.name).join(", ") || trackInfo.subtitle,
+            //         image: trackInfo.images.medium
+            //     }, {
+            //         headers: {
+            //             "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            //         },
+            //     });
+            // }
+
+
+
         } catch (error) {
             console.error('Error playing track:', error);
         }
@@ -174,14 +196,13 @@ const AudioPlayerContext = ({ children }) => {
 
                 if (nextIndex < songsList.length) {
                     const nextSong = songsList[nextIndex];
-                    currentIndexRef.current = nextIndex; // Update ref directly
+                    currentIndexRef.current = nextIndex;
 
-                    // Update queue
+
                     const remainingSongs = songsList.slice(nextIndex + 1);
                     queueRef.current = remainingSongs;
                     setQueue(remainingSongs);
 
-                    // Fetch and play the song
                     const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.id}`);
                     const songData = response.data;
 
@@ -208,7 +229,6 @@ const AudioPlayerContext = ({ children }) => {
                         onplay: () => setIsPlaying(true)
                     });
                 } else if (queueRef.current.length < 5) {
-                    // If we're at the end of the list, get more recommendations
                     const lastSongId = songsList[songsList.length - 1].id;
                     await getRecommendations(lastSongId);
                     currentIndexRef.current = 0; // Update ref directly
@@ -221,18 +241,15 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playPreviousSong = async () => {
-        // Don't play previous song if loop is enabled
         if (looping) return;
 
         try {
             const songsList = currentSongsListRef.current;
-            // Use the ref value for current calculations
             if (songsList.length > 0 && currentIndexRef.current > 0) {
                 const prevIndex = currentIndexRef.current - 1;
                 const prevSong = songsList[prevIndex];
                 currentIndexRef.current = prevIndex; // Update ref directly
 
-                // Update queue to include current song and remaining songs
                 const remainingSongs = songsList.slice(prevIndex + 1);
                 queueRef.current = remainingSongs;
                 setQueue(remainingSongs);

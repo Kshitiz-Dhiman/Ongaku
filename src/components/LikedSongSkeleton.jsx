@@ -6,7 +6,7 @@ const LikedSongSkeleton = () => {
 
             {Array.from({ length: 10 }).map((_, i) => {
                 return (
-                    <div className='flex w-full gap-4 items-center justify-center' key={i}>
+                    <div className='flex w-full gap-4 items-center justify-start' key={i}>
                         <Skeleton className="w-12 h-12 bg-[#202020] " />
                         <div className='flex flex-col w-full gap-3'>
                             <Skeleton className="w-3/3 h-4 bg-[#202020]" />

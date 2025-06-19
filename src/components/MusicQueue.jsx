@@ -17,14 +17,15 @@ const MusicQueue = ({ onClose }) => {
         // await playTrack(url, id, addToQueue, remainingQueue);
     }
     return (
-        <div className='bg-black h-screen  lg:w-[600px] overflow-y-auto p-6 rounded-lg'>
+        // md:bg-none bg-black md:h-[580px] h-screen md:w-full w-[600px] overflow-y-auto p-6 rounded-lg
+        <div className='md:bg-none bg-black md:h-[580px] h-screen md:w-full sm:w-[600px] overflow-y-auto p-6 rounded-lg'>
             <div className='flex justify-between items-center mb-6'>
                 <h2 className='text-white text-2xl font-bold'>
                     Queue ({queueLength})
                 </h2>
                 <button
                     onClick={onClose}
-                    className='text-white hover:text-gray-300 transition-colors h-10 w-12 font-bold duration-200'
+                    className='text-white md:hidden hover:text-gray-300 transition-colors h-10 w-12 font-bold duration-200'
                 >
                     ✕
                 </button>

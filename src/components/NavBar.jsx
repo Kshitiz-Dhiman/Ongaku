@@ -4,9 +4,10 @@ import { Music, NavigationOff } from "lucide-react"
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
 import { AudioPlayerData } from '../context/AudioPlayerContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import SampleLogin from '@/pages/LoginBtn';
 import { useAuthUserInfo } from '../context/AuthUserInfoContext';
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -197,12 +198,18 @@ const NavBar = () => {
                         <DropdownMenuContent className="fixed left-[-165px] w-56 bg-[#101010] border-[#202020] z-[100] text-white">
                             <DropdownMenuLabel className="font-bold text-gray-300">My Account</DropdownMenuLabel>
                             <DropdownMenuGroup>
-                                <DropdownMenuItem className="hover:bg-[#1a1a1a] cursor-pointer">
-                                    Profile
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="hover:bg-[#1a1a1a] cursor-pointer">
-                                    History
-                                </DropdownMenuItem>
+                                <NavLink to='/profile'>
+
+                                    <DropdownMenuItem className="hover:bg-[#1a1a1a] cursor-pointer">
+                                        Profile
+                                    </DropdownMenuItem>
+                                </NavLink>
+                                <NavLink to='/history'>
+                                    <DropdownMenuItem className="hover:bg-[#1a1a1a] cursor-pointer">
+                                        History
+                                    </DropdownMenuItem>
+                                </NavLink>
+
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator className="bg-[#202020]" />
                             <DropdownMenuItem onClick={() => logoutAuthUser()} className="cursor-pointer text-red-500">

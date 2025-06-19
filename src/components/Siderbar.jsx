@@ -4,39 +4,37 @@ import { useNavigate } from 'react-router-dom'
 
 const Sidebar = ({ onClose }) => {
     const navigate = useNavigate()
-    const handleNavClick = () => {
-        if (onClose) onClose();
-    }
+
 
     return (
         <>
             <div className='hidden md:flex h-screen fixed top-0 left-0 bg-black flex-col text-white p-6 pt-20 gap-8 mt-15 mx-5'>
                 <DesktopMenu
-                    menuTitle="Trending"
+                    menuTitle="trending"
                     items={[
-                        { icon: <Home size={20} />, title: 'Song' },
-                        { icon: <Home size={20} />, title: 'Album' },
-                        { icon: <Home size={20} />, title: 'Artist' }
+                        { icon: <Home size={20} />, title: 'Song', link: 'song' },
+                        { icon: <Home size={20} />, title: 'Album', link: 'album' },
+                        { icon: <Home size={20} />, title: 'Artist', link: 'artist' }
                     ]}
                     handleNavClick={() => navigate('/')}
                 />
 
                 <DesktopMenu
-                    menuTitle="Library"
+                    menuTitle="library"
                     items={[
-                        { icon: <Home size={20} />, title: 'Songs' },
-                        { icon: <Home size={20} />, title: 'Playlist' },
-                        { icon: <Home size={20} />, title: 'Album' }
+                        { icon: <Library size={20} />, title: 'Songs', link: 'liked' },
+                        { icon: <Library size={20} />, title: 'Playlist', link: 'playlist' },
+                        { icon: <Library size={20} />, title: 'Album', link: 'album' }
                     ]}
                     handleNavClick={() => navigate('/library')}
                 />
 
                 <DesktopMenu
-                    menuTitle="Account"
+                    menuTitle="account"
                     items={[
-                        { icon: <Home size={20} />, title: 'Profile' },
-                        { icon: <Home size={20} />, title: 'Settings' },
-                        { icon: <Home size={20} />, title: 'Logout' }
+                        { icon: <User size={20} />, title: 'Profile', link: 'profile' },
+                        { icon: <User size={20} />, title: 'Settings', link: 'setting' },
+                        { icon: <User size={20} />, title: 'History', link: 'history' }
                     ]}
                     handleNavClick={() => navigate('/profile')}
                 />
@@ -68,6 +66,7 @@ const NavItem = ({ icon, label, onClick }) => {
         <button
             onClick={onClick}
             className='flex flex-col items-center justify-center w-1/3 py-2 text-gray-400 hover:text-white focus:text-white transition-colors'
+
         >
             {icon}
             <span className='text-xs mt-1'>{label}</span>
@@ -75,15 +74,16 @@ const NavItem = ({ icon, label, onClick }) => {
     )
 }
 
-const DesktopMenu = ({ menuTitle, items, handleNavClick }) => {
+const DesktopMenu = ({ menuTitle, items }) => {
+    const navigate = useNavigate();
     return (
         <div className='space-y-4'>
-            <h2 className='text-[#6e7273] text-lg font-semibold'>{menuTitle}</h2>
+            <h2 className='text-[#6e7273] text-lg font-semibold capitalize'>{menuTitle}</h2>
             <ul className='space-y-2'>
                 {items.map((item) => (
                     <li
                         key={item.title}
-                        onClick={handleNavClick}
+                        onClick={() => navigate(`/${menuTitle}/${item.link}`)}
                         role="button"
                         tabIndex={0}
                         onKeyDown={(e) => {

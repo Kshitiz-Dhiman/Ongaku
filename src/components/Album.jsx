@@ -104,7 +104,7 @@ const Album = () => {
                         </div>
 
                         {/* Songs List */}
-                        <div className='mt-8'>
+                        <div className='mt-8 bg-zinc-800/30 backdrop-blur-sm p-10 rounded-md'>
                             <table className='w-full text-left text-white'>
                                 <thead className='border-b border-[#262626]'>
                                     <tr className='text-gray-400'>

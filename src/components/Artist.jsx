@@ -8,6 +8,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { Skeleton } from './ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 //{ id, onClose, onAlbumClick }
+
 const Artist = () => {
     const [artistData, setArtistData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -130,13 +131,13 @@ const Artist = () => {
                         <XIcon className="w-6 h-6 text-white" />
                     </button>
                 </div>
-                <Tabs defaultValue="overview">
-                    <TabsList className="bg-[#080c10] w-full mt-4">
-                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                        <TabsTrigger value="songs">Songs</TabsTrigger>
-                        <TabsTrigger value="albums">Albums</TabsTrigger>
+                <Tabs defaultValue="overview" className="w-full">
+                    <TabsList className="bg-zinc-800/50 backdrop-blur-sm rounded-lg w-full mt-4 p-1">
+                        <TabsTrigger value="overview" className="text-sm font-medium">Overview</TabsTrigger>
+                        <TabsTrigger value="songs" className="text-sm font-medium">Songs</TabsTrigger>
+                        <TabsTrigger value="albums" className="text-sm font-medium">Albums</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="overview">
+                    <TabsContent value="overview" className="mt-4 bg-zinc-800/30 rounded-lg p-4">
                         <OverView
                             artistData={artistData}
                             handleClose={handleClose}
@@ -146,10 +147,10 @@ const Artist = () => {
                             artistSongs={artistData.topSongs}
                         />
                     </TabsContent>
-                    <TabsContent value="songs">
+                    <TabsContent value="songs" className="mt-4 bg-zinc-800/30 rounded-lg p-4">
                         <Songs artistId={artistId} />
                     </TabsContent>
-                    <TabsContent value="albums">
+                    <TabsContent value="albums" className="mt-4 bg-zinc-800/30 rounded-lg p-4">
                         <Albums artistId={artistId} handleAlbumClick={handleAlbumClick} />
                     </TabsContent>
                 </Tabs>

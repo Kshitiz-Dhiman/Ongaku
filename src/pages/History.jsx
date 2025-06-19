@@ -1,50 +1,37 @@
 import React, { useContext, useEffect, useState } from 'react'
-import axios from 'axios'
-import { toast } from 'react-toastify';
-import { EllipsisVertical } from 'lucide-react';
-import LikedSongSkeleton from '@/components/LikedSongSkeleton';
-import { AudioPlayerData } from '../context/AudioPlayerContext';
+import axios from 'axios';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
     DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
+} from "../components/ui/dropdown-menu"
+import { EllipsisVertical } from 'lucide-react';
+import LikedSongSkeleton from '@/components/LikedSongSkeleton';
+import { AudioPlayerData } from '@/context/AudioPlayerContext';
+const History = () => {
 
-const Library = () => {
-    const [loading, setLoading] = useState(false);
-    const [likedSongs, setlikedSongs] = useState([]);
-    const [likedAlbums, setlikedAlbums] = useState([]);
-    const [likedArtists, setlikedArtists] = useState([]);
-
+    const [history, setHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
     const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
-    const getLikedSongs = async () => {
+
+    const getHistory = async () => {
         setLoading(true);
-        try {
-            if (!localStorage.getItem("token")) {
-                toast.error("Please login to continue");
-                return;
+        const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song/history`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
             }
-
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/liked/songs`, {
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-
-            if (likedSongs.length === 0) {
-                setlikedSongs("No Liked Songs");
-            }
-            setlikedSongs(response.data.likedSongs.reverse());
-            setLoading(false);
-        } catch (e) {
-            console.log(e);
-        }
+        });
+        setHistory(response.data.history);
+        setLoading(false);
     }
-
+    useEffect(() => {
+        getHistory();
+    }, []);
     const handlePlaySong = async (song) => {
         try {
+            console.log("playing song");
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.songId}`);
             const songData = response.data.data;
 
@@ -77,48 +64,13 @@ const Library = () => {
         }
     };
 
-    useEffect(() => {
-        getLikedSongs();
-    }, []);
-
-
-    if (!localStorage.getItem("token")) {
-        return (
-            <div className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20'>
-                <h1 className='
-                    text-2xl sm:text-2xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left
-                '>
-                    Login Required
-                </h1>
-            </div>
-        )
-    }
-
-    const songMenu = () => {
-
-    }
-    const handleRemoveFromLiked = async (songId) => {
-        try {
-            await axios.delete(`${import.meta.env.VITE_MUSIC_API}/liked/songs/${songId}`, {
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-            getLikedSongs(); // Refresh the list
-            toast.success("Song removed from liked songs");
-        } catch (error) {
-            console.error('Error removing song:', error);
-            toast.error("Failed to remove song");
-        }
-    };
-
     return (
         <div className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20 mb-10'>
-            <h1 className='text-2xl sm:text-2xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left'>Liked Songs</h1>
+            <h1 className='text-2xl sm:text-2xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left'>History</h1>
             <div className='flex flex-col w-full'>
                 {loading ? (
                     <LikedSongSkeleton />
-                ) : likedSongs.map((song) => {
+                ) : history.map((song) => {
                     return (
                         <div
                             key={song.songId}
@@ -154,7 +106,7 @@ const Library = () => {
                                     <DropdownMenuItem
                                         className="hover:bg-[#1a1a1a] cursor-pointer text-red-500"
                                     >
-                                        Remove from Liked
+                                        Remove from History
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -166,4 +118,4 @@ const Library = () => {
     )
 }
 
-export default Library
+export default History
