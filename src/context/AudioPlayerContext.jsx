@@ -72,7 +72,21 @@ const AudioPlayerContext = ({ children }) => {
                     label: songData.data.label,
                     copyright: songData.data.copyright
                 });
+                // const trackInfo = {
+                //     id: songData.id,
+                //     title: songData.title,
+                //     subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
+                //     images: songData.images,
+                //     download_url: songData.download,
+                //     artists: songData.artists,
+                //     album: songData.album,
+                //     duration: songData.duration,
+                //     releaseDate: songData.releaseDate,
+                //     label: songData.label,
+                //     copyright: songData.copyright
+                // };
 
+                // addToHistoryAsync(trackInfo);
                 // Load the next song with the same callback
                 load(songData.data.download[4].link, {
                     autoplay: true,
@@ -82,6 +96,7 @@ const AudioPlayerContext = ({ children }) => {
                     onend: handleSongEnd,
                     onplay: () => setIsPlaying(true)
                 });
+
             } else if (songsList && songsList.length > 0) {
                 const lastSongId = songsList[songsList.length - 1].id;
                 await getRecommendations(lastSongId);
@@ -125,7 +140,6 @@ const AudioPlayerContext = ({ children }) => {
     };
 
     const playTrack = async (song, songId, addToQueue = true, songsList = null) => {
-
         try {
             localStorage.setItem('musicId', songId);
             const songDetailsResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${songId}`);
@@ -144,8 +158,10 @@ const AudioPlayerContext = ({ children }) => {
                 label: songData.label,
                 copyright: songData.copyright
             };
+
             setCurrentTrack(trackInfo);
 
+            // Handle queue logic
             if (songsList) {
                 currentSongsListRef.current = songsList;
                 const index = songsList.findIndex(song => song.id === songId);
@@ -155,9 +171,14 @@ const AudioPlayerContext = ({ children }) => {
                 queueRef.current = remainingSongs;
                 setQueue(remainingSongs);
             } else if (addToQueue) {
-                await getRecommendations(songId);
+                // Run recommendations in parallel (don't await)
+                getRecommendations(songId).catch(err =>
+                    console.error('Error getting recommendations:', err)
+                );
                 currentIndexRef.current = 0;
             }
+
+            // Start playing immediately
             load(song, {
                 autoplay: true,
                 initialVolume: volume,
@@ -166,24 +187,37 @@ const AudioPlayerContext = ({ children }) => {
                 onend: looping ? null : handleSongEnd,
                 onplay: () => setIsPlaying(true)
             });
-            // Add history api
-            // if (localStorage.getItem("token")) {
-            //     const response = await axios.post(`${import.meta.env.VITE_MUSIC_API}/song/addhistory`, {
-            //         songId: trackInfo.id, // Use trackInfo directly
-            //         title: trackInfo.title,
-            //         artist: trackInfo.artists?.primary?.map(artist => artist.name).join(", ") || trackInfo.subtitle,
-            //         image: trackInfo.images.medium
-            //     }, {
-            //         headers: {
-            //             "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            //         },
-            //     });
-            // }
 
-
+            // Add to history asynchronously without blocking
+            // addToHistoryAsync(trackInfo);
 
         } catch (error) {
             console.error('Error playing track:', error);
+        }
+    };
+
+    // Separate async function for history API call
+    const addToHistoryAsync = async (trackInfo) => {
+        console.log("Checking token");
+        if (!localStorage.getItem("token")) return;
+        console.log("Adding to history")
+        try {
+            axios.post(`${import.meta.env.VITE_MUSIC_API}/song/addhistory`, {
+                songId: trackInfo.id,
+                title: trackInfo.title,
+                artist: trackInfo.artists?.primary?.map(artist => artist.name).join(", ") || trackInfo.subtitle,
+                image: trackInfo.images.medium
+            }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                },
+                timeout: 5000 // Add timeout to prevent hanging
+            }).catch(err => {
+                // Silent fail for history - don't interrupt user experience
+                console.warn('Failed to add song to history:', err);
+            });
+        } catch (error) {
+            console.warn('Error adding to history:', error);
         }
     };
 

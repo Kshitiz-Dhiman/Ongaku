@@ -204,7 +204,7 @@ const NavBar = () => {
                                         Profile
                                     </DropdownMenuItem>
                                 </NavLink>
-                                <NavLink to='/history'>
+                                <NavLink to='/account/history'>
                                     <DropdownMenuItem className="hover:bg-[#1a1a1a] cursor-pointer">
                                         History
                                     </DropdownMenuItem>

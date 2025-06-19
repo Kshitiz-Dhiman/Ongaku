@@ -31,34 +31,33 @@ const History = () => {
     }, []);
     const handlePlaySong = async (song) => {
         try {
-            console.log("playing song");
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.songId}`);
-            const songData = response.data.data;
+            // const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.songId}`);
+            // const songData = response.data.data;
 
-            const trackInfo = {
-                id: songData.id,
-                title: songData.title,
-                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
-                images: songData.images,
-                download_url: songData.download[4].link,
-                artists: songData.artists,
-                album: songData.album,
-                duration: songData.duration,
-                releaseDate: songData.releaseDate,
-                label: songData.label,
-                copyright: songData.copyright
-            };
+            // const trackInfo = {
+            //     id: songData.id,
+            //     title: songData.title,
+            //     subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
+            //     images: songData.images,
+            //     download_url: songData.download[4].link,
+            //     artists: songData.artists,
+            //     album: songData.album,
+            //     duration: songData.duration,
+            //     releaseDate: songData.releaseDate,
+            //     label: songData.label,
+            //     copyright: songData.copyright
+            // };
 
-            setCurrentTrack(trackInfo);
+            // setCurrentTrack(trackInfo);
 
-            const formattedSongs = likedSongs.map(likedSong => ({
-                id: likedSong.songId,
-                title: likedSong.title,
-                subtitle: likedSong.artist,
-                image: { small: likedSong.image }
-            }));
+            // const formattedSongs = likedSongs.map(likedSong => ({
+            //     id: likedSong.songId,
+            //     title: likedSong.title,
+            //     subtitle: likedSong.artist,
+            //     image: { small: likedSong.image }
+            // }));
 
-            await playTrack(songData.download[4].link, songData.id, true, formattedSongs);
+            // await playTrack(songData.download[4].link, songData.id, true, formattedSongs);
         } catch (error) {
             console.error('Error playing song:', error);
         }

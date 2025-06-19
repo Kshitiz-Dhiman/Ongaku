@@ -49,12 +49,12 @@ const Sidebar = ({ onClose }) => {
                 <NavItem
                     icon={<Library size={24} />}
                     label="Library"
-                    onClick={() => navigate('/library')}
+                    onClick={() => navigate('/library/liked')}
                 />
                 <NavItem
                     icon={<User size={24} />}
                     label="Profile"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => navigate('/account/profile')}
                 />
             </div>
         </>

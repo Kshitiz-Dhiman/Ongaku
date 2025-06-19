@@ -188,17 +188,18 @@ const ExpandedMusicPlayer = ({
 
 
             <div className='md:block hidden h-full w-full bg-gradient-to-b from-zinc-900 to-black flex-col p-6'>
-                <div className='flex h-3/4 justify-around items-start gap-8'>
-                    <div className="h-full max-w-full p-20 aspect-square rounded-xl overflow-hidden">
+                <div className='flex h-3/4 justify-around items-start '>
+                    <div className="h-full max-w-full p-20 aspect-square rounded-xl overflow-hidden ">
                         <img
                             src={currentTrack?.images?.medium}
                             alt={currentTrack?.title}
                             className="w-full h-full object-cover transform rounded-lg"
                         />
                     </div>
-                    <div className="h-full flex-1 max-w-xl pt-17">
-                        <Tabs defaultValue="overview" className="w-full">
-                            <TabsList className="bg-zinc-800/50 backdrop-blur-sm rounded-lg w-full mt-4 p-1">
+                    <div className="h-full mr-4 md:mr-8 lg:mr-30 w-full max-w-xl pt-8 md:pt-12 lg:pt-17">
+                        <Tabs defaultValue="queue" className="w-full">
+                            <TabsList className="bg-zinc-800/50 backdrop-blur-sm shadow-sm shadow-gray-600 rounded-lg w-full mt-4 p-1">
+
                                 <TabsTrigger onClick={() => {
                                     setLyrics("Fetching lyrics....")
                                     fetchLryics();
@@ -206,27 +207,27 @@ const ExpandedMusicPlayer = ({
                                 <TabsTrigger value="queue" className="text-sm font-medium">Queue</TabsTrigger>
                                 <TabsTrigger value="related" className="text-sm font-medium">Related</TabsTrigger>
                             </TabsList>
-                            <TabsContent value="lyrics" className="mt-4 bg-zinc-800/30 rounded-lg p-4">
+                            <TabsContent value="lyrics" className="mt-4 bg-zinc-800/30 shadow-sm shadow-gray-600 h-full rounded-lg p-2 md:p-4">
                                 {
                                     lyricsLoading ? <LyricsSkeleton /> : (
-                                        <div>
-                                            <p className='text-[22px]  font-bold  text-gray-400 text-center mb-2 h-[560px] overflow-scroll whitespace-pre-line'>
+                                        <div className="w-full">
+                                            <p className='text-lg sm:text-xl md:text-[22px] font-bold px-2 sm:px-4 md:px-6 lg:px-10 text-gray-400 text-center h-[47vh] overflow-y-auto whitespace-pre-line '>
                                                 {lyrics}
                                             </p>
                                         </div>
                                     )
                                 }
                             </TabsContent>
-                            <TabsContent value="queue" className="mt-4 bg-zinc-800/30 rounded-lg p-4">
+                            <TabsContent value="queue" className="mt-4 bg-zinc-800/30 rounded-lg p-2 md:p-4">
                                 <MusicQueue />
                             </TabsContent>
-                            <TabsContent value="related" className="mt-4 bg-zinc-800/30 rounded-lg p-4">
+                            <TabsContent value="related" className="mt-4 bg-zinc-800/30 rounded-lg p-2 md:p-4">
 
                             </TabsContent>
                         </Tabs>
                     </div>
                 </div>
-                <div className=''>
+                <div className='flex flex-col'>
                     {/* Track Info */}
                     <div className="text-center">
                         <h1 className="text-2xl font-bold">
@@ -255,7 +256,7 @@ const ExpandedMusicPlayer = ({
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="mt-4 px-4">
+                    <div className="mt-1 px-4 md:px-30">
                         <div className="flex justify-between text-sm mb-2">
                             <span>{formatTime(pos)}</span>
                             <span>{formatTime(duration)}</span>
@@ -268,12 +269,12 @@ const ExpandedMusicPlayer = ({
                             onValueChange={handleSliderChange}
                             onPointerDown={() => setIsDragging(true)}
                             onValueCommit={handleSliderCommit}
-                            className="w-full h-1 rounded-lg bg-gray-600 cursor-pointer"
+                            className="w-full  h-1 rounded-lg bg-gray-600 cursor-pointer"
                         />
                     </div>
 
                     {/* Controls */}
-                    <div className="mt-8 flex justify-center items-center gap-8">
+                    <div className="mt-5 flex justify-center items-center gap-8">
                         {
                             isliked ? (
                                 <Heart className="w-6 h-6 text-red-500 fill-red-500 hover:text-red-600 cursor-pointer" onClick={toggleLiked} />
@@ -333,7 +334,7 @@ const ExpandedMusicPlayer = ({
                             </div>
                         ) : (lyricsLoading ? <LyricsSkeleton /> : (
                             <div>
-                                <p className='text-[22px]  font-bold  text-gray-400 text-center mb-2 h-[300px] overflow-scroll whitespace-pre-line'>
+                                <p className='text-[22px] px-4 font-bold  text-gray-400 text-center mb-2 h-[300px] overflow-scroll whitespace-pre-line'>
                                     {lyrics}
                                 </p>
                             </div>
