@@ -333,7 +333,7 @@ const ExpandedMusicPlayer = ({
             <div className="md:hidden h-full flex flex-col px-6 pb-20">
                 {/* Album Art */}
                 <div
-                    className="absolute inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-30 scale-110"
+                    className="absolute inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-30 scale-200"
                     style={{
                         backgroundImage: `url(${currentTrack?.images?.medium})`,
                         willChange: 'transform',
@@ -389,8 +389,8 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mt-4 ">
-                    <div className="flex text-gray-300 justify-between text-sm mb-2">
+                <div className="pt-4 ">
+                    <div className="flex text-gray-300 justify-between text-sm pb-2">
                         <span>{formatTime(pos)}</span>
                         <span>{formatTime(duration)}</span>
                     </div>
@@ -402,7 +402,7 @@ const ExpandedMusicPlayer = ({
                         onValueChange={handleSliderChange}
                         onPointerDown={() => setIsDragging(true)}
                         onValueCommit={handleSliderCommit}
-                        className="w-full h-1 rounded-lg bg-gray-600 cursor-pointer"
+                        className="w-full h-2 rounded-lg bg-gray-600 cursor-pointer"
                     />
                 </div>
 
