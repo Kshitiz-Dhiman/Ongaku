@@ -336,6 +336,9 @@ const ExpandedMusicPlayer = ({
                     className="absolute inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-30 scale-110"
                     style={{
                         backgroundImage: `url(${currentTrack?.images?.medium})`,
+                        willChange: 'transform',
+                        transform: 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
                     }}
                 />
                 <div className="md:hidden flex-1 flex items-center mb-[-70px] justify-center p-2 leading-7">
