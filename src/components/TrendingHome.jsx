@@ -58,7 +58,7 @@ const PlaylistHome = () => {
                 </h1> */}
 
                 <div className='flex flex-col space-y-4 sm:space-y-6 md:space-y-0 md:flex-row md:items-center md:justify-between mb-6 mt-13 md:mt-10 md:mb-8'>
-                    <div className='text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#6e7273] text-left'>
+                    <div className='text-3xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#6e7273] text-left'>
                         Trending Albums
                     </div>
                     <div className='flex flex-wrap items-center justify-center md:justify-end gap-4 md:gap-6'>

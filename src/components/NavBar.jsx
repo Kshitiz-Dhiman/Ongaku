@@ -22,13 +22,20 @@ import image from "../assets/avatar.jpeg";
 const customStyles = {
     control: (base) => ({
         ...base,
-        backgroundColor: '#101010',
-        border: 'none',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        // backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)', // Safari support
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         borderRadius: '1rem',
         padding: '0.5rem',
         paddingInlineStart: '2rem',
         width: '100%',
-        color: 'white'
+        color: 'white',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        '&:hover': {
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            backgroundColor: 'rgba(255, 255, 255, 0.15)'
+        }
     }),
     input: (base) => ({
         ...base,
@@ -36,17 +43,42 @@ const customStyles = {
     }),
     menu: (base) => ({
         ...base,
-        backgroundColor: '#101010',
-        border: 'none',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(15px)',
+        WebkitBackdropFilter: 'blur(15px)', // Safari support
+        border: '1px solid rgba(255, 255, 255, 0.2)',
         borderRadius: '1rem',
-        marginTop: '0.5rem'
+        marginTop: '0.5rem',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        overflow: 'hidden' // Ensures border radius is respected
     }),
     option: (base, state) => ({
         ...base,
-        backgroundColor: state.isFocused ? '#1a1a1a' : '#101010',
+        backgroundColor: state.isFocused
+            ? 'rgba(255, 255, 255, 0.2)'
+            : 'transparent',
         color: 'white',
         padding: '0.75rem',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.15)'
+        }
+    }),
+    singleValue: (base) => ({
+        ...base,
+        color: 'white'
+    }),
+    placeholder: (base) => ({
+        ...base,
+        color: 'rgba(255, 255, 255, 0.7)'
+    }),
+    dropdownIndicator: (base) => ({
+        ...base,
+        color: 'rgba(255, 255, 255, 0.7)',
+        '&:hover': {
+            color: 'white'
+        }
     })
 };
 
@@ -175,6 +207,14 @@ const NavBar = () => {
         // Navbar component with improved responsive layout
         <div className='fixed bg-black w-full flex flex-wrap justify-between items-center px-4 md:px-12 z-[99] pt-5 pb-2'>
             {/* Logo - First on desktop and mobile */}
+            <div
+                className="absolute bg-linear-65 from-red-500 to-blue-800 inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-30 scale-200"
+                style={{
+                    willChange: 'transform',
+                    transform: 'translateZ(0)',
+                    backfaceVisibility: 'hidden',
+                }}
+            />
             <div className='flex order-1 items-center justify-center gap-2 w-auto'>
                 <Music size={34} color='#f2371d' strokeWidth={4} className='mt-2' />
                 <h1 className='hidden sm:block text-2xl md:text-3xl font-bold'> Ongaku</h1>

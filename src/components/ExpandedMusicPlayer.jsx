@@ -402,7 +402,7 @@ const ExpandedMusicPlayer = ({
                         onValueChange={handleSliderChange}
                         onPointerDown={() => setIsDragging(true)}
                         onValueCommit={handleSliderCommit}
-                        className="w-full h-2 rounded-lg bg-gray-600 cursor-pointer"
+                        className="w-full h-3 rounded-lg bg-gray-600 cursor-pointer"
                     />
                 </div>
 
