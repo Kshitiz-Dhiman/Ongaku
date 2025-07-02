@@ -19,6 +19,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
+import { FaPlay } from "react-icons/fa6";
+import { FaPause } from "react-icons/fa6";
 
 gsap.registerPlugin(useGSAP);
 
@@ -283,18 +285,18 @@ const MusicPlayer = () => {
                     onKeyDown={(e) => { if (e.key === 'Enter') expandMusicPlayer(); }}
                 >
                     <div className='flex items-center gap-2 text-xl'>
-                        <div className='bg-white h-10 w-10 rounded-full overflow-hidden'>
+                        <div className='bg-white h-12 w-12 rounded-lg overflow-hidden'>
                             <img src={currentTrack?.images?.large} alt="" className='w-full h-full object-cover' />
                         </div>
-                        <div className='flex flex-col'>
-                            <h1 className='text-lg/5'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
-                            <div className='flex items-center gap-1 flex-wrap'>
+                        <div className='flex flex-col justify-around'>
+                            <h1 className='text-lg font-bold'>{trimString(currentTrack?.title, 30) || 'No Track Selected'}</h1>
+                            <div className='flex items-center  gap-2  flex-wrap'>
                                 {currentTrack?.artists?.primary ? (
                                     currentTrack.artists.primary.map((artist, index) => (
                                         <React.Fragment key={artist.id}>
                                             <Link
                                                 to={`/artist/${artist.id}`}
-                                                className='text-sm text-gray-400 underline hover:text-gray-300'
+                                                className='text-sm font-bold text-gray-400  hover:text-gray-300'
                                                 onClick={(e) => { e.stopPropagation(); }}
                                             >
                                                 {trimString(artist.name, Math.floor(23 / currentTrack.artists.primary.length))}
@@ -324,17 +326,18 @@ const MusicPlayer = () => {
                     <div
                         onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
                         onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }}
-                        className='p-2 md:hidden rounded-full bg-white'
+                        className='p-2 md:hidden active:bg-[#202020] rounded-full transition duration-200 ease-in-out  '
                         onClick={(e) => {
                             e.stopPropagation(); // Prevent expandMusicPlayer
                             togglePlayPause();
                         }}
                     >
-                        {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={30} /> : <Play color='black' size={30} />}
+                        {/* {isLoading ? <LoadingSpinner /> : playing ? <Pause strokeWidth={2} color='white' size={30} /> : <Play color='white' size={30} strokeWidth={2} />} */}
+                        {isLoading ? <LoadingSpinner /> : playing ? <FaPause color='white' size={30} /> : <FaPlay color='white' size={30} />}
                     </div>
                 </div>
 
-                {/* Controls and Slider - not clickable to expand */}
+                {/* Controls and Slider  */}
                 <div className='flex flex-col items-center gap-4 w-full md:w-auto'>
                     <Slider
                         value={[pos]}
@@ -365,7 +368,7 @@ const MusicPlayer = () => {
                     </div>
                 </div>
 
-                {/* Volume controls - not clickable to expand */}
+                {/* Volume controls */}
                 <div className='items-center gap-3 md:flex hidden'>
                     <h1 className='tracking-wider'>
                         {formatTime(pos)}/{formatTime(duration)}

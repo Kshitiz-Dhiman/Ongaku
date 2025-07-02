@@ -104,7 +104,7 @@ const Album = () => {
                         </div>
 
                         {/* Songs List */}
-                        <div className='mt-8 bg-zinc-800/30 backdrop-blur-sm p-10 rounded-md'>
+                        <div className='mt-8 bg-zinc-800/30 backdrop-blur-sm p-5 md:p-10 rounded-md'>
                             <table className='w-full text-left text-white'>
                                 <thead className='border-b border-[#262626]'>
                                     <tr className='text-gray-400'>
@@ -154,7 +154,7 @@ const Album = () => {
     );
 };
 const AlbumSkeleton = () => (
-    <div className='w-full min-h-screen bg-black px-4 py-20 md:py-24'>
+    <div className='w-full  mt-10 min-h-screen bg-black px-4 py-20 md:py-24'>
         <div className='max-w-7xl mx-auto md:mt-5'>
             <div className='flex flex-col gap-8'>
                 {/* Album Header Skeleton */}

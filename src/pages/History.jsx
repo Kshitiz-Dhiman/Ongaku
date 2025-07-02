@@ -22,7 +22,7 @@ const History = () => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`
             }
-        });
+        });     
         setHistory(response.data.history);
         setLoading(false);
     }

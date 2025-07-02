@@ -11,7 +11,7 @@ const MusicQueue = ({ onClose }) => {
         console.log("Not ready");
 
         // const remainingQueue = queue.slice(
-        //     queue.findIndex((song) => song.id === id) + 1,
+        //     queue.findIndex(() => song.id === id) + 1,
         //     queue.length
         // );
         // await playTrack(url, id, addToQueue, remainingQueue);

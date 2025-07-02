@@ -14,6 +14,10 @@ import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import MusicQueue from './MusicQueue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Volume2 } from 'lucide-react';
+import { FaPlay } from "react-icons/fa6";
+import { FaPause } from "react-icons/fa6";
+import { FaForward } from "react-icons/fa6";
+import { FaBackward } from "react-icons/fa6";
 const ExpandedMusicPlayer = ({
     expandedPlayerRef,
     isExpanded,
@@ -179,7 +183,7 @@ const ExpandedMusicPlayer = ({
             <button
                 type='button'
                 onClick={onClose}
-                className="pt-3 pl-5 flex items-center bg-zinc-900 w-full "
+                className="pt-3 pl-5 flex items-center  w-full "
             >
                 <div className="w-12 h-1 bg-gray-500 rounded-full mx-auto mt-2 mb-3"></div>
 
@@ -239,7 +243,7 @@ const ExpandedMusicPlayer = ({
                                     <React.Fragment key={artist.id}>
                                         <Link
                                             to={`/artist/${artist.id}`}
-                                            className='text-sm text-gray-400 underline hover:text-gray-300'
+                                            className='text-sm text-gray-400  hover:text-gray-300'
                                             onClick={(e) => { e.stopPropagation() }}
                                         >
                                             {trimString(artist.name, Math.floor(23 / currentTrack.artists.primary.length))}
@@ -298,6 +302,13 @@ const ExpandedMusicPlayer = ({
                             ) : (
                                 <Play className="w-8 h-8 text-black" />
                             )}
+                            {/* {isLoading ? (
+                                <LoadingSpinner />
+                            ) : playing ? (
+                                <FaPause color='black' size={30} />
+                            ) : (
+                                <FaPlay color='black' size={30} />
+                            )} */}
                         </div>
                         <SkipForward
                             className="w-8 h-8 hover:text-gray-300 cursor-pointer"
@@ -319,9 +330,15 @@ const ExpandedMusicPlayer = ({
             </div>
 
 
-            <div className="md:hidden bg-gradient-to-b from-zinc-900 to-black  h-full flex flex-col px-4 pb-20">
+            <div className="md:hidden h-full flex flex-col px-6 pb-20">
                 {/* Album Art */}
-                <div className="md:hidden flex-1 flex items-center justify-center p-2 leading-7">
+                <div
+                    className="absolute inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-30 scale-110"
+                    style={{
+                        backgroundImage: `url(${currentTrack?.images?.medium})`,
+                    }}
+                />
+                <div className="md:hidden flex-1 flex items-center mb-[-70px] justify-center p-2 leading-7">
 
                     {!lyricsMenuOpen ?
                         (
@@ -342,9 +359,8 @@ const ExpandedMusicPlayer = ({
                     }
                 </div>
 
-                {/* Track Info */}
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold">
+                    <h1 className="text-2xl font-extrabold">
                         {trimString(currentTrack?.title, 30) || 'No Track Selected'}
                     </h1>
                     <p className="text-gray-400 mt-2">
@@ -353,25 +369,25 @@ const ExpandedMusicPlayer = ({
                                 <React.Fragment key={artist.id}>
                                     <Link
                                         to={`/artist/${artist.id}`}
-                                        className='text-sm text-gray-400 underline hover:text-gray-300'
+                                        className='text-md text-gray-400 hover:text-gray-300 font-semibold'
                                         onClick={(e) => { e.stopPropagation() }}
                                     >
                                         {trimString(artist.name, Math.floor(23 / currentTrack.artists.primary.length))}
                                     </Link>
                                     {index < currentTrack.artists.primary.length - 1 && (
-                                        <span className='text-sm text-gray-400'>, </span>
+                                        <span className='text-lg text-gray-400'>, </span>
                                     )}
                                 </React.Fragment>
                             ))
                         ) : (
-                            <span className='text-sm text-gray-400'>Unknown Artist</span>
+                            <span className='text-lg text-gray-400 font-semibold'>Unknown Artist</span>
                         )}
                     </p>
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mt-4 px-4">
-                    <div className="flex justify-between text-sm mb-2">
+                <div className="mt-4 ">
+                    <div className="flex text-gray-300 justify-between text-sm mb-2">
                         <span>{formatTime(pos)}</span>
                         <span>{formatTime(duration)}</span>
                     </div>
@@ -396,27 +412,35 @@ const ExpandedMusicPlayer = ({
                             <Heart className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" onClick={toggleLiked} />
                         )
                     }
-                    <SkipBack
-                        className="w-8 h-8 hover:text-gray-300 cursor-pointer"
+                    <FaBackward
+                        className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer"
                         onClick={playPreviousSong}
                     />
                     <div
-                        className="p-4 rounded-full bg-white hover:bg-gray-200 cursor-pointer"
+                        className="p-4 rounded-full bg-gray-400 hover:bg-gray-200 cursor-pointer"
                         onClick={togglePlayPause}
                         onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') togglePlayPause(); }}
                     >
-                        {isLoading ? (
+                        {/* {isLoading ? (
                             <LoadingSpinner />
                         ) : playing ? (
                             <Pause className="w-8 h-8 text-black" />
                         ) : (
                             <Play className="w-8 h-8 text-black" />
+                        )} */}
+                        {isLoading ? (
+                            <LoadingSpinner />
+                        ) : playing ? (
+                            <FaPause color='black' size={30} />
+                        ) : (
+                            <FaPlay color='black' size={30} />
                         )}
                     </div>
-                    <SkipForward
+                    {/* <SkipForward
                         className="w-8 h-8 hover:text-gray-300 cursor-pointer"
                         onClick={playNextSong}
-                    />
+                    /> */}
+                    <FaForward onClick={playNextSong} className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
                     <Repeat onClick={() => startLoop()} className={!loopOnOrOff ? "w-6 h-6 text-gray-400 hover:text-white cursor-pointer" : "w-7 h-7 text-white cursor-pointer"} />
                 </div>
 
