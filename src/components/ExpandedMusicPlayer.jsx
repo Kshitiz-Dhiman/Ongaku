@@ -145,8 +145,6 @@ const ExpandedMusicPlayer = ({
         }
     }
 
-
-
     const [loopOnOrOff, setLoopOnOrOff] = useState(false);
 
     const startLoop = () => {
@@ -158,6 +156,122 @@ const ExpandedMusicPlayer = ({
             setLoopOnOrOff(true);
         }
     }
+    const [isDragActive, setIsDragActive] = useState(false);
+    const [currentY, setCurrentY] = useState(0);
+    const dragData = useRef({
+        startY: 0,
+        currentTranslateY: 0,
+        isDragging: false
+    });
+
+    useEffect(() => {
+        const player = expandedPlayerRef.current;
+        if (!player || !isExpanded) return;
+
+        const handleStart = (e) => {
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            dragData.current.startY = clientY;
+            dragData.current.isDragging = true;
+            setIsDragActive(true);
+
+            // Prevent default to avoid scrolling on mobile
+            e.preventDefault();
+        };
+
+        const handleMove = (e) => {
+            if (!dragData.current.isDragging) return;
+
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const deltaY = clientY - dragData.current.startY;
+
+            // Only allow downward movement
+            if (deltaY > 0) {
+                dragData.current.currentTranslateY = deltaY;
+                setCurrentY(deltaY);
+
+                // Clear any transition for smooth dragging
+                player.style.transition = '';
+
+                // Apply transform
+                player.style.transform = `translateY(${deltaY}px)`;
+
+                // Check if dragged halfway
+                const screenHeight = window.innerHeight;
+                const halfwayPoint = screenHeight * 0.1;
+
+                if (deltaY > halfwayPoint) {
+                    // Animate out of screen
+                    player.style.transition = 'transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                    player.style.transform = `translateY(${screenHeight}px)`;
+
+                    setTimeout(() => {
+                        onClose(); // Call the onClose function to close the expanded player
+                    }, 200);
+
+                    dragData.current.isDragging = false;
+                    setIsDragActive(false);
+                    return;
+                }
+            }
+
+            e.preventDefault();
+        };
+
+        const handleEnd = (e) => {
+            if (!dragData.current.isDragging) return;
+
+            dragData.current.isDragging = false;
+            setIsDragActive(false);
+
+            // Snap back to original position if not dragged far enough
+            player.style.transition = 'transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)';
+            player.style.transform = 'translateY(0px)';
+
+            dragData.current.currentTranslateY = 0;
+            setCurrentY(0);
+        };
+
+        // Mouse events
+        player.addEventListener('mousedown', handleStart);
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('mouseup', handleEnd);
+
+        // Touch events
+        player.addEventListener('touchstart', handleStart, { passive: false });
+        document.addEventListener('touchmove', handleMove, { passive: false });
+        document.addEventListener('touchend', handleEnd);
+
+        return () => {
+            if (player) {
+                player.removeEventListener('mousedown', handleStart);
+                player.removeEventListener('touchstart', handleStart);
+            }
+            document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('mouseup', handleEnd);
+            document.removeEventListener('touchmove', handleMove);
+            document.removeEventListener('touchend', handleEnd);
+        };
+    }, [isExpanded, onClose]);
+
+    // Reset drag state when component mounts/unmounts
+    useEffect(() => {
+        if (isExpanded && expandedPlayerRef.current) {
+            // Reset any transforms
+            expandedPlayerRef.current.style.transform = 'translateY(0px)';
+            expandedPlayerRef.current.style.transition = '';
+
+            // Reset drag data
+            dragData.current = {
+                startY: 0,
+                currentTranslateY: 0,
+                isDragging: false
+            };
+            setCurrentY(0);
+            setIsDragActive(false);
+        }
+    }, [isExpanded]);
+
+
 
     return (
         <div ref={expandedPlayerRef}
@@ -182,7 +296,7 @@ const ExpandedMusicPlayer = ({
 
             <button
                 type='button'
-                onClick={onClose}
+                // onClick={onClose}
                 className="pt-3 pl-5 flex items-center  w-full "
             >
                 <div className="w-12 h-1 bg-gray-500 rounded-full mx-auto mt-2 mb-3"></div>
@@ -333,12 +447,18 @@ const ExpandedMusicPlayer = ({
             <div className="md:hidden h-full flex flex-col px-6 pb-20">
                 {/* Album Art */}
                 <div
-                    className="absolute inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-30 scale-200"
+                    className="absolute inset-0 z-[-1] bg-cover bg-center opacity-50"
                     style={{
                         backgroundImage: `url(${currentTrack?.images?.medium})`,
-                        willChange: 'transform',
                         transform: 'translateZ(0)',
                         backfaceVisibility: 'hidden',
+                    }}
+                />
+                <div
+                    className="absolute inset-0 z-[-1]"
+                    style={{
+                        backdropFilter: 'blur(300px)',
+                        transform: 'translateZ(0)',
                     }}
                 />
                 <div className="md:hidden flex-1 flex items-center mb-[-70px] justify-center p-2 leading-7">

@@ -34,7 +34,7 @@ const MusicPlayer = () => {
         gsap.matchMedia("(min-width: 800px)", () => {
             gsap.from(playerRef.current, {
                 y: 100,
-                duration: 0.8,
+                duration: 0.3,
                 ease: "power2.out",
                 opacity: 0,
                 clearProps: "all"
@@ -53,7 +53,7 @@ const MusicPlayer = () => {
                     y: 0,
                     opacity: 1,
                     scale: 1,
-                    duration: 0.6,
+                    duration: 0.3,
                     ease: "back.out(0)"
                 }
             );
@@ -69,11 +69,7 @@ const MusicPlayer = () => {
     const expandMusicPlayer = (e) => {
         if (isExpanded && expandedPlayerRef.current) {
             gsap.to(expandedPlayerRef.current, {
-                y: window.innerHeight,
-                opacity: 1,
-                scale: 0.95,
-                duration: 0.3,
-                ease: "power3.in",
+
                 onComplete: () => setIsExpanded(false)
             });
         } else {
