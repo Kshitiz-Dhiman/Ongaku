@@ -156,6 +156,7 @@ const ExpandedMusicPlayer = ({
             setLoopOnOrOff(true);
         }
     }
+
     const [isDragActive, setIsDragActive] = useState(false);
     const [currentY, setCurrentY] = useState(0);
     const dragData = useRef({
@@ -164,17 +165,38 @@ const ExpandedMusicPlayer = ({
         isDragging: false
     });
 
+    // Replace your existing drag effect with this improved version
+    // Replace your existing drag effect with this version that includes image dragging
     useEffect(() => {
         const player = expandedPlayerRef.current;
         if (!player || !isExpanded) return;
 
         const handleStart = (e) => {
+            // Check if the touch/click started on an interactive element
+            const target = e.target;
+            const isInteractiveElement = target.closest('button, a, [role="button"], [onclick], input, select, textarea, .slider, [data-interactive]');
+
+            if (isInteractiveElement) {
+                return; // Don't start drag on interactive elements
+            }
+
+            // Check if touch started on the album art image or its container
+            const isOnImage = target.closest('.album-art-container, .album-art-image');
+
+            // Only start drag if touch/click is in the upper portion of the screen OR on the album art
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const screenHeight = window.innerHeight;
+
+            // Allow drag from top 30% of screen OR if touching the album art
+            if (!isOnImage && clientY > screenHeight * 0.3) {
+                return;
+            }
+
             dragData.current.startY = clientY;
             dragData.current.isDragging = true;
             setIsDragActive(true);
 
-            // Prevent default to avoid scrolling on mobile
+            // Only prevent default after we've decided to start dragging
             e.preventDefault();
         };
 
@@ -197,7 +219,7 @@ const ExpandedMusicPlayer = ({
 
                 // Check if dragged halfway
                 const screenHeight = window.innerHeight;
-                const halfwayPoint = screenHeight * 0.1;
+                const halfwayPoint = screenHeight * 0.3;
 
                 if (deltaY > halfwayPoint) {
                     // Animate out of screen
@@ -205,7 +227,7 @@ const ExpandedMusicPlayer = ({
                     player.style.transform = `translateY(${screenHeight}px)`;
 
                     setTimeout(() => {
-                        onClose(); // Call the onClose function to close the expanded player
+                        onClose();
                     }, 200);
 
                     dragData.current.isDragging = false;
@@ -236,10 +258,10 @@ const ExpandedMusicPlayer = ({
         document.addEventListener('mousemove', handleMove);
         document.addEventListener('mouseup', handleEnd);
 
-        // Touch events
+        // Touch events - use passive: false only for touchstart on the player
         player.addEventListener('touchstart', handleStart, { passive: false });
         document.addEventListener('touchmove', handleMove, { passive: false });
-        document.addEventListener('touchend', handleEnd);
+        document.addEventListener('touchend', handleEnd, { passive: true });
 
         return () => {
             if (player) {
@@ -305,7 +327,22 @@ const ExpandedMusicPlayer = ({
 
 
 
-            <div className='md:block hidden h-full w-full bg-gradient-to-b from-zinc-900 to-black flex-col p-6'>
+            <div className='md:block hidden h-full w-full flex-col p-6'>
+                <div
+                    className="absolute inset-0 z-[-1] bg-cover bg-center opacity-50"
+                    style={{
+                        backgroundImage: `url(${currentTrack?.images?.medium})`,
+                        transform: 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
+                    }}
+                />
+                <div
+                    className="absolute inset-0 z-[-1]"
+                    style={{
+                        backdropFilter: 'blur(300px)',
+                        transform: 'translateZ(0)',
+                    }}
+                />
                 <div className='flex h-3/4 justify-around items-start '>
                     <div className="h-full max-w-full p-20 aspect-square rounded-xl overflow-hidden ">
                         <img
@@ -400,32 +437,32 @@ const ExpandedMusicPlayer = ({
                                 <Heart className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" onClick={toggleLiked} />
                             )
                         }
-                        <SkipBack
-                            className="w-8 h-8 hover:text-gray-300 cursor-pointer"
+                        <FaBackward
+                            className="w-8 h-8 text-gray-400 hover:text-gray-300 cursor-pointer"
                             onClick={playPreviousSong}
                         />
                         <div
-                            className="p-4 rounded-full bg-white hover:bg-gray-200 cursor-pointer"
+                            className="p-4 rounded-full bg-gray-400 hover:bg-gray-200 cursor-pointer"
                             onClick={togglePlayPause}
                             onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') togglePlayPause(); }}
                         >
-                            {isLoading ? (
+                            {/* {isLoading ? (
                                 <LoadingSpinner />
                             ) : playing ? (
                                 <Pause className="w-8 h-8 text-black" />
                             ) : (
                                 <Play className="w-8 h-8 text-black" />
-                            )}
-                            {/* {isLoading ? (
+                            )} */}
+                            {isLoading ? (
                                 <LoadingSpinner />
                             ) : playing ? (
                                 <FaPause color='black' size={30} />
                             ) : (
                                 <FaPlay color='black' size={30} />
-                            )} */}
+                            )}
                         </div>
-                        <SkipForward
-                            className="w-8 h-8 hover:text-gray-300 cursor-pointer"
+                        <FaForward
+                            className="w-8 h-8 text-gray-400 hover:text-gray-300 cursor-pointer"
                             onClick={playNextSong}
                         />
                         <Repeat onClick={() => startLoop()} className={!loopOnOrOff ? "w-6 h-6 text-gray-400 hover:text-white cursor-pointer" : "w-7 h-7 text-white cursor-pointer"} />
@@ -461,11 +498,11 @@ const ExpandedMusicPlayer = ({
                         transform: 'translateZ(0)',
                     }}
                 />
-                <div className="md:hidden flex-1 flex items-center mb-[-70px] justify-center p-2 leading-7">
+                <div className="md:hidden flex-1 album-art-container flex items-center mb-[-70px] justify-center p-2 leading-7">
 
                     {!lyricsMenuOpen ?
                         (
-                            <div className="max-w-md aspect-square rounded-lg overflow-hidden">
+                            <div className="album-art-image max-w-md aspect-square rounded-lg overflow-hidden">
                                 <img
                                     src={currentTrack?.images?.medium}
                                     alt={currentTrack?.title}
@@ -541,7 +578,11 @@ const ExpandedMusicPlayer = ({
                     />
                     <div
                         className="p-4 rounded-full bg-gray-400 hover:bg-gray-200 cursor-pointer"
-                        onClick={togglePlayPause}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            togglePlayPause();
+                        }}
                         onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') togglePlayPause(); }}
                     >
                         {/* {isLoading ? (

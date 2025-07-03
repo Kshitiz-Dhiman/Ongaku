@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
-import { FaPlay } from "react-icons/fa6";
+import { FaBackward, FaForward, FaPlay } from "react-icons/fa6";
 import { FaPause } from "react-icons/fa6";
 
 gsap.registerPlugin(useGSAP);
@@ -347,19 +347,19 @@ const MusicPlayer = () => {
                     />
                     {/* Controls */}
                     <div className='cursor-pointer hover:opacity-80 mt-3 md:m-0'>
-                        <div className='md:flex justify-center items-center gap-4 hidden'>
-                            <Shuffle />
-                            <SkipBack onClick={(e) => { playPreviousSong(); }} />
+                        <div className='md:flex justify-center items-center gap-6 hidden'>
+                            <Shuffle className='text-gray-400' />
+                            <FaBackward size={30} className='text-gray-400' onClick={(e) => { playPreviousSong(); }} />
                             <div
                                 onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
                                 onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }}
-                                className='p-2 rounded-full bg-white'
+                                className='p-3 rounded-full bg-gray-400'
                                 onClick={(e) => { togglePlayPause(); }}
                             >
-                                {isLoading ? <LoadingSpinner /> : playing ? <Pause color='black' size={35} /> : <Play color='black' size={35} />}
+                                {isLoading ? <LoadingSpinner /> : playing ? <FaPause color='black' size={30} /> : <FaPlay color='black' size={30} />}
                             </div>
-                            <SkipForward onClick={(e) => { playNextSong(); }} />
-                            <Repeat />
+                            <FaForward size={30} className='text-gray-400' onClick={(e) => { playNextSong(); }} />
+                            <Repeat className='text-gray-400' />
                         </div>
                     </div>
                 </div>
