@@ -219,10 +219,9 @@ const ExpandedMusicPlayer = ({
 
                 // Check if dragged halfway
                 const screenHeight = window.innerHeight;
-                const halfwayPoint = screenHeight * 0.3;
+                const halfwayPoint = screenHeight * 0.15;
 
                 if (deltaY > halfwayPoint) {
-                    // Animate out of screen
                     player.style.transition = 'transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)';
                     player.style.transform = `translateY(${screenHeight}px)`;
 
