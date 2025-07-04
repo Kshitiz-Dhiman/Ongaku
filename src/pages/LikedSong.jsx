@@ -11,6 +11,7 @@ import {
     DropdownMenuTrigger,
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { addAudio } from '@/app/indexDB';
 
 const LikedSong = () => {
     const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ const LikedSong = () => {
     const [likedAlbums, setlikedAlbums] = useState([]);
     const [likedArtists, setlikedArtists] = useState([]);
 
-    const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
+    const { playTrack, currentTrack, setCurrentTrack } = useContext(AudioPlayerData);
     const getLikedSongs = async () => {
         setLoading(true);
         try {
@@ -97,7 +98,8 @@ const LikedSong = () => {
     const songMenu = () => {
 
     }
-    const handleRemoveFromLiked = async (songId) => {
+    const handleRemoveFromLiked = async (songId, e) => {
+        e.stopPropagation();
         try {
             await axios.delete(`${import.meta.env.VITE_MUSIC_API}/liked/songs/${songId}`, {
                 headers: {
@@ -111,6 +113,37 @@ const LikedSong = () => {
             toast.error("Failed to remove song");
         }
     };
+
+    const handleAddToDownloads = async (id, e) => {
+        e.stopPropagation();
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${id}`);
+            const songData = response.data.data;
+
+            const audio = {
+                id: songData.id,
+                title: songData.title,
+                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
+                images: songData.images,
+                download_url: songData.download[4].link,
+                artists: songData.artists,
+                album: songData.album,
+                duration: songData.duration,
+                releaseDate: songData.releaseDate,
+                label: songData.label,
+            }
+            // console.log(audio)
+            await addAudio(songData.id, audio);
+            alert("Song added to downloads");
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const handleAddToQueue = (e) => {
+        e.stopPropagation();
+        // Add your queue logic here
+    }
 
     return (
         <div className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20 mb-10'>
@@ -145,14 +178,21 @@ const LikedSong = () => {
                                         <EllipsisVertical />
                                     </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-48 bg-[#101010] border-[#202020] text-white">
-                                    <DropdownMenuItem>
+                                <DropdownMenuContent
+                                    className="w-48 bg-[#101010] border-[#202020] text-white"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <DropdownMenuItem onClick={handleAddToQueue}>
                                         Add to the Queue
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={(e) => handleAddToDownloads(song.songId, e)}>
+                                        Add to Downloads
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator className="bg-[#202020]" />
 
                                     <DropdownMenuItem
                                         className="hover:bg-[#1a1a1a] cursor-pointer text-red-500"
+                                        onClick={(e) => handleRemoveFromLiked(song.songId, e)}
                                     >
                                         Remove from Liked
                                     </DropdownMenuItem>

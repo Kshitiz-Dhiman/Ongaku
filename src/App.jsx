@@ -13,11 +13,10 @@ import LikedSong from './pages/LikedSong'
 import Profile from './pages/Profile'
 import History from './pages/History'
 import isOnline from './pages/IsOnline';
+import Downloads from './pages/Downloads'
 const App = () => {
 
-    if (!isOnline) {
-        return <ErrorPage />
-    }
+
     const GoogleAuthWrapper = () => {
         return (
             <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
@@ -48,6 +47,7 @@ const App = () => {
                             <Route path='/library/:lib' element={<LikedSong />} />
                             <Route path='/account/:profile' element={<Profile />} />
                             <Route path='/account/history' element={<History />} />
+                            <Route path='/downloads' element={<Downloads />} />
                             <Route path='*' element={<ErrorPage />} />
                         </Routes>
                     </main>

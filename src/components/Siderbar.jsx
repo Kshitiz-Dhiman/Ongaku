@@ -1,5 +1,5 @@
 import React from 'react'
-import { Home, Library, User } from "lucide-react"
+import { Home, Library, User, Download } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
 
 const Sidebar = ({ onClose }) => {
@@ -50,6 +50,11 @@ const Sidebar = ({ onClose }) => {
                     icon={<Library size={24} />}
                     label="Library"
                     onClick={() => navigate('/library/liked')}
+                />
+                <NavItem
+                    icon={<Download size={24} />}
+                    label="Downloads"
+                    onClick={() => navigate('/downloads')}
                 />
                 <NavItem
                     icon={<User size={24} />}
