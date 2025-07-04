@@ -208,7 +208,7 @@ const NavBar = () => {
         <div className='fixed bg-black w-full flex flex-wrap justify-between items-center px-4 md:px-12 z-[99] pt-5 pb-2'>
             {/* Logo - First on desktop and mobile */}
             <div
-                className="absolute bg-linear-65 from-red-500 to-blue-800 inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-30 scale-200"
+                className="absolute bg-linear-65 from-red-500 to-blue-800 inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-40 scale-200 h-[100px]"
                 style={{
                     willChange: 'transform',
                     transform: 'translateZ(0)',

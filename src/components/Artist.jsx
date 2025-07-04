@@ -266,7 +266,7 @@ const OverView = ({ artistSongs, artistData, handleSingleClick, formatTime, hand
 }
 
 const ArtistSkeleton = () => (
-    <div className='w-full min-h-screen bg-black px-4 py-20 md:py-24'>
+    <div className='w-full mt-10 min-h-screen bg-black px-4 py-20 md:py-24'>
         <div className='max-w-7xl mx-auto md:mt-5'>
             <div className='flex flex-col gap-8'>
                 {/* Artist Header Skeleton */}

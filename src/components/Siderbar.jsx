@@ -24,9 +24,12 @@ const Sidebar = ({ onClose }) => {
                     items={[
                         { icon: <Library size={20} />, title: 'Songs', link: 'liked' },
                         { icon: <Library size={20} />, title: 'Playlist', link: 'playlist' },
-                        { icon: <Library size={20} />, title: 'Album', link: 'album' }
+                        { icon: <Library size={20} />, title: 'Album', link: 'album' },
+                        { icon: <Library size={20} />, title: 'Downloads', link: 'downloads' }
+
                     ]}
                     handleNavClick={() => navigate('/library')}
+
                 />
 
                 <DesktopMenu
@@ -34,7 +37,7 @@ const Sidebar = ({ onClose }) => {
                     items={[
                         { icon: <User size={20} />, title: 'Profile', link: 'profile' },
                         { icon: <User size={20} />, title: 'Settings', link: 'setting' },
-                        { icon: <User size={20} />, title: 'History', link: 'history' }
+                        { icon: <User size={20} />, title: 'History', link: 'history' },
                     ]}
                     handleNavClick={() => navigate('/profile')}
                 />
@@ -54,7 +57,7 @@ const Sidebar = ({ onClose }) => {
                 <NavItem
                     icon={<Download size={24} />}
                     label="Downloads"
-                    onClick={() => navigate('/downloads')}
+                    onClick={() => navigate('/library/downloads')}
                 />
                 <NavItem
                     icon={<User size={24} />}

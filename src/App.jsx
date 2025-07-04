@@ -47,7 +47,7 @@ const App = () => {
                             <Route path='/library/:lib' element={<LikedSong />} />
                             <Route path='/account/:profile' element={<Profile />} />
                             <Route path='/account/history' element={<History />} />
-                            <Route path='/downloads' element={<Downloads />} />
+                            <Route path='/library/downloads' element={<Downloads />} />
                             <Route path='*' element={<ErrorPage />} />
                         </Routes>
                     </main>
