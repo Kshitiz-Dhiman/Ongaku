@@ -22,7 +22,8 @@ const AudioPlayerContext = ({ children }) => {
         setVolume,
         seek,
         looping,
-        loop
+        loop,
+
     } = useGlobalAudioPlayer();
     const queueRef = useRef([]);
 
@@ -187,7 +188,7 @@ const AudioPlayerContext = ({ children }) => {
                 onend: looping ? null : handleSongEnd,
                 onplay: () => setIsPlaying(true)
             });
-
+            
             // Add to history asynchronously without blocking
             // addToHistoryAsync(trackInfo);
 

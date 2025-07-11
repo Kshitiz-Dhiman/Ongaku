@@ -5,7 +5,11 @@ import { AudioPlayerData } from '../context/AudioPlayerContext'
 import axios from "axios"
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
+import { useAudioStore } from '@/app/storeZustand'
+import { useAudioPlayerContext as useExternalAudioPlayer } from 'react-use-audio-player'
+
 function MusicCard({ key, song }) {
+    const { load } = useExternalAudioPlayer(); // External audio player
     const cardRef = useRef(null);
 
     gsap.registerPlugin(useGSAP);
@@ -23,32 +27,20 @@ function MusicCard({ key, song }) {
             }
         });
     }, [])
-    const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
+
+    const { playTrack, setCurrentSong } = useAudioStore();
+
     const playthehomesong = async () => {
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.id}`);
-            const songData = response.data.data;
-
-            const trackInfo = {
-                id: songData.id,
-                title: songData.title,
-                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
-                images: songData.images,
-                download_url: songData.download,
-                artists: songData.artists,
-                album: songData.album,
-                duration: songData.duration,
-                releaseDate: songData.releaseDate,
-                label: songData.label,
-                copyright: songData.copyright
-            };
-
-            setCurrentTrack(trackInfo);
-            await playTrack(songData.download[4].link, songData.id, true);
-        } catch (e) {
-            console.log(e);
-        }
+        await playTrack(song, true);
+        // load(song.download_urls[4].link, {
+        //     autoplay: true,
+        //     initialVolume: 0.5,
+        //     onend: () => {
+        //         console.log("Song ended");
+        //     },
+        // })
     }
+
     return (
         <div onClick={playthehomesong} ref={cardRef} key={key} className="w-full sm:max-w-[250px] rounded-xl hover:bg-[#202020] cursor-pointer p-2 md:p-3">
             <div className='relative group aspect-square overflow-hidden rounded-2xl'>

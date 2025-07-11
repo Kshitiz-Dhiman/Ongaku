@@ -7,7 +7,7 @@ import { AudioPlayerData } from '../context/AudioPlayerContext';
 import { useNavigate, NavLink } from 'react-router-dom';
 import SampleLogin from '@/pages/LoginBtn';
 import { useAuthUserInfo } from '../context/AuthUserInfoContext';
-
+import Favicon from '../../public/newfavicon.png';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -208,7 +208,7 @@ const NavBar = () => {
         <div className='fixed bg-black w-full flex flex-wrap justify-between items-center px-4 md:px-12 z-[99] pt-5 pb-2'>
             {/* Logo - First on desktop and mobile */}
             <div
-                className="absolute bg-linear-65 from-red-500 to-blue-800 inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-40 scale-200 h-[100px]"
+                className="absolute bg-linear-65 from-red-500 to-blue-800 inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-40 scale-200 h-[90px]"
                 style={{
                     willChange: 'transform',
                     transform: 'translateZ(0)',
@@ -216,7 +216,8 @@ const NavBar = () => {
                 }}
             />
             <div className='flex order-1 items-center justify-center gap-2 w-auto'>
-                <Music size={34} color='#f2371d' strokeWidth={4} className='mt-2' />
+                <img src={Favicon} alt="tung tung tung sahur" className='h-12 w-12 mr-[-15px]' />
+
                 <h1 className='hidden sm:block text-2xl md:text-3xl font-bold'> Ongaku</h1>
             </div>
 

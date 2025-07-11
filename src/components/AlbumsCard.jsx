@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { trimString } from '@/utils/utils'
+import { trimString, decodeHTMLEntities } from '@/utils/utils'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 const AlbumsCard = ({ key, album }) => {
@@ -38,7 +38,7 @@ const AlbumsCard = ({ key, album }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="text-sm sm:text-base font-bold text-white truncate">
-                        {trimString(album.title, window.innerWidth < 640 ? 30 : 50)}
+                        {trimString(decodeHTMLEntities(album.title, window.innerWidth < 640 ? 30 : 50))}
                     </div>
                 </div>
             </div>

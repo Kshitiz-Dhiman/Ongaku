@@ -3,7 +3,8 @@ import axios from 'axios'
 import { toast } from 'react-toastify';
 import { EllipsisVertical } from 'lucide-react';
 import LikedSongSkeleton from '@/components/LikedSongSkeleton';
-import { AudioPlayerData } from '../context/AudioPlayerContext';
+// import { AudioPlayerData } from '../context/AudioPlayerContext';
+import { useAudioStore } from '@/app/storeZustand';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,14 +13,15 @@ import {
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { addAudio } from '@/app/indexDB';
+import { useAudioPlayerContext } from 'react-use-audio-player';
 
 const LikedSong = () => {
     const [loading, setLoading] = useState(false);
     const [likedSongs, setlikedSongs] = useState([]);
     const [likedAlbums, setlikedAlbums] = useState([]);
     const [likedArtists, setlikedArtists] = useState([]);
-
-    const { playTrack, currentTrack, setCurrentTrack } = useContext(AudioPlayerData);
+    const { playTrack, currentSong, setCurrentSong, handleNextSong, handlePrevSong } = useAudioStore();
+    const { load } = useAudioPlayerContext();
     const getLikedSongs = async () => {
         setLoading(true);
         try {
@@ -46,33 +48,8 @@ const LikedSong = () => {
 
     const handlePlaySong = async (song) => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.songId}`);
-            const songData = response.data.data;
+            await playTrack(song, false, likedSongs);
 
-            const trackInfo = {
-                id: songData.id,
-                title: songData.title,
-                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
-                images: songData.images,
-                download_url: songData.download[4].link,
-                artists: songData.artists,
-                album: songData.album,
-                duration: songData.duration,
-                releaseDate: songData.releaseDate,
-                label: songData.label,
-                copyright: songData.copyright
-            };
-
-            setCurrentTrack(trackInfo);
-
-            const formattedSongs = likedSongs.map(likedSong => ({
-                id: likedSong.songId,
-                title: likedSong.title,
-                subtitle: likedSong.artist,
-                image: { small: likedSong.image }
-            }));
-
-            await playTrack(songData.download[4].link, songData.id, true, formattedSongs);
         } catch (error) {
             console.error('Error playing song:', error);
         }

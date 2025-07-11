@@ -19,7 +19,7 @@ const PlaylistHome = () => {
 
     const getHomeSongs = async () => {
         try {
-            setIsLoading(false); // Set loading to false before fetching
+            setIsLoading(false);
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/get/trending?lang=${language}&type=song`);
             const homeSongs = response.data.data;
             setHomesongs(homeSongs);
@@ -29,6 +29,7 @@ const PlaylistHome = () => {
             setIsLoading(true);
         }
     }
+
 
     const getHomeAlbums = async () => {
         try {
@@ -53,10 +54,6 @@ const PlaylistHome = () => {
     return (
         <div className='w-full min-h-screen bg-black px-4 py-20 mt-5 md:mt-0 md:py-20 '>
             <div className='max-w-7xl mx-auto md:mt-5'>
-                {/* <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-[#6e7273] mb-6 md:mb-8'>
-                    Trending
-                </h1> */}
-
                 <div className='flex flex-col space-y-4 sm:space-y-6 md:space-y-0 md:flex-row md:items-center md:justify-between mb-6 mt-13 md:mt-10 md:mb-8'>
                     <div className='text-3xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#6e7273] text-left'>
                         Trending Albums
@@ -101,7 +98,7 @@ const PlaylistHome = () => {
                 <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-[#6e7273] mb-6 md:mb-8'>
                     Trending Songs
                 </h1>
-                <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 mt-8'>
+                <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 md:gap-2 mt-8'>
 
                     {isLoading ? homesongs.map((song) => (
                         <MusicCard key={song.id} song={song} />

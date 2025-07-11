@@ -14,6 +14,7 @@ import Profile from './pages/Profile'
 import History from './pages/History'
 import isOnline from './pages/IsOnline';
 import Downloads from './pages/Downloads'
+import AudioPlayerSync from './AudioPlayerSync'
 const App = () => {
 
 
@@ -31,6 +32,7 @@ const App = () => {
         <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
             <div className='flex flex-col min-h-screen bg-black text-white'>
                 <Navbar />
+                <AudioPlayerSync />
                 <div className="flex flex-1 relative">
                     <Sidebar />
                     <main className="flex-1 md:ml-[12%]">

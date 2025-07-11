@@ -1,18 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AudioPlayerData } from '../context/AudioPlayerContext';
 import { Play, Clock3, XIcon, User } from 'lucide-react';
 import axios from 'axios';
 import { trimString } from '../utils/utils';
 import { LoadingSpinner } from './LoadingSpinner';
 import { Skeleton } from './ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-//{ id, onClose, onAlbumClick }
+import { useAudioStore } from '@/app/storeZustand';
+import { useAudioPlayerContext as useExternalAudioPlayer } from 'react-use-audio-player'
 
 const Artist = () => {
     const [artistData, setArtistData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
+
     const { artistId } = useParams();
     useEffect(() => {
         const fetchArtistData = async () => {
@@ -46,32 +46,20 @@ const Artist = () => {
     const handleAlbumClick = (album) => {
         navigate(`/album/${album.id}`);
     }
+    const { playTrack } = useAudioStore();
+    const { load } = useExternalAudioPlayer();
 
     const handlePlaySong = async (song) => {
         try {
-            console.log(artistData)
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.id}`);
-            const songData = response.data.data;
-            const trackInfo = {
-                id: songData.id,
-                title: songData.title,
-                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
-                images: songData.images,
-                download_url: songData.download[4].link,
-                artists: songData.artists,
-                album: songData.album,
-                duration: songData.duration,
-                releaseDate: songData.releaseDate,
-                label: songData.label,
-                copyright: songData.copyright
-            };
 
-            setCurrentTrack(trackInfo);
-            await playTrack(songData.download[4].link, songData.id, true, artistData.topSongs);
+            await playTrack(song, false, artistData.topSongs);
+
+
         } catch (error) {
             console.error('Error playing song:', error);
         }
     };
+
     const handleSingleClick = async (single) => {
         try {
             const albumResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/album?id=${single.id}`);
@@ -87,6 +75,7 @@ const Artist = () => {
             console.error('Error handling single click:', error);
         }
     };
+
     const formatTime = (seconds) => {
         if (Number.isNaN(seconds)) {
             return '00:00';
@@ -336,13 +325,17 @@ const ArtistSkeleton = () => (
         </div>
     </div>
 );
+
 const Songs = ({ artistId }) => {
     const [songs, setSongs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [total, setTotal] = useState(0);
-    const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
+
+    // Use the same audio store as MusicCard
+    const { playTrack, setCurrentSong } = useAudioStore();
+    const { load } = useExternalAudioPlayer();
 
     useEffect(() => {
         const fetchSongs = async () => {
@@ -357,7 +350,6 @@ const Songs = ({ artistId }) => {
                 if (!data.top_songs.last_page) {
                     setSongs(prev => [...prev, ...data.top_songs.songs]);
                 }
-
 
                 setTotal(data.top_songs.total);
                 setHasMore(!data.top_songs.last_page);
@@ -375,25 +367,10 @@ const Songs = ({ artistId }) => {
 
     const handlePlaySong = async (song) => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.id}`);
-            const songData = response.data.data;
+            setCurrentSong(song);
 
-            const trackInfo = {
-                id: songData.id,
-                title: songData.title,
-                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
-                images: songData.images,
-                download_url: songData.download[4].link,
-                artists: songData.artists,
-                album: songData.album,
-                duration: songData.duration,
-                releaseDate: songData.releaseDate,
-                label: songData.label,
-                copyright: songData.copyright
-            };
+            await playTrack(song, true);
 
-            setCurrentTrack(trackInfo);
-            await playTrack(songData.download[4].link, songData.id, true, songs);
         } catch (error) {
             console.error('Error playing song:', error);
         }
@@ -444,7 +421,7 @@ const Songs = ({ artistId }) => {
                                         className='w-10 h-10 rounded'
                                     />
                                     <div>
-                                        <h3 className='font-medium'>{trimString(song.name, 40)}</h3>
+                                        <h3 className='font-medium'>{trimString(song.title, 40)}</h3>
                                         <p className='text-sm text-gray-400'>{trimString(song.subtitle, 30)}</p>
                                     </div>
                                 </div>
@@ -474,9 +451,9 @@ const Songs = ({ artistId }) => {
                     <button
                         type="button"
                         onClick={loadMore}
-                        className="bg-[#262626] hover:bg-[#333] px-6 py-2 rounded-full text-white"
+                        className="bg-[#262626] hover:bg-[#333] px-6 py-2 mb-20 rounded-full text-white"
                     >
-                        Load More
+                        +
                     </button>
                 </div>
             )}
@@ -489,6 +466,7 @@ const Songs = ({ artistId }) => {
         </div>
     );
 };
+
 const Albums = ({ artistId, handleAlbumClick }) => {
     const [albums, setAlbums] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -505,7 +483,6 @@ const Albums = ({ artistId, handleAlbumClick }) => {
 
                 const { data } = response.data;
 
-
                 if (data?.topAlbums && data?.topAlbums?.albums) {
                     if (page === 0) {
                         setAlbums(data.topAlbums.albums);
@@ -514,9 +491,6 @@ const Albums = ({ artistId, handleAlbumClick }) => {
                     }
                     setHasMore(!data.topAlbums.last_page);
                 }
-
-
-
             } catch (error) {
                 console.error('Error fetching albums:', error);
             } finally {
@@ -588,4 +562,5 @@ const Albums = ({ artistId, handleAlbumClick }) => {
         </div>
     );
 };
+
 export default Artist;

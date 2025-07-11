@@ -6,7 +6,7 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import AudioPlayerContext from './context/AudioPlayerContext';
 import { AuthUserInfoProvider } from './context/AuthUserInfoContext';
-
+import { AudioPlayerProvider } from 'react-use-audio-player'
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
@@ -27,13 +27,16 @@ if ('serviceWorker' in navigator) {
 }
 
 createRoot(document.getElementById('root')).render(
-    <AuthUserInfoProvider>
-        <BrowserRouter>
-            <StrictMode>
-                <AudioPlayerContext>
-                    <App />
-                </AudioPlayerContext>
-            </StrictMode>
-        </BrowserRouter>
-    </AuthUserInfoProvider>
+    <AudioPlayerProvider>
+        <AuthUserInfoProvider>
+            <BrowserRouter>
+                <StrictMode>
+                    <AudioPlayerContext>
+                        <App />
+                    </AudioPlayerContext>
+                </StrictMode>
+            </BrowserRouter>
+        </AuthUserInfoProvider>
+    </AudioPlayerProvider >
+
 )

@@ -1,16 +1,22 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AudioPlayerData } from '../context/AudioPlayerContext';
+// import { AudioPlayerData } from '../context/AudioPlayerContext';
 import { Play, Clock3, XIcon } from 'lucide-react';
 import axios from 'axios';
 import { trimString } from '../utils/utils';
 import { Skeleton } from './ui/skeleton';
+import { useAudioPlayerContext } from 'react-use-audio-player';
+import { useAudioStore } from '@/app/storeZustand';
 const Album = () => {
     const [albumData, setAlbumData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
+    // const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
     const { albumId } = useParams();
     const navigate = useNavigate();
+
+    const { load } = useAudioPlayerContext();
+    const { playTrack, setCurrentTrack } = useAudioStore();
+
     useEffect(() => {
         const fetchAlbumData = async () => {
             try {
@@ -41,25 +47,8 @@ const Album = () => {
 
     const handlePlaySong = async (song) => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.id}`);
-            const songData = response.data.data;
+            await playTrack(song, true, albumData.songs);
 
-            const trackInfo = {
-                id: songData.id,
-                title: songData.title,
-                subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
-                images: songData.images,
-                download_url: songData.download[4].link,
-                artists: songData.artists,
-                album: songData.album,
-                duration: songData.duration,
-                releaseDate: songData.releaseDate,
-                label: songData.label,
-                copyright: songData.copyright
-            };
-
-            setCurrentTrack(trackInfo);
-            await playTrack(songData.download[4].link, songData.id, true, albumData.songs);
         } catch (error) {
             console.error('Error playing song:', error);
         }
