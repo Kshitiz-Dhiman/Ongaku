@@ -8,13 +8,10 @@ function AudioPlayerSync() {
 
     useEffect(() => {
         if (currentSong && currentSong.download_urls && currentSong.download_urls[4]) {
-            console.log('Loading new song:', currentSong.title);
-            console.log(currentSong.download_urls[4].link);
             load(currentSong.download_urls[4].link, {
                 autoplay: true,
                 initialVolume: 0.5,
                 onend: () => {
-                    console.log("Song ended, playing next");
                     handleNextSong();
                 },
             });

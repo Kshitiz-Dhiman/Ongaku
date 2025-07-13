@@ -20,7 +20,7 @@ const LikedSong = () => {
     const [likedSongs, setlikedSongs] = useState([]);
     const [likedAlbums, setlikedAlbums] = useState([]);
     const [likedArtists, setlikedArtists] = useState([]);
-    const { playTrack, currentSong, setCurrentSong, handleNextSong, handlePrevSong } = useAudioStore();
+    const { playTrack } = useAudioStore();
     const { load } = useAudioPlayerContext();
     const getLikedSongs = async () => {
         setLoading(true);
@@ -48,8 +48,19 @@ const LikedSong = () => {
 
     const handlePlaySong = async (song) => {
         try {
-            await playTrack(song, false, likedSongs);
-
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.songId}`);
+            const songData = response.data.data;
+            songData.images.large = songData.images.large.replace("150x150", "500x500")
+            const audio = {
+                id: songData.id,
+                title: songData.title,
+                download_urls: songData.download,
+                subtitle: songData.subtitle,
+                artists: songData.artists.primary,
+                image: songData.images,
+                type: "song"
+            }
+            await playTrack(audio, false, likedSongs);
         } catch (error) {
             console.error('Error playing song:', error);
         }

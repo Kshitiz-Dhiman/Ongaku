@@ -3,7 +3,6 @@ import { FiSearch } from "react-icons/fi";
 import { Music, NavigationOff } from "lucide-react"
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
-import { AudioPlayerData } from '../context/AudioPlayerContext';
 import { useNavigate, NavLink } from 'react-router-dom';
 import SampleLogin from '@/pages/LoginBtn';
 import { useAuthUserInfo } from '../context/AuthUserInfoContext';
@@ -18,7 +17,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import image from "../assets/avatar.jpeg";
-
+import { useAudioStore } from '@/app/storeZustand';
+import { useAudioPlayerContext } from 'react-use-audio-player';
 const customStyles = {
     control: (base) => ({
         ...base,
@@ -135,34 +135,22 @@ const NavBar = () => {
             console.log(e);
         }
     };
-    const {
-        playTrack,
-        setQueue,
-        setCurrentTrack
-    } = useContext(AudioPlayerData);
+
     const [selectedOption, setSelectedOption] = useState(null);
     const navigate = useNavigate();
     const songOptionsFunction = async (option) => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${option.value}`);
-            const songData = response.data;
+            const songId = option.value;
+            const song = songSuggestions.find(s => s.id === songId);
+            if (!song) {
+                console.error("Song not found in suggestions");
+                return;
+            }
 
-            const trackInfo = {
-                id: songData.data.id,
-                title: songData.data.title,
-                subtitle: songData.data.artists?.primary?.map(artist => artist.name).join(", ") || songData.data.subtitle,
-                images: songData.data.images,
-                download_url: songData.data.download[4].link,
-                artists: songData.data.artists,
-                album: songData.data.album,
-                duration: songData.data.duration,
-                releaseDate: songData.data.releaseDate,
-                label: songData.data.label,
-                copyright: songData.data.copyright
-            };
 
-            setCurrentTrack(trackInfo);
-            await playTrack(songData.data.download[4].link, songData.data.id);
+            const { playTrack } = useAudioStore.getState();
+            await playTrack(song, true, songSuggestions);
+
         } catch (error) {
             console.error('Error playing song:', error);
         }
@@ -216,9 +204,9 @@ const NavBar = () => {
                 }}
             />
             <div className='flex order-1 items-center justify-center gap-2 w-auto'>
-                <img src={Favicon} alt="tung tung tung sahur" className='h-12 w-12 mr-[-15px]' />
+                <img src={Favicon} alt="tung tung tung sahur" className='h-10 w-13 mr-15 rounded-full md:h-12 md:w-14 md:mr-[-13px]' />
 
-                <h1 className='hidden sm:block text-2xl md:text-3xl font-bold'> Ongaku</h1>
+                <h1 className='hidden sm:block text-2xl md:text-3xl font-bold'>Ongaku</h1>
             </div>
 
             {/* User controls - On right side for desktop, but second item on mobile */}
