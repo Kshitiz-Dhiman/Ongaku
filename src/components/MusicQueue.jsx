@@ -1,12 +1,12 @@
 import React, { useContext } from 'react'
 import { AudioPlayerData } from '../context/AudioPlayerContext';
 import Equaliser from '../assets/equaliser.gif';
-
+import { useAudioStore } from '@/app/storeZustand';
 
 const MusicQueue = ({ onClose }) => {
-    const { queue, playTrack } = useContext(AudioPlayerData);
     // playTrack(url , id , addToqueue , songsList(remainging queue));
-    const queueLength = queue.length;
+    const { musicQueue } = useAudioStore();
+    const queueLength = musicQueue.length;
     const playTrackFromQueue = async (url, id, addToQueue, queue) => {
         console.log("Not ready");
 
@@ -30,9 +30,9 @@ const MusicQueue = ({ onClose }) => {
                 </button>
             </div>
             <ul className='space-y-4'>
-                {queue.map((song, index) => (
+                {musicQueue.map((song, index) => (
                     <li
-                        onClick={() => { playTrackFromQueue(song.download_url, song.id, true, queue); }}
+                        onClick={() => { playTrackFromQueue(song.download_url, song.id, true, musicQueue); }}
                         key={index}
                         className='bg-zinc-800 rounded-lg p-4 text-white hover:bg-zinc-800 transition-colors duration-200 h-20 flex items-center justify-between group'>
 

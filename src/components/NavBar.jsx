@@ -19,6 +19,7 @@ import {
 import image from "../assets/avatar.jpeg";
 import { useAudioStore } from '@/app/storeZustand';
 import { useAudioPlayerContext } from 'react-use-audio-player';
+
 const customStyles = {
     control: (base) => ({
         ...base,
@@ -87,6 +88,7 @@ const NavBar = () => {
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
     const [artistSuggestions, setArtistSuggestions] = useState([]);
     const [top_query, setTopQuery] = useState([]);
+
     const loadSuggestions = async (inputValue) => {
         try {
             const response = await axios(`${import.meta.env.VITE_MUSIC_API}/search?q=${inputValue}`)
@@ -106,7 +108,7 @@ const NavBar = () => {
                 },
                 {
                     label: "Songs",
-                    options: songSuggestions.map((song) => ({
+                    options: data1.data.songs.data.map((song) => ({
                         value: song.id,
                         label: `${song.title} - ${song.more_info.primary_artists}`,
                         type: "song"
@@ -114,7 +116,7 @@ const NavBar = () => {
                 },
                 {
                     label: "Albums",
-                    options: albumSuggestions.map((album) => ({
+                    options: data1.data.albums.data.map((album) => ({
                         value: album.id,
                         label: `${album.title} - ${album.more_info.music}`,
                         type: "album"
@@ -122,7 +124,7 @@ const NavBar = () => {
                 },
                 {
                     label: "Artists",
-                    options: artistSuggestions.map((artist) => ({
+                    options: data1.data.artists.data.map((artist) => ({
                         value: artist.id,
                         label: `${artist.title}`,
                         type: "artist"
@@ -138,46 +140,99 @@ const NavBar = () => {
 
     const [selectedOption, setSelectedOption] = useState(null);
     const navigate = useNavigate();
-    const songOptionsFunction = async (option) => {
+
+    const { playTrack } = useAudioStore();
+
+    const playSongFromSearch = async (songId, sourceList = []) => {
         try {
-            const songId = option.value;
-            const song = songSuggestions.find(s => s.id === songId);
-            if (!song) {
-                console.error("Song not found in suggestions");
-                return;
+            // Fetch complete song data from the API
+            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${songId}`);
+            const songData = response.data.data;
+
+            // Transform the song data to match your player's expected format
+            songData.images.large = songData.images.large.replace("150x150", "500x500");
+
+            const audio = {
+                id: songData.id,
+                title: songData.title,
+                download_urls: songData.download,
+                subtitle: songData.subtitle,
+                artists: songData.artists.primary,
+                image: songData.images,
+                type: "song"
+            };
+
+            // If we have a source list (like search results), convert them to the proper format
+            let playlistData = [];
+            if (sourceList.length > 0) {
+                // Convert search results to proper format for the playlist
+                const convertedSongs = await Promise.all(
+                    sourceList.map(async (searchSong) => {
+                        try {
+                            const songResponse = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${searchSong.id}`);
+                            const fullSongData = songResponse.data.data;
+                            fullSongData.images.large = fullSongData.images.large.replace("150x150", "500x500");
+
+                            return {
+                                id: fullSongData.id,
+                                title: fullSongData.title,
+                                download_urls: fullSongData.download,
+                                subtitle: fullSongData.subtitle,
+                                artists: fullSongData.artists.primary,
+                                image: fullSongData.images,
+                                type: "song"
+                            };
+                        } catch (error) {
+                            console.error(`Error fetching song ${searchSong.id}:`, error);
+                            return null;
+                        }
+                    })
+                );
+
+                // Filter out any failed conversions
+                playlistData = convertedSongs.filter(song => song !== null);
             }
 
-
-            const { playTrack } = useAudioStore.getState();
-            await playTrack(song, true, songSuggestions);
+            // Play the song with the converted playlist
+            await playTrack(audio, playlistData.length === 0, playlistData);
 
         } catch (error) {
-            console.error('Error playing song:', error);
+            console.error('Error playing song from search:', error);
         }
-    }
+    };
 
     const handleSelect = async (option) => {
         if (option?.type === 'top_query') {
+            const topQueryItem = top_query.find(item => item.id === option.value);
+            if (!topQueryItem) {
+                console.error("Top query item not found");
+                return;
+            }
+
             const removeTypes = top_query.filter((item) => item.type === "song" || item.type === "album" || item.type === "artist")
             if (removeTypes.length === 0) {
                 alert("Shows cant be played")
                 return;
             }
-            if (top_query[0].type === "song") {
+
+            if (topQueryItem.type === "song") {
                 console.log("This is the song type")
-                await songOptionsFunction(option);
-            } else if (top_query[0].type === "album") {
+                await playSongFromSearch(option.value, songSuggestions);
+            } else if (topQueryItem.type === "album") {
                 navigate(`/album/${option.value}`)
-            } else if (top_query[0].type === "artist") {
+            } else if (topQueryItem.type === "artist") {
                 navigate(`/artist/${option.value}`)
             }
         } else if (option?.type === 'song') {
-            await songOptionsFunction(option)
+            await playSongFromSearch(option.value, songSuggestions);
         } else if (option?.type === 'album') {
             navigate(`/album/${option.value}`)
         } else if (option?.type === 'artist') {
             navigate(`/artist/${option.value}`)
         }
+
+        // Clear the selection after handling
+        setSelectedOption(null);
     };
 
     const userInfo = useAuthUserInfo();
@@ -188,8 +243,6 @@ const NavBar = () => {
         setUserInfo(null);
         window.location.reload();
     };
-
-
 
     return (
         // Navbar component with improved responsive layout
@@ -228,7 +281,6 @@ const NavBar = () => {
                             <DropdownMenuLabel className="font-bold text-gray-300">My Account</DropdownMenuLabel>
                             <DropdownMenuGroup>
                                 <NavLink to='/profile'>
-
                                     <DropdownMenuItem className="hover:bg-[#1a1a1a] cursor-pointer">
                                         Profile
                                     </DropdownMenuItem>
@@ -238,7 +290,6 @@ const NavBar = () => {
                                         History
                                     </DropdownMenuItem>
                                 </NavLink>
-
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator className="bg-[#202020]" />
                             <DropdownMenuItem onClick={() => logoutAuthUser()} className="cursor-pointer text-red-500">

@@ -38,7 +38,6 @@ export const useAudioStore = create(
 
                 playTrack: async (song, generateRecommendation = true, songsList = []) => {
                     if (!song) return;
-                    console.log(song);
                     set({ isLoading: true });
 
                     const { getRecommendation } = get();
