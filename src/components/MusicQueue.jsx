@@ -140,19 +140,11 @@ const MusicQueue = ({ onClose }) => {
                 </button>
             </div>
             <ul className='space-y-4'>
-                {musicQueue.map((song, index) => {
-                    const isCurrentSong = currentSong && (
-                        currentSong.id === song.songId
-                    );
-
-                    return (
-                        <li
-                            ref={el => itemsRef.current[index] = el}
-                            onClick={() => handleClick(index, song)}
-                            onMouseEnter={() => handleMouseEnter(index)}
-                            onMouseLeave={() => handleMouseLeave(index)}
-                            key={song.id || song.songId || index}
-                            className={`bg-zinc-800/60 rounded-lg p-4 text-white hover:bg-zinc-800 transition-colors duration-200 h-20 flex items-center justify-between group ${isClosing ? 'pointer-events-none' : 'cursor-pointer'}`}>
+                {queue.map((song, index) => (
+                    <li
+                        onClick={() => { playTrackFromQueue(song.download_url, song.id, true, queue); }}
+                        key={index}
+                        className='bg-zinc-800 rounded-lg p-4 text-white hover:bg-zinc-800 transition-colors duration-200 h-20 flex items-center justify-between group'>
 
                             <div className='flex-1 truncate mr-4'>
                                 <p className='font-medium truncate'>{song.title}</p>
