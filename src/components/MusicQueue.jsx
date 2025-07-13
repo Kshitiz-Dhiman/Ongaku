@@ -146,23 +146,23 @@ const MusicQueue = ({ onClose }) => {
                         key={index}
                         className='bg-zinc-800 rounded-lg p-4 text-white hover:bg-zinc-800 transition-colors duration-200 h-20 flex items-center justify-between group'>
 
-                            <div className='flex-1 truncate mr-4'>
-                                <p className='font-medium truncate'>{song.title}</p>
-                                {song.subtitle && (
-                                    <p className='text-sm text-gray-400 truncate'>{song.subtitle}</p>
-                                )}
-                            </div>
-                            <img
-                                src={Equaliser}
-                                alt="equaliser"
-                                className={`h-32 w-12 ml-2 inline-block object-cover transition-opacity duration-200 ${isCurrentSong
-                                    ? 'opacity-100'
-                                    : 'opacity-0 group-hover:opacity-100'
+                        <div className='flex-1 truncate mr-4'>
+                            <p className='font-medium truncate'>{song.title}</p>
+                            {song.subtitle && (
+                                <p className='text-sm text-gray-400 truncate'>{song.subtitle}</p>
+                            )}
+                        </div>
+                        <img
+                            src={Equaliser}
+                            alt="equaliser"
+                            className={`h-32 w-12 ml-2 inline-block object-cover transition-opacity duration-200 ${isCurrentSong
+                                ? 'opacity-100'
+                                : 'opacity-0 group-hover:opacity-100'
                                 }`}
-                            />
-                        </li>
-                    );
-                })}
+                        />
+                    </li>
+                )
+                )}
             </ul>
         </div>
     )
