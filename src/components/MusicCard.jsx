@@ -1,15 +1,14 @@
 import React, { useContext, useRef } from 'react'
 import { Play } from "lucide-react"
 import { trimString } from "../utils/utils"
-import { AudioPlayerData } from '../context/AudioPlayerContext'
 import axios from "axios"
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { useAudioStore } from '@/app/storeZustand'
-import { useAudioPlayerContext as useExternalAudioPlayer } from 'react-use-audio-player'
+import { useAudioPlayerContext } from 'react-use-audio-player'
 
 function MusicCard({ key, song }) {
-    const { load } = useExternalAudioPlayer(); // External audio player
+const { load } = useAudioPlayerContext();
     const cardRef = useRef(null);
 
     gsap.registerPlugin(useGSAP);

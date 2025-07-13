@@ -19,8 +19,8 @@ import { FaPause } from "react-icons/fa6";
 import { FaForward } from "react-icons/fa6";
 import { FaBackward } from "react-icons/fa6";
 import { decodeHTMLEntities } from '../utils/utils';
-import { useAudioStore } from '@/app/storeZustand'; // Import Zustand store
-
+import { useAudioStore } from '@/app/storeZustand';
+import {useGSAP} from "@gsap/react";
 const ExpandedMusicPlayer = ({
     expandedPlayerRef,
     isExpanded,
@@ -43,7 +43,6 @@ const ExpandedMusicPlayer = ({
         loop
     } = useAudioPlayerContext();
 
-    // Use Zustand store methods instead of props
     const { handleNextSong, handlePrevSong, shuffleQueue } = useAudioStore();
 
     const [isliked, setIsLiked] = useState(false);
@@ -60,7 +59,6 @@ const ExpandedMusicPlayer = ({
         }
     }
 
-    // Wrapper functions to handle both UI and audio state
     const playPreviousSong = async () => {
         await handlePrevSong();
     };
@@ -132,7 +130,6 @@ const ExpandedMusicPlayer = ({
     const fetchLryics = async () => {
         setLyricsLoading(true);
         try {
-            console.log("getting lyrics")
             setLyricsLoading(false);
         } catch (error) {
             setLyrics('Lyrics are not available at this moment');
@@ -142,7 +139,7 @@ const ExpandedMusicPlayer = ({
     useEffect(() => {
         if (currentTrack) {
             setLyrics('Fetching lyrics...');
-            fetchLryics();
+            // fetchLryics();
         } else {
             setLyrics('Lyrics are not available at this moment');
         }
@@ -549,6 +546,7 @@ const ExpandedMusicPlayer = ({
                 </div>
 
                 <div className=" mt-10 mb-5 flex items-center justify-center gap-10">
+
                     <MicVocal onClick={() => openLyricsMenu()} className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
                     <ListMusic
                         onClick={() => openQueue()}

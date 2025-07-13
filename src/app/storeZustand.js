@@ -2,10 +2,9 @@ import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import axios from "axios";
 
-// Create axios instance with optimizations
 const musicApi = axios.create({
     baseURL: import.meta.env.VITE_MUSIC_API,
-    timeout: 5000, // 5 second timeout
+    timeout: 5000,
 });
 
 export const useAudioStore = create(
@@ -14,7 +13,7 @@ export const useAudioStore = create(
             (set, get) => ({
                 currentSong: null,
                 musicQueue: [],
-                originalSongsList: [], // Track the original songs list
+                originalSongsList: [],
                 history: [],
                 currentIndex: -1,
                 isLoading: false,
@@ -38,7 +37,6 @@ export const useAudioStore = create(
 
                 playTrack: async (song, generateRecommendation = true, songsList = []) => {
                     if (!song) return;
-                    console.log(song);
                     set({ isLoading: true });
 
                     const { getRecommendation } = get();

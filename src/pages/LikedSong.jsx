@@ -48,9 +48,24 @@ const LikedSong = () => {
 
     const handlePlaySong = async (song) => {
         try {
+            if (song.download && song.download.length > 0) {
+                const audio = {
+                    id: song.songId,
+                    title: song.title,
+                    download_urls: song.download,
+                    subtitle: song.artist,
+                    artists: song.artists || [{ name: song.artist }],
+                    image: song.image,
+                    type: "song"
+                };
+                await playTrack(audio, false, likedSongs);
+                return;
+            }
+
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.songId}`);
             const songData = response.data.data;
-            songData.images.large = songData.images.large.replace("150x150", "500x500")
+            songData.images.large = songData.images.large.replace("150x150", "500x500");
+
             const audio = {
                 id: songData.id,
                 title: songData.title,
@@ -59,12 +74,14 @@ const LikedSong = () => {
                 artists: songData.artists.primary,
                 image: songData.images,
                 type: "song"
-            }
+            };
+
             await playTrack(audio, false, likedSongs);
         } catch (error) {
             console.error('Error playing song:', error);
         }
     };
+
 
     useEffect(() => {
         getLikedSongs();

@@ -9,12 +9,10 @@ import {
 } from "../components/ui/dropdown-menu"
 import { EllipsisVertical } from 'lucide-react';
 import LikedSongSkeleton from '@/components/LikedSongSkeleton';
-import { AudioPlayerData } from '@/context/AudioPlayerContext';
 const History = () => {
 
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { playTrack, setCurrentTrack } = useContext(AudioPlayerData);
 
     const getHistory = async () => {
         setLoading(true);
