@@ -43,7 +43,6 @@ export const useAudioStore = create(
                     let queue = [];
                     let index = -1;
 
-                    // Immediately set the current song for instant UI feedback
                     set({ currentSong: song });
 
                     try {
@@ -51,7 +50,6 @@ export const useAudioStore = create(
                             queue = songsList;
                             index = songsList.findIndex(s => s.id === song.id || s.songId === song.id);
 
-                            // Store the original songs list
                             set({
                                 originalSongsList: songsList,
                                 musicQueue: queue,
@@ -59,19 +57,17 @@ export const useAudioStore = create(
                                 isLoading: false
                             });
                         } else if (generateRecommendation) {
-                            // Don't await recommendation - let it load in background
                             const recommendationPromise = getRecommendation(song.id);
-                            queue = [song]; // Start with just the current song
+                            queue = [song];
                             index = 0;
 
                             set({
-                                originalSongsList: [], // Clear original list for recommendations
+                                originalSongsList: [],
                                 musicQueue: queue,
                                 currentIndex: index,
                                 isLoading: false
                             });
 
-                            // Update queue when recommendation arrives
                             recommendationPromise.then(recommended => {
                                 if (recommended) {
                                     set(state => ({
@@ -99,11 +95,9 @@ export const useAudioStore = create(
                 handleNextSong: async () => {
                     const { musicQueue, currentIndex, originalSongsList, getRecommendation } = get();
 
-                    // First, try to play the next song from the current queue
                     if (currentIndex >= 0 && currentIndex < musicQueue.length - 1) {
                         const nextSong = musicQueue[currentIndex + 1];
 
-                        // If the next song is from liked songs, we need to fetch its full data
                         if (nextSong.songId && !nextSong.download) {
                             try {
                                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.songId}`);
@@ -134,11 +128,10 @@ export const useAudioStore = create(
                             });
                         }
                     } else {
-                        // If we're at the end of the queue, only fetch recommendations if there's no original songs list
+
                         if (originalSongsList.length === 0) {
                             const { currentSong } = get();
                             if (currentSong) {
-                                // Don't block on recommendation loading
                                 const recommended = await getRecommendation(currentSong.id);
                                 if (recommended && recommended.data && recommended.data.length > 0) {
                                     const currentState = get();

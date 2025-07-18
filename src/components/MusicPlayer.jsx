@@ -213,7 +213,8 @@ const MusicPlayer = () => {
                 songId: currentSong.id,
                 title: currentSong.title,
                 artist: currentSong.subtitle || currentSong.artists?.primary?.[0]?.name,
-                image: currentSong.images?.medium
+                image: currentSong.image?.medium,
+                download_urls: currentSong.download_urls
             },
             {
                 headers: {

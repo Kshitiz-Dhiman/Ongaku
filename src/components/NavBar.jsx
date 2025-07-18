@@ -231,7 +231,6 @@ const NavBar = () => {
             navigate(`/artist/${option.value}`)
         }
 
-        // Clear the selection after handling
         setSelectedOption(null);
     };
 
@@ -311,7 +310,7 @@ const NavBar = () => {
                     onChange={handleSelect}
                     loadOptions={loadSuggestions}
                     styles={customStyles}
-                    placeholder="Search for music, playlist or albums"
+                    placeholder="Search for songs and playlists..."
                     className="w-full"
                     noOptionsMessage={() => "Start typing to search..."}
                 />

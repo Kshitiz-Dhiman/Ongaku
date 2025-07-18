@@ -137,8 +137,7 @@ const LikedSong = () => {
                 releaseDate: songData.releaseDate,
                 label: songData.label,
             }
-            // console.log(audio)
-            await addAudio(songData.id, audio);
+            await addAudio(audio.id, audio);
             alert("Song added to downloads");
         } catch (e) {
             console.log(e);
@@ -147,7 +146,7 @@ const LikedSong = () => {
 
     const handleAddToQueue = (e) => {
         e.stopPropagation();
-        // Add your queue logic here
+        // your
     }
 
     return (
