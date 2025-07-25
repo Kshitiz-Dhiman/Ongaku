@@ -14,7 +14,6 @@ const Search = () => {
             const res = await axios.get(`${musicUrl}/music/getsong?q=${searchQuery}`);
 
             setMusic(res.data.content);
-            // console.log(res.data.content);
         } catch (e) {
             console.log(e);
         }

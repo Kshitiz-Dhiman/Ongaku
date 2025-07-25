@@ -6,6 +6,10 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthUserInfoProvider } from './context/AuthUserInfoContext';
 import { AudioPlayerProvider } from 'react-use-audio-player'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+const queryClient = new QueryClient({});
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
@@ -30,7 +34,10 @@ createRoot(document.getElementById('root')).render(
         <AuthUserInfoProvider>
             <BrowserRouter>
                 <StrictMode>
-                    <App />
+                    <QueryClientProvider client={queryClient}>
+                        <App />
+                        <ReactQueryDevtools initialIsOpen={false} />
+                    </QueryClientProvider>
                 </StrictMode>
             </BrowserRouter>
         </AuthUserInfoProvider>

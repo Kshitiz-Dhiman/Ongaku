@@ -6,7 +6,6 @@ import Sidebar from './components/Siderbar'
 import TrendingHome from './components/TrendingHome'
 import Artist from './components/Artist'
 import SampleLogin from './pages/LoginBtn'
-import SampleDashBoard from './pages/SampleDashBoard'
 import ErrorPage from './pages/ErrorPage'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import LikedSong from './pages/LikedSong'
@@ -45,7 +44,6 @@ const App = () => {
                             <Route path='/album/:albumId' element={<Album />} />
                             <Route path='/artist/:artistId' element={<Artist />} />
                             <Route path='/login' element={<GoogleAuthWrapper />} />
-                            <Route path='/dashboard' element={<SampleDashBoard />} />
                             <Route path='/library/:lib' element={<LikedSong />} />
                             <Route path='/account/:profile' element={<Profile />} />
                             <Route path='/account/history' element={<History />} />

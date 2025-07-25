@@ -306,7 +306,6 @@ const MusicPlayer = () => {
                         onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
                         onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }}
                         onClick={(e) => {
-                            console.log("Toggle Play/Pause");
                             togglePlayPause();
                             e.stopPropagation();
                         }}

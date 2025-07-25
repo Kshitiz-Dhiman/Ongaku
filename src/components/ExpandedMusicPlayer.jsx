@@ -13,16 +13,66 @@ import LyricsSkeleton from './LyricsSkeleton';
 import { useAudioPlayerContext } from 'react-use-audio-player';
 import MusicQueue from './MusicQueue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Volume2 } from 'lucide-react';
 import { FaPlay } from "react-icons/fa6";
 import { FaPause } from "react-icons/fa6";
 import { FaForward } from "react-icons/fa6";
 import { FaBackward } from "react-icons/fa6";
 import { decodeHTMLEntities } from '../utils/utils';
-
-import { useGSAP } from "@gsap/react";
-
 import { useAudioStore } from '@/app/storeZustand';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+const API = import.meta.env.VITE_MUSIC_API;
+
+const useCheckLikedStatus = (songId) =>
+    useQuery({
+        queryKey: ['likedStatus', songId],
+        queryFn: async () => {
+            const { data } = await axios.get(`${API}/liked/song?id=${songId}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            return data.liked;
+        },
+        enabled: !!songId && !!localStorage.getItem('token'),
+        staleTime: 1000 * 60 * 5,
+    });
+
+const useToggleLike = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ songId, songData }) => {
+            const { data } = await axios.post(`${API}/liked/song`, {
+                songId: songId,
+                title: songData.title,
+                artist: songData.subtitle || songData.artists?.primary?.[0]?.name,
+                image: songData.image?.medium,
+                download_urls: songData.download_urls
+            }, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            return data;
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['likedStatus', variables.songId]);
+            queryClient.invalidateQueries(['liked']);
+            toast(data.message);
+        },
+        onError: (error) => {
+            console.error('Error toggling like status:', error);
+            toast("Error updating liked status");
+        },
+    });
+};
+
+const useFetchLyrics = () => {
+    return useMutation({
+        mutationFn: async (songId) => {
+            return 'Lyrics are not available at this moment';
+        },
+        onError: () => {
+            return 'Lyrics are not available at this moment';
+        },
+    });
+};
 
 const ExpandedMusicPlayer = ({
     expandedPlayerRef,
@@ -48,12 +98,14 @@ const ExpandedMusicPlayer = ({
 
     const { handleNextSong, handlePrevSong, shuffleQueue } = useAudioStore();
 
-    const [isliked, setIsLiked] = useState(false);
+    const { data: isLiked = false, refetch: refetchLikedStatus } = useCheckLikedStatus(currentTrack?.id);
+    const toggleLikeMutation = useToggleLike();
+    const fetchLyricsMutation = useFetchLyrics();
+
     const [lyrics, setLyrics] = useState('');
     const [lyricsMenuOpen, setLyricsMenuOpen] = useState(false);
-    const [lyricsLoading, setLyricsLoading] = useState(false);
-
     const [queueOpen, setQueueOpen] = useState(false);
+
     const openQueue = () => {
         if (queueOpen) {
             setQueueOpen(false);
@@ -74,75 +126,38 @@ const ExpandedMusicPlayer = ({
         shuffleQueue();
     };
 
-    const checkIftheSongisLiked = async () => {
-        if (!currentTrack || !localStorage.getItem('token')) {
-            return;
-        }
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/liked/song?id=${currentTrack.id}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-
-            if (response.data.liked) {
-                setIsLiked(true);
-            } else {
-                setIsLiked(false);
-            }
-
-        } catch (error) {
-            console.error('Error checking liked status:', error);
-        }
-    }
-
-    useEffect(() => {
-        checkIftheSongisLiked();
-    }, [currentTrack]);
-
     const toggleLiked = () => {
         if (!currentTrack || !localStorage.getItem('token')) {
             toast("Please login to like songs");
             return;
         }
 
-        axios.post(`${import.meta.env.VITE_MUSIC_API}/liked/song`,
-            {
-                songId: currentTrack.id,
-                title: currentTrack.title,
-                artist: currentTrack.subtitle || currentTrack.artists?.primary?.[0]?.name,
-                image: currentTrack.image?.medium,
-                download_urls: currentTrack.download_urls
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            }
-        )
-            .then(response => {
-                setIsLiked(response.data.liked);
-                toast(response.data.message);
-            })
-            .catch(error => {
-                console.error('Error toggling like status:', error);
-                toast("Error updating liked status");
-            });
+        toggleLikeMutation.mutate({
+            songId: currentTrack.id,
+            songData: currentTrack
+        });
     };
 
     const fetchLryics = async () => {
-        setLyricsLoading(true);
-        try {
-            setLyricsLoading(false);
-        } catch (error) {
+        if (!currentTrack?.id) {
             setLyrics('Lyrics are not available at this moment');
+            return;
         }
-    }
+
+        fetchLyricsMutation.mutate(currentTrack.id, {
+            onSuccess: (lyrics) => {
+                setLyrics(lyrics);
+            },
+            onError: () => {
+                setLyrics('Lyrics are not available at this moment');
+            }
+        });
+    };
 
     useEffect(() => {
         if (currentTrack) {
             setLyrics('Fetching lyrics...');
-            // fetchLryics();
+            // fetchLryics(); // Uncomment when you want to auto-fetch lyrics
         } else {
             setLyrics('Lyrics are not available at this moment');
         }
@@ -347,7 +362,7 @@ const ExpandedMusicPlayer = ({
                             </TabsList>
                             <TabsContent value="lyrics" className="mt-4 bg-zinc-800/30 shadow-sm shadow-gray-600 h-full rounded-lg p-2 md:p-4">
                                 {
-                                    lyricsLoading ? <LyricsSkeleton /> : (
+                                    fetchLyricsMutation.isPending ? <LyricsSkeleton /> : (
                                         <div className="w-full">
                                             <p className='text-lg sm:text-xl md:text-[22px] font-bold px-2 sm:px-4 md:px-6 lg:px-10 text-gray-400 text-center h-[47vh] overflow-y-auto whitespace-pre-line '>
                                                 {lyrics}
@@ -407,7 +422,7 @@ const ExpandedMusicPlayer = ({
 
                     <div className="mt-5 flex justify-center items-center gap-8">
                         {
-                            isliked ? (
+                            isLiked ? (
                                 <Heart className="w-6 h-6 text-red-500 fill-red-500 hover:text-red-600 cursor-pointer" onClick={toggleLiked} />
                             ) : (
                                 <Heart className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" onClick={toggleLiked} />
@@ -465,7 +480,7 @@ const ExpandedMusicPlayer = ({
                                     className="w-full h-full object-cover"
                                 />
                             </div>
-                        ) : (lyricsLoading ? <LyricsSkeleton /> : (
+                        ) : (fetchLyricsMutation.isPending ? <LyricsSkeleton /> : (
                             <div>
                                 <p className='text-[22px] px-4 font-bold  text-gray-400 text-center mb-2 h-[300px] overflow-scroll whitespace-pre-line'>
                                     {lyrics}
@@ -517,7 +532,7 @@ const ExpandedMusicPlayer = ({
 
                 <div className="mt-8 flex justify-center items-center gap-8">
                     {
-                        isliked ? (
+                        isLiked ? (
                             <Heart className="w-6 h-6 text-red-500 fill-red-500 hover:text-red-600 cursor-pointer" onClick={toggleLiked} />
                         ) : (
                             <Heart className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" onClick={toggleLiked} />
