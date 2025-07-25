@@ -124,19 +124,19 @@ const LikedSong = () => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${id}`);
             const songData = response.data.data;
-
             const audio = {
                 id: songData.id,
                 title: songData.title,
                 subtitle: songData.artists?.primary?.map(artist => artist.name).join(", ") || songData.subtitle,
                 images: songData.images,
-                download_url: songData.download[4].link,
+                download_urls: songData.download,
                 artists: songData.artists,
                 album: songData.album,
                 duration: songData.duration,
                 releaseDate: songData.releaseDate,
                 label: songData.label,
             }
+            console.log(audio);
             await addAudio(audio.id, audio);
             alert("Song added to downloads");
         } catch (e) {

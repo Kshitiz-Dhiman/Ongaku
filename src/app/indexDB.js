@@ -18,7 +18,8 @@ export const addAudio = async (id, audio) => {
     const db = await initDB();
 
     try {
-        const response = await axios.get(audio.download_url, {
+        console.log(audio.download_urls[4].link);
+        const response = await axios.get(audio.download_urls[4].link, {
             responseType: 'blob',
             headers: {
                 'Accept': 'audio/*',
@@ -53,6 +54,7 @@ export const addAudio = async (id, audio) => {
             }
         }
 
+        audio.images.large = audio.images.large.replace("150x150", "500x500");
         const audioMetadata = {
             id,
             title: audio.title,
@@ -61,11 +63,10 @@ export const addAudio = async (id, audio) => {
             duration: audio.duration,
             image: audio.images,
             added_at: new Date().toISOString(),
-            original_url: audio.download_url,
+            download_urls: audio.download_urls,
             blob_type: audioBlob.type,
             blob_size: audioBlob.size
         };
-
         const audioFile = {
             id,
             blob: audioBlob,
