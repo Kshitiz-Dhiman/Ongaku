@@ -27,7 +27,7 @@ function AudioPlayerSync() {
                 },
             });
         } else  */
-        console.log(audioWithBlob);
+        // console.log(audioWithBlob);
         {
             if (currentSong && currentSong.download_urls && currentSong.download_urls[4]) {
                 load(currentSong.download_urls[4].link, {

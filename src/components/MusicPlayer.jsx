@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { FaBackward, FaForward, FaPlay, FaPause } from "react-icons/fa6";
+import { checkLikedStatus } from './hooks/useQuery';
 
 gsap.registerPlugin(useGSAP);
 
@@ -67,6 +68,9 @@ const MusicPlayer = () => {
         }
     };
 
+
+    const { isliked, isLoading: likedLoading, error } = checkLikedStatus;
+
     const {
         currentSong,
         setCurrentSong,
@@ -90,7 +94,6 @@ const MusicPlayer = () => {
     const frameRef = useRef(0);
     const [isDragging, setIsDragging] = useState(false);
     const [pos, setPos] = useState(0);
-    const [isliked, setIsLiked] = useState(false);
 
     const handleSliderChange = (values) => {
         const newPosition = values[0];
@@ -174,31 +177,7 @@ const MusicPlayer = () => {
         }
     }, [getPosition, isDragging, playing]);
 
-    const checkIftheSongisLiked = async () => {
-        if (!currentSong || !localStorage.getItem('token')) {
-            return;
-        }
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/liked/song?id=${currentSong.id}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
 
-            if (response.data.liked) {
-                setIsLiked(true);
-            } else {
-                setIsLiked(false);
-            }
-
-        } catch (error) {
-            console.error('Error checking liked status:', error);
-        }
-    }
-
-    useEffect(() => {
-        checkIftheSongisLiked();
-    }, [currentSong]);
 
     const toggleLiked = (e) => {
         e.stopPropagation();

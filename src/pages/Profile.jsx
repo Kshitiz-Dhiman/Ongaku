@@ -1,39 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Separator } from '@/components/ui/separator';
+import { getProfile } from '@/components/hooks/useQuery';
 const Profile = () => {
-
-    const [userInfo, setUserInfo] = useState({
-        _id: '',
-        name: '',
-        email: '',
-        image: '',
-        likedSong: [],
-        likedArtist: [],
-        likedAlbum: [],
-        history: [],
-    });
-
-
-
-    const getProfile = async () => {
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/auth/user`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            setUserInfo(response.data.user);
-
-        } catch (e) {
-            console.log(e);
-        }
-    }
-    useEffect(() => {
-        getProfile();
-    }, []);
-
     if (!localStorage.getItem("token")) {
         return (
             <div className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20'>
@@ -45,7 +14,7 @@ const Profile = () => {
             </div>
         )
     }
-
+    const { data: userInfo, isLoading, error } = getProfile();
 
     return (
         <div className='

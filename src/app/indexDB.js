@@ -18,7 +18,6 @@ export const addAudio = async (id, audio) => {
     const db = await initDB();
 
     try {
-        console.log(audio.download_urls[4].link);
         const response = await axios.get(audio.download_urls[4].link, {
             responseType: 'blob',
             headers: {
@@ -34,9 +33,6 @@ export const addAudio = async (id, audio) => {
         }
 
         const audioBlob = response.data;
-
-        // Validate that we actually got an audio file
-        console.log('Downloaded blob type:', audioBlob.type, 'Size:', audioBlob.size);
 
         if (!audioBlob.type.startsWith('audio/') && !audioBlob.type.includes('octet-stream')) {
             // If it's not an audio type, it might be an error page or redirect
