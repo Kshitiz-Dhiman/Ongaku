@@ -33,6 +33,8 @@ function AudioPlayerSync() {
                 load(currentSong.download_urls[4].link, {
                     autoplay: true,
                     initialVolume: 0.5,
+                    html5: true,
+                    format: "mp4",
                     onend: () => {
                         handleNextSong();
                     },
