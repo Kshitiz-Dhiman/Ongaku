@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { FaBackward, FaForward, FaPlay, FaPause } from "react-icons/fa6";
-import { checkLikedStatus } from './hooks/useQuery';
+import { useCheckLikedStatus, useToggleLike } from './hooks/useQuery';
 
 gsap.registerPlugin(useGSAP);
 
@@ -69,7 +69,6 @@ const MusicPlayer = () => {
     };
 
 
-    const { isliked, isLoading: likedLoading, error } = checkLikedStatus;
 
     const {
         currentSong,
@@ -78,6 +77,7 @@ const MusicPlayer = () => {
         handleSongEnd,
         handlePrevSong
     } = useAudioStore();
+    const { data: isLiked = false, refetch: refetchLikedStatus } = useCheckLikedStatus(currentSong?.id);
 
     const {
         playing,
@@ -179,37 +179,6 @@ const MusicPlayer = () => {
 
 
 
-    const toggleLiked = (e) => {
-        e.stopPropagation();
-
-        if (!currentSong || !localStorage.getItem('token')) {
-            toast("Please login to like songs");
-            return;
-        }
-
-        axios.post(`${import.meta.env.VITE_MUSIC_API}/liked/song`,
-            {
-                songId: currentSong.id,
-                title: currentSong.title,
-                artist: currentSong.subtitle || currentSong.artists?.primary?.[0]?.name,
-                image: currentSong.image?.medium,
-                download_urls: currentSong.download_urls
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            }
-        )
-            .then(response => {
-                setIsLiked(response.data.liked);
-                toast(response.data.message);
-            })
-            .catch(error => {
-                console.error('Error toggling like status:', error);
-                toast("Error updating liked status");
-            });
-    };
 
     return (
         <>
@@ -269,15 +238,16 @@ const MusicPlayer = () => {
                                 )}
                             </div>
                         </div>
-                        {isliked ? (
+                        {isLiked ? (
                             <Heart
                                 className="hidden md:block w-6 h-6 text-red-500 fill-red-500 hover:text-red-600 cursor-pointer"
-                                onClick={toggleLiked}
+                                onClick={useToggleLike}
                             />
+
                         ) : (
                             <Heart
                                 className="hidden md:block w-6 h-6 text-gray-400 hover:text-white cursor-pointer"
-                                onClick={toggleLiked}
+                                onClick={useToggleLike}
                             />
                         )}
                     </div>

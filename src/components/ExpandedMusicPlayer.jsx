@@ -20,48 +20,8 @@ import { FaBackward } from "react-icons/fa6";
 import { decodeHTMLEntities } from '../utils/utils';
 import { useAudioStore } from '@/app/storeZustand';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { useCheckLikedStatus, useToggleLike } from './hooks/useQuery';
 const API = import.meta.env.VITE_MUSIC_API;
-
-const useCheckLikedStatus = (songId) =>
-    useQuery({
-        queryKey: ['likedStatus', songId],
-        queryFn: async () => {
-            const { data } = await axios.get(`${API}/liked/song?id=${songId}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
-            return data.liked;
-        },
-        enabled: !!songId && !!localStorage.getItem('token'),
-        staleTime: 1000 * 60 * 5,
-    });
-
-const useToggleLike = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async ({ songId, songData }) => {
-            const { data } = await axios.post(`${API}/liked/song`, {
-                songId: songId,
-                title: songData.title,
-                artist: songData.subtitle || songData.artists?.primary?.[0]?.name,
-                image: songData.image?.medium,
-                download_urls: songData.download_urls
-            }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
-            return data;
-        },
-        onSuccess: (data, variables) => {
-            queryClient.invalidateQueries(['likedStatus', variables.songId]);
-            queryClient.invalidateQueries(['liked']);
-            toast(data.message);
-        },
-        onError: (error) => {
-            console.error('Error toggling like status:', error);
-            toast("Error updating liked status");
-        },
-    });
-};
 
 const useFetchLyrics = () => {
     return useMutation({
@@ -298,7 +258,6 @@ const ExpandedMusicPlayer = ({
             setIsDragActive(false);
         }
     }, [isExpanded]);
-
     return (
         <div ref={expandedPlayerRef}
             className="fixed z-[1000] inset-0 bg-black text-white">

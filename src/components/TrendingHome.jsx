@@ -59,7 +59,7 @@ const TrendingHome = () => {
                 <div className=' grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-10'>
                     {isLoadingAlbums
                         ? Array(6).fill().map((_, i) => <AlbumsCardSkeleton key={i} />)
-                        : homeAlbums.slice(0, 6).map(album => (
+                        : homeAlbums.slice(0, 8).map(album => (
                             <AlbumsCard key={album.id} album={album} />
                         ))
                     }

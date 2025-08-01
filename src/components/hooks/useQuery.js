@@ -79,19 +79,49 @@ export const getProfile = () => useQuery({
     gcTime: 1000 * 60 * 10,
 });
 
-export const checkLikedStatus = () => useQuery({
-    queryKey: ['likedStatus'],
-    queryFn: async () => {
-        const { currentSong } = useAudioStore();
 
-        if (!currentSong || !localStorage.getItem("token")) return false;
-
-        const { data } = await axios.get(`${API}/liked/song?id=${currentSong.id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
+export const useCheckLikedStatus = (songId) =>
+    useQuery({
+        queryKey: ['likedStatus', songId],
+        queryFn: async () => {
+            console.log(songId);
+            try {
+                const { data } = await axios.get(`${API}/liked/song?id=${songId}`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                return data.liked;
+            } catch (e) {
+                console.log("Error while checking liked status:", e);
+                return false; // Return false if there's an error
             }
-        })
-        console.log(data);
-        return data;
-    }
-})
+        },
+        enabled: !!songId && !!localStorage.getItem('token'),
+        staleTime: 1000 * 60 * 5,
+    });
+
+export const useToggleLike = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ songId, songData }) => {
+            const { data } = await axios.post(`${API}/liked/song`, {
+                songId: songId,
+                title: songData.title,
+                artist: songData.subtitle || songData.artists?.primary?.[0]?.name,
+                image: songData.image?.medium,
+                download_urls: songData.download_urls
+            }, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            return data;
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['likedStatus', variables.songId]);
+            queryClient.invalidateQueries(['liked']);
+            toast(data.message);
+        },
+        onError: (error) => {
+            console.error('Error toggling like status:', error);
+            toast("Error updating liked status");
+        },
+    });
+};
