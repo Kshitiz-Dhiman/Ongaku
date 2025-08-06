@@ -23,63 +23,31 @@ import { useAudioPlayerContext } from 'react-use-audio-player';
 const customStyles = {
     control: (base) => ({
         ...base,
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        // backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)', // Safari support
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'rgb(42, 40, 42, 0.7)',
+        border: 'none',
         borderRadius: '1rem',
         padding: '0.5rem',
         paddingInlineStart: '2rem',
         width: '100%',
-        color: 'white',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-        '&:hover': {
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            backgroundColor: 'rgba(255, 255, 255, 0.15)'
-        }
+        color: 'white'
     }),
     input: (base) => ({
         ...base,
-        color: 'white',
+        color: 'white'
     }),
     menu: (base) => ({
         ...base,
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(15px)',
-        WebkitBackdropFilter: 'blur(15px)', // Safari support
-        border: '1px solid rgba(255, 255, 255, 0.2)',
+        backgroundColor: '#080c10',
+        border: 'none',
         borderRadius: '1rem',
-        marginTop: '0.5rem',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-        overflow: 'hidden' // Ensures border radius is respected
+        marginTop: '0.5rem'
     }),
     option: (base, state) => ({
         ...base,
-        backgroundColor: state.isFocused
-            ? 'rgba(255, 255, 255, 0.2)'
-            : 'transparent',
+        backgroundColor: state.isFocused ? '#262626' : '#080c10',
         color: 'white',
         padding: '0.75rem',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.15)'
-        }
-    }),
-    singleValue: (base) => ({
-        ...base,
-        color: 'white'
-    }),
-    placeholder: (base) => ({
-        ...base,
-        color: 'rgba(255, 255, 255, 0.7)'
-    }),
-    dropdownIndicator: (base) => ({
-        ...base,
-        color: 'rgba(255, 255, 255, 0.7)',
-        '&:hover': {
-            color: 'white'
-        }
+        cursor: 'pointer'
     })
 };
 
@@ -145,11 +113,9 @@ const NavBar = () => {
 
     const playSongFromSearch = async (songId, sourceList = []) => {
         try {
-            // Fetch complete song data from the API
             const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${songId}`);
             const songData = response.data.data;
 
-            // Transform the song data to match your player's expected format
             songData.images.large = songData.images.large.replace("150x150", "500x500");
 
             const audio = {
@@ -162,7 +128,6 @@ const NavBar = () => {
                 type: "song"
             };
 
-            // If we have a source list (like search results), convert them to the proper format
             let playlistData = [];
             if (sourceList.length > 0) {
                 // Convert search results to proper format for the playlist
@@ -189,12 +154,11 @@ const NavBar = () => {
                     })
                 );
 
-                // Filter out any failed conversions
                 playlistData = convertedSongs.filter(song => song !== null);
             }
-
-            // Play the song with the converted playlist
-            await playTrack(audio, playlistData.length === 0, playlistData);
+            console.log(audio);
+            console.log(playlistData);
+            await playTrack(audio, true, []);
 
         } catch (error) {
             console.error('Error playing song from search:', error);

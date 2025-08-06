@@ -156,7 +156,6 @@ export const getAudioWithBlob = async (id) => {
         if (!metadata || !audioFile) {
             throw new Error(`Audio with id ${id} not found`);
         }
-
         return {
             ...metadata,
             blob: audioFile.blob,

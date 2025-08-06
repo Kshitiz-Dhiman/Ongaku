@@ -84,7 +84,6 @@ export const useCheckLikedStatus = (songId) =>
     useQuery({
         queryKey: ['likedStatus', songId],
         queryFn: async () => {
-            console.log(songId);
             try {
                 const { data } = await axios.get(`${API}/liked/song?id=${songId}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
