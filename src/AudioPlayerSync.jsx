@@ -13,7 +13,7 @@ function AudioPlayerSync() {
             try {
                 audioWithBlob = await getAudioWithBlob(currentSong.id);
                 await setBlobFound(true);
-                console.log(blobFound);
+                console.log(audioWithBlob.url)
                 if (blobFound && audioWithBlob.blob) {
                     load(audioWithBlob.url, {
                         autoplay: true,
@@ -26,7 +26,7 @@ function AudioPlayerSync() {
                     });
                 }
             } catch (e) {
-                console.error("Error fetching audio with blob:", e);
+                console.log("no download :( playing from URL");
             } finally {
                 if (!blobFound && currentSong && currentSong.download_urls && currentSong.download_urls[4]) {
                     load(currentSong.download_urls[4].link, {

@@ -163,7 +163,7 @@ export const getAudioWithBlob = async (id) => {
         };
 
     } catch (error) {
-        console.error('Error getting audio with blob:', error);
+        console.log("....")
         throw error;
     }
 }
