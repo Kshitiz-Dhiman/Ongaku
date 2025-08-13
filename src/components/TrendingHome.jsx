@@ -33,7 +33,7 @@ const TrendingHome = () => {
     };
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 mt-5 md:mt-0 md:py-20'>
+        <div className='w-full min-h-screen bg-black px-4 py-20 mt-5 md:mt-0 md:py-23'>
             <div className='max-w-7xl h-full mx-auto md:mt-5'>
 
                 <div className='flex flex-col space-y-4 sm:space-y-6 md:space-y-0 md:flex-row md:items-center md:justify-between mb-6 mt-13 md:mt-10 md:mb-8'>

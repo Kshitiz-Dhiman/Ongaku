@@ -125,29 +125,9 @@ const MusicPlayer = () => {
         await handlePrevSong();
 
     };
+    
 
-    useEffect(() => {
-        const initializePlayer = async () => {
-            try {
-                if (currentSong) {
-                    load(currentSong.download_urls[4].link, {
-                        autoplay: false,
-                        initialVolume: 0.5,
-                        onend: () => {
-                            console.log("Song ended");
-                        },
-                    })
-                } else {
-                    console.warn('No current song found in store');
-                }
-            } catch (error) {
-                console.error('Error initializing player:', error);
-            }
-        };
-
-        initializePlayer();
-    }, []); // Empty dependency array since we're using the store
-
+    // Control for keyboard shortcuts
     useEffect(() => {
         const handleKeyPress = (e) => {
             if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
@@ -155,11 +135,21 @@ const MusicPlayer = () => {
                 togglePlayPause();
             }
         };
-
+        const pressQtoExpandMusicPlayer = (e) => {
+            if (e.code === 'KeyQ') {
+                e.preventDefault();
+                expandMusicPlayer();
+            }
+        };
         window.addEventListener('keydown', handleKeyPress);
-        return () => window.removeEventListener('keydown', handleKeyPress);
+        window.addEventListener('keydown', pressQtoExpandMusicPlayer);
+        return () => {
+            window.removeEventListener('keydown', handleKeyPress);
+            window.removeEventListener('keydown', pressQtoExpandMusicPlayer);
+        };
     }, [togglePlayPause]);
 
+    // Animation for the progress bar
     useEffect(() => {
         if (!isDragging && playing) {
             const animate = () => {
@@ -276,19 +266,19 @@ const MusicPlayer = () => {
                         className="w-9/10 top-0 md:w-[600px] h-1 rounded-lg bg-gray-600 md:relative absolute cursor-pointer"
                     />
                     {/* Controls */}
-                    <div className='cursor-pointer hover:opacity-80 mt-3 md:m-0'>
+                    <div className='cursor-pointer  mt-3 md:m-0'>
                         <div className='md:flex justify-center items-center gap-6 hidden'>
                             <Shuffle className='text-gray-400' />
-                            <FaBackward size={30} className='text-gray-400' onClick={(e) => { playPreviousSong(); }} />
+                            <FaBackward size={30} className='text-gray-400 hover:text-gray-300 cursor-pointer' onClick={(e) => { playPreviousSong(); }} />
                             <div
                                 onKeyDown={(e) => { if (e.key === 'Enter') togglePlayPause(); }}
                                 onKeyUp={(e) => { if (e.key === ' ') togglePlayPause(); }}
-                                className='p-3 rounded-full bg-gray-400'
+                                className='p-3 rounded-full bg-gray-400 hover:bg-gray-200 cursor-pointer'
                                 onClick={(e) => { togglePlayPause(); }}
                             >
                                 {isLoading ? <LoadingSpinner /> : playing ? <FaPause color='black' size={30} /> : <FaPlay color='black' size={30} />}
                             </div>
-                            <FaForward size={30} className='text-gray-400' onClick={(e) => { playNextSong(); }} />
+                            <FaForward size={30} className='text-gray-400 hover:text-gray-300 cursor-pointer' onClick={(e) => { playNextSong(); }} />
                             <Repeat className='text-gray-400' />
                         </div>
                     </div>

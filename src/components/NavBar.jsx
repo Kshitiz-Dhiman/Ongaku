@@ -23,7 +23,7 @@ import { useAudioPlayerContext } from 'react-use-audio-player';
 const customStyles = {
     control: (base) => ({
         ...base,
-        backgroundColor: 'rgb(42, 40, 42, 0.7)',
+        backgroundColor: 'rgb(42, 40, 42, 0.5)',
         border: 'none',
         borderRadius: '1rem',
         padding: '0.5rem',

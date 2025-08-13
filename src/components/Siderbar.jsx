@@ -24,7 +24,6 @@ const Sidebar = ({ onClose }) => {
                     items={[
                         { icon: <Library size={20} />, title: 'Songs', link: 'liked' },
                         { icon: <Library size={20} />, title: 'Playlist', link: 'playlist' },
-                        { icon: <Library size={20} />, title: 'Album', link: 'album' },
                         { icon: <Library size={20} />, title: 'Downloads', link: 'downloads' }
 
                     ]}
