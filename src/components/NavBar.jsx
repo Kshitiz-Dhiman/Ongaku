@@ -212,7 +212,7 @@ const NavBar = () => {
         <div className='fixed bg-black w-full flex flex-wrap justify-between items-center px-4 md:px-12 z-[99] pt-5 pb-2'>
             {/* Logo - First on desktop and mobile */}
             <div
-                className="absolute bg-linear-65 from-red-500 to-blue-800 inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-40 scale-200 h-[90px]"
+                className="absolute bg-linear-65 from-red-500 to-blue-800 inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-40 scale-200 h-[100px]"
                 style={{
                     willChange: 'transform',
                     transform: 'translateZ(0)',
@@ -220,8 +220,7 @@ const NavBar = () => {
                 }}
             />
             <div className='flex order-1 items-center justify-center gap-2 w-auto'>
-                <img src={Favicon} alt="tung tung tung sahur" className='h-10 w-13 mr-15 rounded-full md:h-12 md:w-14 md:mr-[-13px]' />
-
+                <Music size={34} color='#e56158' strokeWidth={4} className='mt-2' />
                 <h1 className='hidden sm:block text-2xl md:text-3xl font-bold'>Ongaku</h1>
             </div>
 

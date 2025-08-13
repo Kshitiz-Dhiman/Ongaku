@@ -65,7 +65,7 @@ const TrendingHome = () => {
                     }
                 </div>
 
-                <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-[#6e7273] mb-6 md:mb-8'>
+                <h1 className='text-2xl sm:text-3xl font-bold text-[#6e7273] mb-6 md:mb-8'>
                     Trending Songs
                 </h1>
 

@@ -350,7 +350,7 @@ const ExpandedMusicPlayer = ({
                                         <Link
                                             to={`/artist/${artist.id}`}
                                             className='text-sm font-bold text-gray-400 hover:text-gray-300'
-                                            onClick={(e) => { e.stopPropagation(); }}
+                                            onClick={() => { console.log("Artist clicked") }}
                                         >
                                             {decodeHTMLEntities(trimString(artist.name, Math.floor(30 / currentTrack.artists.length))) + (index < currentTrack.artists.length - 1 ? ', ' : '')}
                                         </Link>
@@ -485,7 +485,7 @@ const ExpandedMusicPlayer = ({
                         onValueChange={handleSliderChange}
                         onPointerDown={() => setIsDragging(true)}
                         onValueCommit={handleSliderCommit}
-                        className="w-full h-[5px] rounded-lg bg-gray-600 cursor-pointer"
+                        className="w-full h-[10px] rounded-lg bg-gray-600 cursor-pointer"
                     />
                 </div>
 

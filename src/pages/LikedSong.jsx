@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { EllipsisVertical } from 'lucide-react';
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
 import LikedSongSkeleton from '@/components/LikedSongSkeleton';
 import { useAudioStore } from '@/app/storeZustand';
 import {
@@ -18,15 +20,45 @@ import {
 } from '../components/hooks/useQuery';
 import { useQueryClient } from '@tanstack/react-query';
 
+gsap.registerPlugin(useGSAP);
+
 const LikedSong = () => {
     const { playTrack } = useAudioStore();
     const queryClient = useQueryClient();
+    const containerRef = useRef(null);
+    const titleRef = useRef(null);
+    const songRefs = useRef([]);
 
     const [selectedSongId, setSelectedSongId] = useState(null);
 
     const { data: likedSongs, isLoading } = useLikedSongs();
     const removeFromLiked = useRemoveFromLiked();
     const { data: selectedSongData } = useSongById(selectedSongId);
+
+    useGSAP(() => {
+        if (titleRef.current) {
+            gsap.fromTo(titleRef.current,
+                { opacity: 0, y: 25 },
+                { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+            );
+        }
+    }, { scope: containerRef });
+
+    useGSAP(() => {
+        if (!isLoading && likedSongs?.length && songRefs.current.length > 0) {
+            gsap.fromTo(songRefs.current,
+                { opacity: 0, y: 15 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.1,
+                    stagger: 0.05,
+                    ease: "power2.out",
+                    delay: 0.1
+                }
+            );
+        }
+    }, { dependencies: [isLoading, likedSongs], scope: containerRef });
 
     useEffect(() => {
         if (!selectedSongData) return;
@@ -66,12 +98,21 @@ const LikedSong = () => {
 
     const handleRemoveFromLiked = async (songId, e) => {
         e.stopPropagation();
+
+        const songElement = songRefs.current.find(el => el?.dataset?.songId === songId);
+        if (songElement) {
+            gsap.to(songElement, { opacity: 0, x: -40, duration: 0.3, ease: "power2.in" });
+        }
+
         try {
             await removeFromLiked.mutateAsync(songId);
             toast.success("Removed from liked songs");
         } catch (err) {
             console.error("Error:", err);
             toast.error("Failed to remove");
+            if (songElement) {
+                gsap.to(songElement, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" });
+            }
         }
     };
 
@@ -123,27 +164,23 @@ const LikedSong = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20 mb-10'>
-            <h1 className='text-2xl sm:text-2xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left'>
+        <div ref={containerRef} className='w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20 mb-10'>
+            <h1
+                ref={titleRef}
+                className='text-2xl sm:text-2xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left'
+            >
                 Liked Songs
             </h1>
             <div className='flex flex-col w-full'>
                 {isLoading ? (
                     <LikedSongSkeleton />
-                ) : likedSongs?.map((song) => (
+                ) : likedSongs?.map((song, index) => (
                     <div
                         key={song.songId}
-                        className="flex items-center justify-between w-full py-2 px-4 mb-2 rounded-lg hover:bg-zinc-800/40 transition-all duration-300 cursor-pointer"
+                        ref={(el) => songRefs.current[index] = el}
+                        data-song-id={song.songId}
+                        className="flex items-center justify-between w-full py-2 px-4 mb-2 rounded-lg hover:bg-zinc-800/40 transition-colors duration-300 cursor-pointer"
                         onClick={() => handlePlaySong(song)}
-                    // onMouseEnter={() =>
-                    //     queryClient.prefetchQuery({
-                    //         queryKey: ['song', song.songId],
-                    //         queryFn: async () => {
-                    //             const res = await fetch(`${import.meta.env.VITE_MUSIC_API}/song?id=${song.songId}`);
-                    //             return (await res.json()).data;
-                    //         }
-                    //     })
-                    // }
                     >
                         <div className="flex items-center gap-4">
                             <img

@@ -125,9 +125,33 @@ const MusicPlayer = () => {
         await handlePrevSong();
 
     };
-    
+    useEffect(() => {
+        if ('mediaSession' in navigator && currentSong) {
+            navigator.mediaSession.metadata = new window.MediaMetadata({
+                title: currentSong.title,
+                artist: currentSong.artists?.map(a => a.name).join(', ') || '',
+                album: currentSong.album || '',
+                artwork: [
+                    { src: currentSong.image?.large || currentSong.image?.small, sizes: '512x512', type: 'image/png' }
+                ]
+            });
 
-    // Control for keyboard shortcuts
+            navigator.mediaSession.setActionHandler('play', () => {
+                if (!playing) togglePlayPause();
+            });
+            navigator.mediaSession.setActionHandler('pause', () => {
+                if (playing) togglePlayPause();
+            });
+            navigator.mediaSession.setActionHandler('previoustrack', playPreviousSong);
+            navigator.mediaSession.setActionHandler('nexttrack', playNextSong);
+
+        }
+        return () => {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = null;
+            }
+        };
+    }, [currentSong, togglePlayPause]);
     useEffect(() => {
         const handleKeyPress = (e) => {
             if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
