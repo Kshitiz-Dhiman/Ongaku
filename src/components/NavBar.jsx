@@ -21,7 +21,7 @@ import { useAudioStore } from '@/app/storeZustand';
 import { useAudioPlayerContext } from 'react-use-audio-player';
 
 const customStyles = {
-    control: (base) => ({
+    control: (base, state) => ({
         ...base,
         backgroundColor: 'rgb(42, 40, 42, 0.5)',
         border: 'none',
@@ -29,7 +29,11 @@ const customStyles = {
         padding: '0.5rem',
         paddingInlineStart: '2rem',
         width: '100%',
-        color: 'white'
+        color: 'white',
+        boxShadow: state.isFocused ? '0 0 0 1px grey' : 'none',
+        '&:hover': {
+            borderColor: 'transparent'
+        }
     }),
     input: (base) => ({
         ...base,

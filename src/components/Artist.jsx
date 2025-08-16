@@ -90,7 +90,7 @@ const Artist = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-30 md:mt-0 mt-10'>
+        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-30 md:mt-0 mt-10 mb-20'>
             <div className='max-w-7xl mx-auto md:mt-5'>
                 <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl'>
                     <div className="w-48 h-48 shadow-xl rounded-xl overflow-hidden">

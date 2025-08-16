@@ -98,7 +98,8 @@ const DesktopMenu = ({ menuTitle, items }) => {
                                 handleNavClick();
                             }
                         }}
-                        className='flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-[#262626] transition-colors duration-200 cursor-pointer'
+                        className='flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-[#262626] active:bg-[#202020]
+                        active:scale-97 transition-colors duration-200 cursor-pointer'
                     >
                         {item.icon}
                         <span className='text-base font-medium'>{item.title}</span>

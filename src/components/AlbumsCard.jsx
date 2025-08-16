@@ -27,7 +27,8 @@ const AlbumsCard = ({ key, album }) => {
             <div
                 onClick={openAlbum}
                 key={key}
-                className="flex items-center gap-2 sm:gap-4  transition-colors duration-200 rounded-md hover:bg-[#262626] cursor-pointer bg-[#151515]"
+                className="flex items-center gap-2 sm:gap-4  transition-colors duration-200 rounded-md hover:bg-[#262626] cursor-pointer bg-[#151515] active:bg-[#202020]
+                        active:scale-97"
             >
                 <div className="relative group">
                     <img

@@ -18,7 +18,7 @@ const Profile = () => {
 
     return (
         <div className='
-            w-full min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-2
+            w-full md:w-9/10 md:ml-20 min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-2
 '>
             <h1 className='
                 text-2xl sm:text-2xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left
