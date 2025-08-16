@@ -11,6 +11,13 @@ A modern music application built with React and Vite, designed to provide an int
 - **Search Functionality**: Quick search through your music library
 
 ## 🚀 Quick Start
+### Screenshots
+<img width="604" height="1325" alt="Screenshot 2025-08-16 185842" src="https://github.com/user-attachments/assets/ea3b7da1-0651-4d9f-9ff4-507856ee25a7" />
+<img width="601" height="1311" alt="Screenshot 2025-08-16 185957" src="https://github.com/user-attachments/assets/0c4e7591-d7f6-40e7-99e3-d4545078ee48" />
+<img width="619" height="1333" alt="Screenshot 2025-08-16 190226" src="https://github.com/user-attachments/assets/45aba1d6-a5f6-490f-be74-02505f6d9d3f" />
+<img width="608" height="1326" alt="Screenshot 2025-08-16 190104" src="https://github.com/user-attachments/assets/08767444-33cd-4c25-98ad-0ab546317e65" />
+<img width="605" height="1326" alt="Screenshot 2025-08-16 190045" src="https://github.com/user-attachments/assets/5d9b3fdc-17ee-4983-941a-96bba9833bcc" />
+
 
 ### Prerequisites
 
