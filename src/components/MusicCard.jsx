@@ -8,7 +8,7 @@ import { useAudioStore } from '@/app/storeZustand'
 import { useAudioPlayerContext } from 'react-use-audio-player'
 
 function MusicCard({ key, song }) {
-const { load } = useAudioPlayerContext();
+    const { load } = useAudioPlayerContext();
     const cardRef = useRef(null);
 
     gsap.registerPlugin(useGSAP);
@@ -30,14 +30,8 @@ const { load } = useAudioPlayerContext();
     const { playTrack, setCurrentSong } = useAudioStore();
 
     const playthehomesong = async () => {
-        await playTrack(song, true);
-        // load(song.download_urls[4].link, {
-        //     autoplay: true,
-        //     initialVolume: 0.5,
-        //     onend: () => {
-        //         console.log("Song ended");
-        //     },
-        // })
+        await playTrack(song, true, []);
+
     }
 
     return (

@@ -158,7 +158,6 @@ export const useAudioStore = create(
                     if (currentIndex > 0 && musicQueue.length > 0) {
                         const prevSong = musicQueue[currentIndex - 1];
 
-                        // If the previous song is from liked songs, we need to fetch its full data
                         if (prevSong.songId && !prevSong.download) {
                             try {
                                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${prevSong.songId}`);

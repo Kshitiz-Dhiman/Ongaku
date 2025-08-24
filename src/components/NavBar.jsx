@@ -134,7 +134,6 @@ const NavBar = () => {
 
             let playlistData = [];
             if (sourceList.length > 0) {
-                // Convert search results to proper format for the playlist
                 const convertedSongs = await Promise.all(
                     sourceList.map(async (searchSong) => {
                         try {
@@ -160,8 +159,6 @@ const NavBar = () => {
 
                 playlistData = convertedSongs.filter(song => song !== null);
             }
-            console.log(audio);
-            console.log(playlistData);
             await playTrack(audio, true, []);
 
         } catch (error) {
