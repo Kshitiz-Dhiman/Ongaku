@@ -19,20 +19,9 @@ import { FaForward } from "react-icons/fa6";
 import { FaBackward } from "react-icons/fa6";
 import { decodeHTMLEntities } from '../utils/utils';
 import { useAudioStore } from '@/app/storeZustand';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCheckLikedStatus, useToggleLike } from './hooks/useQuery';
+import { useCheckLikedStatus, useToggleLike, useFetchLyrics } from './hooks/useQuery';
 const API = import.meta.env.VITE_MUSIC_API;
 
-const useFetchLyrics = () => {
-    return useMutation({
-        mutationFn: async (songId) => {
-            return 'Lyrics are not available at this moment';
-        },
-        onError: () => {
-            return 'Lyrics are not available at this moment';
-        },
-    });
-};
 
 const ExpandedMusicPlayer = ({
     expandedPlayerRef,
@@ -97,22 +86,19 @@ const ExpandedMusicPlayer = ({
             songData: currentTrack
         });
     };
-
-    const fetchLryics = async () => {
-        if (!currentTrack?.id) {
-            setLyrics('Lyrics are not available at this moment');
+    const fetchLyrics = (currentTrack) => {
+        if (!currentTrack) {
+            setLyrics('No track selected');
             return;
         }
-
-        fetchLyricsMutation.mutate(currentTrack.id, {
-            onSuccess: (lyrics) => {
-                setLyrics(lyrics);
-            },
-            onError: () => {
-                setLyrics('Lyrics are not available at this moment');
+        const lyricsData = fetchLyricsMutation.mutate(currentTrack, {
+            onSuccess: (data) => {
+                // syncedLyrics
+                setLyrics(data?.plainLyrics || 'Lyrics not found');
             }
         });
-    };
+    }
+
 
     useEffect(() => {
         if (currentTrack) {
@@ -128,7 +114,7 @@ const ExpandedMusicPlayer = ({
             setLyricsMenuOpen(false);
         } else {
             setLyricsMenuOpen(true);
-            fetchLryics();
+            fetchLyrics(currentTrack);
         }
     }
 
@@ -314,7 +300,7 @@ const ExpandedMusicPlayer = ({
                             <TabsList className="bg-zinc-800/50 backdrop-blur-sm shadow-sm shadow-gray-600 rounded-lg w-full mt-4 p-1">
                                 <TabsTrigger onClick={() => {
                                     setLyrics("Fetching lyrics....")
-                                    fetchLryics();
+                                    fetchLyrics(currentTrack);
                                 }} value="lyrics" className="text-sm font-medium">Lyrics</TabsTrigger>
                                 <TabsTrigger value="queue" className="text-sm font-medium">Queue</TabsTrigger>
                                 <TabsTrigger value="related" className="text-sm font-medium">Related</TabsTrigger>
@@ -441,13 +427,14 @@ const ExpandedMusicPlayer = ({
                             </div>
                         ) : (fetchLyricsMutation.isPending ? <LyricsSkeleton /> : (
                             <div>
-                                <p className='text-[22px] px-4 font-bold  text-gray-400 text-center mb-2 h-[300px] overflow-scroll whitespace-pre-line'>
+                                <p className='text-[22px] font-bold text-gray-400 leading-11 text-center h-[400px] pt-10 italic overflow-y-scroll whitespace-pre-line [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] [mask-repeat:no-repeat] [mask-size:100%_100%]'>
                                     {lyrics}
                                 </p>
                             </div>
                         ))
                     }
                 </div>
+
 
                 <div className="text-center">
                     <h1 className="text-2xl font-extrabold">

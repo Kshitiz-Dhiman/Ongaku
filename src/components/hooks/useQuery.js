@@ -124,3 +124,21 @@ export const useToggleLike = () => {
         },
     });
 };
+export const useFetchLyrics = () => {
+    return useMutation({
+        mutationFn: async (currentTrack) => {
+            console.log(currentTrack);
+            const lyrics = await axios.get(`https://lrclib.net/api/get?track_name=${currentTrack.title}&artist_name=${currentTrack.artists[0]?.name || currentTrack.subtitle}`);
+            if (lyrics.status == 404) {
+                return { plainLyrics: 'Lyrics are not available at this moment' };
+            }
+            return lyrics.data;
+        },
+        onError: () => {
+            return 'Lyrics are not available at this moment';
+        },
+        retry: 1,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 10,
+    });
+};
