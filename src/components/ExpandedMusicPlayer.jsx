@@ -309,7 +309,7 @@ const ExpandedMusicPlayer = ({
                                 {
                                     fetchLyricsMutation.isPending ? <LyricsSkeleton /> : (
                                         <div className="w-full">
-                                            <p className='text-lg sm:text-xl md:text-[22px] font-bold px-2 sm:px-4 md:px-6 lg:px-10 text-gray-400 text-center h-[47vh] overflow-y-auto whitespace-pre-line '>
+                                            <p className='text-lg sm:text-xl md:text-[22px] font-bold px-2 sm:px-4 md:px-6 lg:px-10 text-gray-400 text-center h-[47vh] overflow-y-auto whitespace-pre-line italic leading-10 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] [mask-repeat:no-repeat] [mask-size:100%_100%]'>
                                                 {lyrics}
                                             </p>
                                         </div>
