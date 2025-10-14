@@ -152,10 +152,11 @@ const ExpandedMusicPlayer = ({
             }
 
             const isOnImage = target.closest('.album-art-container, .album-art-image');
+            const isLyricsContainer = target.closest('.lyrics-scroll-container');
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             const screenHeight = window.innerHeight;
 
-            if (!isOnImage && clientY > screenHeight * 0.3) {
+            if (isLyricsContainer || (!isOnImage && clientY > screenHeight * 0.3)) {
                 return;
             }
 
@@ -270,7 +271,7 @@ const ExpandedMusicPlayer = ({
             >
                 <div className="w-12 h-1 bg-gray-500 rounded-full mx-auto mt-2 mb-3"></div>
             </button>
-
+            {/* Laptop view */}
             <div className='md:block hidden h-full w-full flex-col p-6'>
                 <div
                     className="absolute inset-0 z-[-1] bg-cover bg-center opacity-40"
@@ -398,7 +399,7 @@ const ExpandedMusicPlayer = ({
                     </div>
                 </div>
             </div>
-
+            {/* Mobile view */}
             <div className="md:hidden h-full flex flex-col px-6 pb-20">
                 <div
                     className="absolute inset-0 z-[-1] bg-cover bg-center opacity-40"
@@ -426,10 +427,21 @@ const ExpandedMusicPlayer = ({
                                 />
                             </div>
                         ) : (fetchLyricsMutation.isPending ? <LyricsSkeleton /> : (
-                            <div>
-                                <p className='text-[22px] font-bold text-gray-400 leading-11 text-center h-[400px] pt-10 italic overflow-y-scroll whitespace-pre-line [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] [mask-repeat:no-repeat] [mask-size:100%_100%]'>
-                                    {lyrics}
-                                </p>
+                            <div className="lyrics-container h-[400px] w-full overflow-hidden rounded-xl bg-zinc-900/40 backdrop-blur-sm">
+                                <div
+                                    className="lyrics-scroll-container h-full w-full overflow-y-scroll touch-pan-y"
+                                    style={{
+                                        WebkitOverflowScrolling: 'touch',
+                                        msOverflowStyle: 'none',
+                                        scrollbarWidth: 'none'
+                                    }}
+                                >
+                                    <div className="min-h-full flex items-center justify-center">
+                                        <p className='text-[22px] font-medium text-gray-300 leading-11 text-center px-6 py-10 italic whitespace-pre-line'>
+                                            {lyrics}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         ))
                     }
