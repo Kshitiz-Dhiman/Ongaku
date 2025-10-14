@@ -44,7 +44,6 @@ export const useAudioStore = create(
                     let index = -1;
 
                     set({ currentSong: song });
-                    if (currentSong === null) return;
 
                     try {
                         if (songsList.length > 0) {
@@ -94,8 +93,13 @@ export const useAudioStore = create(
                 },
 
                 handleNextSong: async () => {
-                    if (currentSong === null) return;
-                    const { musicQueue, currentIndex, originalSongsList, getRecommendation } = get();
+                    const { musicQueue, currentIndex, originalSongsList, getRecommendation, currentSong } = get();
+
+                    // If there's no current song or queue is empty, do nothing
+                    if (!currentSong || musicQueue.length === 0) {
+                        console.log("No songs in queue or no current song");
+                        return;
+                    }
 
                     if (currentIndex >= 0 && currentIndex < musicQueue.length - 1) {
                         const nextSong = musicQueue[currentIndex + 1];
@@ -104,6 +108,13 @@ export const useAudioStore = create(
                             try {
                                 const response = await axios.get(`${import.meta.env.VITE_MUSIC_API}/song?id=${nextSong.songId}`);
                                 const songData = response.data.data;
+
+                                // Validate song data before proceeding
+                                if (!songData || !songData.images || !songData.images.large) {
+                                    console.error('Invalid song data received from API');
+                                    return;
+                                }
+
                                 songData.images.large = songData.images.large.replace("150x150", "500x500");
 
                                 const audio = {
@@ -139,9 +150,16 @@ export const useAudioStore = create(
                                     const currentState = get();
                                     const newQueueLength = currentState.musicQueue.length;
 
+                                    // Validate that the first recommended song has valid image data
+                                    const nextSong = recommended.data[0];
+                                    if (!nextSong.image || !nextSong.image.large) {
+                                        console.log("Invalid song data received from recommendation");
+                                        return;
+                                    }
+
                                     set({
                                         musicQueue: [...currentState.musicQueue, ...recommended.data],
-                                        currentSong: recommended.data[0],
+                                        currentSong: nextSong,
                                         currentIndex: newQueueLength
                                     });
                                 } else {
@@ -155,7 +173,13 @@ export const useAudioStore = create(
                 },
 
                 handlePrevSong: async () => {
-                    const { musicQueue, currentIndex } = get();
+                    const { musicQueue, currentIndex, currentSong } = get();
+
+                    // If there's no current song or queue is empty, do nothing
+                    if (!currentSong || musicQueue.length === 0) {
+                        console.log("No songs in queue or no current song");
+                        return;
+                    }
 
                     if (currentIndex > 0 && musicQueue.length > 0) {
                         const prevSong = musicQueue[currentIndex - 1];

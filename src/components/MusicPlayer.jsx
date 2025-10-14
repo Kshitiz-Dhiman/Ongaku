@@ -126,29 +126,45 @@ const MusicPlayer = () => {
 
     };
     useEffect(() => {
+
         if ('mediaSession' in navigator && currentSong) {
-            navigator.mediaSession.metadata = new window.MediaMetadata({
-                title: currentSong.title,
-                artist: currentSong.artists?.map(a => a.name).join(', ') || '',
-                album: currentSong.album || '',
-                artwork: [
-                    { src: currentSong.image?.large || currentSong.image?.small, sizes: '512x512', type: 'image/png' }
-                ]
-            });
+            try {
+                // Validate that we have required image data
+                const artworkSrc = currentSong.image?.large || currentSong.image?.small;
+                if (!artworkSrc) {
+                    console.warn('No valid artwork found for MediaMetadata');
+                    return;
+                }
 
-            navigator.mediaSession.setActionHandler('play', () => {
-                if (!playing) togglePlayPause();
-            });
-            navigator.mediaSession.setActionHandler('pause', () => {
-                if (playing) togglePlayPause();
-            });
-            navigator.mediaSession.setActionHandler('previoustrack', playPreviousSong);
-            navigator.mediaSession.setActionHandler('nexttrack', playNextSong);
+                navigator.mediaSession.metadata = new window.MediaMetadata({
+                    title: currentSong.title || 'Unknown Title',
+                    artist: currentSong.artists?.map(a => a.name).join(', ') || 'Unknown Artist',
+                    album: currentSong.album || '',
+                    artwork: [
+                        { src: artworkSrc, sizes: '512x512', type: 'image/png' }
+                    ]
+                });
 
+                navigator.mediaSession.setActionHandler('play', () => {
+                    if (!playing) togglePlayPause();
+                });
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    if (playing) togglePlayPause();
+                });
+                navigator.mediaSession.setActionHandler('previoustrack', playPreviousSong);
+                navigator.mediaSession.setActionHandler('nexttrack', playNextSong);
+            } catch (error) {
+                console.error('Error setting up MediaSession:', error);
+            }
         }
+
         return () => {
             if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = null;
+                try {
+                    navigator.mediaSession.metadata = null;
+                } catch (error) {
+                    console.error('Error clearing MediaSession:', error);
+                }
             }
         };
     }, [currentSong, togglePlayPause]);
