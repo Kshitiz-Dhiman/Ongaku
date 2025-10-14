@@ -44,6 +44,7 @@ export const useAudioStore = create(
                     let index = -1;
 
                     set({ currentSong: song });
+                    if (currentSong === null) return;
 
                     try {
                         if (songsList.length > 0) {
@@ -93,6 +94,7 @@ export const useAudioStore = create(
                 },
 
                 handleNextSong: async () => {
+                    if (currentSong === null) return;
                     const { musicQueue, currentIndex, originalSongsList, getRecommendation } = get();
 
                     if (currentIndex >= 0 && currentIndex < musicQueue.length - 1) {
