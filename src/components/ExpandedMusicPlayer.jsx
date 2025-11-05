@@ -501,7 +501,7 @@ const ExpandedMusicPlayer = ({
                         onClick={playPreviousSong}
                     />
                     <div
-                        className="p-4 rounded-full bg-gray-400 hover:bg-gray-200 cursor-pointer"
+                        className="p-4 rounded-full bg-gray-400 hover:bg-gray-200  cursor-pointer"
                         onClick={(e) => {
                             e.stopPropagation();
                             e.preventDefault();

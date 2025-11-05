@@ -248,7 +248,7 @@ const MusicPlayer = () => {
                             <img src={currentSong?.image?.small} alt="image" className='w-full h-full object-cover' />
                         </div>
                         <div className='flex flex-col justify-around  '>
-                            <h1 className='text-lg font-bold'>{trimString(currentSong?.title, 40) || 'No Track Selected'}</h1>
+                            <h1 className='text-lg font-bold '>{trimString(currentSong?.title, 25) || 'No Track Selected'}</h1>
                             <div className='flex items-center gap-2  flex-wrap'>
                                 {currentSong?.artists ? (
                                     currentSong.artists.map((artist, index) => (

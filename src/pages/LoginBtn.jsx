@@ -30,7 +30,7 @@ const SampleLogin = () => {
     return (
         <div className="w-full flex justify-center items-center">
             <button
-                className='flex items-center gap-2 bg-[#101010] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-4xl md:rounded-lg font-medium transition-colors duration-200 hover:bg-[#202020] focus:outline-none focus:ring-2 focus:ring-[#404040] focus:ring-opacity-50 cursor-pointer text-sm sm:text-base w-full sm:w-auto max-w-[300px]'
+                className='flex items-center gap-2 bg-white/5 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-4xl md:rounded-lg font-medium transition-colors duration-200 hover:bg-[#202020] focus:outline-none focus:ring-2 focus:ring-[#404040] focus:ring-opacity-50 cursor-pointer text-sm sm:text-base w-full sm:w-auto max-w-[300px]'
                 onClick={() => login()}
             >
                 <span className='hidden sm:block'>Login with</span>

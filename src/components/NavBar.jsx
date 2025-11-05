@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useState, useRef, useCallback } from 'react'
 import { FiSearch } from "react-icons/fi";
 import { Music, NavigationOff } from "lucide-react"
-import AsyncSelect from 'react-select/async';
+// Replaced react-select Async with a lightweight async dropdown using existing UI primitives
 import axios from 'axios';
 import { useNavigate, NavLink } from 'react-router-dom';
 import SampleLogin from '@/pages/LoginBtn';
@@ -20,46 +20,19 @@ import image from "../assets/avatar.jpeg";
 import { useAudioStore } from '@/app/storeZustand';
 import { useAudioPlayerContext } from 'react-use-audio-player';
 
-const customStyles = {
-    control: (base, state) => ({
-        ...base,
-        backgroundColor: 'rgb(42, 40, 42, 0.5)',
-        border: 'none',
-        borderRadius: '1rem',
-        padding: '0.5rem',
-        paddingInlineStart: '2rem',
-        width: '100%',
-        color: 'white',
-        boxShadow: state.isFocused ? '0 0 0 1px grey' : 'none',
-        '&:hover': {
-            borderColor: 'transparent'
-        }
-    }),
-    input: (base) => ({
-        ...base,
-        color: 'white'
-    }),
-    menu: (base) => ({
-        ...base,
-        backgroundColor: '#080c10',
-        border: 'none',
-        borderRadius: '1rem',
-        marginTop: '0.5rem'
-    }),
-    option: (base, state) => ({
-        ...base,
-        backgroundColor: state.isFocused ? '#262626' : '#080c10',
-        color: 'white',
-        padding: '0.75rem',
-        cursor: 'pointer'
-    })
-};
-
 const NavBar = () => {
     const [songSuggestions, setSongSuggestions] = useState([]);
     const [albumSuggestions, setAlbumSuggestions] = useState([]);
     const [artistSuggestions, setArtistSuggestions] = useState([]);
     const [top_query, setTopQuery] = useState([]);
+    const [suggestionsGrouped, setSuggestionsGrouped] = useState([]);
+    const [query, setQuery] = useState('');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const inputRef = useRef(null);
+    const timerRef = useRef(null);
+    const [dropdownPos, setDropdownPos] = useState(null);
+    const [isFocused, setIsFocused] = useState(false);
 
     const loadSuggestions = async (inputValue) => {
         try {
@@ -69,12 +42,14 @@ const NavBar = () => {
             setAlbumSuggestions(data1.data.albums.data);
             setTopQuery(data1.data.top_query.data);
             setArtistSuggestions(data1.data.artists.data);
+
             const suggestions = [
                 {
                     label: "Top Search",
                     options: data1.data.top_query.data.map((query) => ({
                         value: query.id,
                         label: `${query.title} - ${query.description}`,
+                        image: query.image || null,
                         type: "top_query"
                     }))
                 },
@@ -82,7 +57,8 @@ const NavBar = () => {
                     label: "Songs",
                     options: data1.data.songs.data.map((song) => ({
                         value: song.id,
-                        label: `${song.title} - ${song.more_info.primary_artists}`,
+                        label: `${song.title} - ${song.more_info?.primary_artists || ''}`,
+                        image: song.image || null,
                         type: "song"
                     }))
                 },
@@ -90,7 +66,8 @@ const NavBar = () => {
                     label: "Albums",
                     options: data1.data.albums.data.map((album) => ({
                         value: album.id,
-                        label: `${album.title} - ${album.more_info.music}`,
+                        label: `${album.title} - ${album.more_info?.music || ''}`,
+                        image: album.image || null,
                         type: "album"
                     }))
                 },
@@ -99,6 +76,7 @@ const NavBar = () => {
                     options: data1.data.artists.data.map((artist) => ({
                         value: artist.id,
                         label: `${artist.title}`,
+                        image: artist.image || null,
                         type: "artist"
                     }))
                 }
@@ -110,7 +88,83 @@ const NavBar = () => {
         }
     };
 
-    const [selectedOption, setSelectedOption] = useState(null);
+    const debouncedLoad = useCallback((value) => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(async () => {
+            const grouped = await loadSuggestions(value || '');
+            if (grouped) {
+                setSuggestionsGrouped(grouped);
+                setDropdownOpen(true);
+                requestAnimationFrame(() => {
+                    if (inputRef.current) {
+                        const rect = inputRef.current.getBoundingClientRect();
+                        setDropdownPos({ left: rect.left, top: rect.bottom, width: rect.width });
+                    }
+                });
+            } else {
+                setSuggestionsGrouped([]);
+                setDropdownOpen(false);
+            }
+        }, 250);
+    }, []);
+
+    const handleFocus = async () => {
+        setIsFocused(true);
+        if (query && query.length > 0) {
+            debouncedLoad(query);
+        } else {
+            const grouped = await loadSuggestions('');
+            if (grouped) {
+                setSuggestionsGrouped(grouped);
+                setDropdownOpen(true);
+                requestAnimationFrame(() => {
+                    if (inputRef.current) {
+                        const rect = inputRef.current.getBoundingClientRect();
+                        setDropdownPos({ left: rect.left, top: rect.bottom, width: rect.width });
+                    }
+                });
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (!dropdownOpen) return;
+
+        const update = () => {
+            if (inputRef.current) {
+                const rect = inputRef.current.getBoundingClientRect();
+                setDropdownPos({ left: rect.left, top: rect.bottom, width: rect.width });
+            }
+        };
+
+        window.addEventListener('resize', update);
+        window.addEventListener('scroll', update, true);
+        update();
+
+        return () => {
+            window.removeEventListener('resize', update);
+            window.removeEventListener('scroll', update, true);
+        };
+    }, [dropdownOpen]);
+
+    useEffect(() => {
+        const onDocClick = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target) && !inputRef.current.contains(e.target)) {
+                setDropdownOpen(false);
+                setIsFocused(false);
+            }
+        };
+        const onKey = (e) => {
+            if (e.key === 'Escape') setDropdownOpen(false);
+        };
+        document.addEventListener('click', onDocClick);
+        document.addEventListener('keydown', onKey);
+        return () => {
+            document.removeEventListener('click', onDocClick);
+            document.removeEventListener('keydown', onKey);
+        };
+    }, []);
+
     const navigate = useNavigate();
 
     const { playTrack } = useAudioStore();
@@ -196,7 +250,8 @@ const NavBar = () => {
             navigate(`/artist/${option.value}`)
         }
 
-        setSelectedOption(null);
+        setDropdownOpen(false);
+        setIsFocused(false);
     };
 
     const userInfo = useAuthUserInfo();
@@ -209,9 +264,7 @@ const NavBar = () => {
     };
 
     return (
-        // Navbar component with improved responsive layout
         <div className='fixed bg-black w-full flex flex-wrap justify-between items-center px-4 md:px-12 z-[99] pt-5 pb-2'>
-            {/* Logo - First on desktop and mobile */}
             <div
                 className="absolute bg-linear-65 from-red-500 to-blue-800 inset-0 z-[-1] bg-cover bg-center blur-3xl opacity-40 scale-200 h-[100px]"
                 style={{
@@ -224,8 +277,7 @@ const NavBar = () => {
                 <Music size={34} color='#e56158' strokeWidth={4} className='mt-2' />
                 <h1 className='hidden sm:block text-2xl md:text-3xl font-bold'>Ongaku</h1>
             </div>
-
-            {/* User controls - On right side for desktop, but second item on mobile */}
+            {/* Profile */}
             <div className='flex order-2 md:order-3 items-center justify-center gap-4 w-auto'>
                 {!localStorage.getItem("token") ? <SampleLogin /> : (
                     <DropdownMenu>
@@ -265,19 +317,61 @@ const NavBar = () => {
                 )}
             </div>
 
-            {/* Search bar - Middle on desktop, bottom on mobile (full width) */}
-            <div className="relative order-3 md:order-2 w-full md:w-1/3 flex items-center mt-2 md:mt-0">
-                <FiSearch className="absolute left-3 text-gray-400 w-5 h-5 z-10" />
-                <AsyncSelect
-                    cacheOptions
-                    value={selectedOption}
-                    onChange={handleSelect}
-                    loadOptions={loadSuggestions}
-                    styles={customStyles}
+            <div className="relative order-3 md:order-2 w-full md:w-1/3 flex items-center mt-2 md:mt-0 group">
+                <FiSearch className={`absolute left-3 w-5 h-5 z-10 transition-colors duration-150 ${isFocused ? 'text-gray-200' : 'text-gray-400'} group-focus:text-gray-200 group-active:text-gray-100`} />
+                <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(e) => {
+                        const v = e.target.value;
+                        setQuery(v);
+                        debouncedLoad(v);
+                    }}
+                    onFocus={handleFocus}
+                    onBlur={() => setIsFocused(false)}
                     placeholder="Search for songs and playlists..."
-                    className="w-full"
-                    noOptionsMessage={() => "Start typing to search..."}
+                    className={`bg-white/5 hover:bg-white/10 focus:bg-white/20  w-full rounded-xl py-3 px-10 text-bold placeholder:text-gray-400 outline-none caret-white transition-all duration-150 ease-in-out ${isFocused ? 'text-gray-100 ring-2 ring-white/10 shadow-[0_6px_20px_rgba(0,0,0,0.4)]' : 'text-gray-300'} focus:ring-2 focus:ring-white/10 hover:shadow-sm`}
                 />
+                {/* Dropdown */}
+                {dropdownOpen && suggestionsGrouped && suggestionsGrouped.length > 0 && (
+                    <div
+                        ref={dropdownRef}
+                        className="max-h-80 overflow-auto rounded-lg bg-[#101010] border border-[#1f1f1f] shadow-lg"
+                        style={dropdownPos ? {
+                            position: 'fixed',
+                            left: dropdownPos.left,
+                            top: dropdownPos.top + 8,
+                            width: dropdownPos.width,
+                            zIndex: 9999
+                        } : { position: 'absolute', left: 0, right: 0, marginTop: '0.5rem', zIndex: 9999 }}
+                    >
+                        {suggestionsGrouped.map((group) => (
+                            <div key={group.label} className="py-2 px-2">
+                                <div className="text-gray-400 font-semibold px-2 py-1 text-bold">{group.label}</div>
+                                {group.options && group.options.map((opt) => {
+                                    return (
+                                        <div
+                                            key={opt.value + opt.type}
+                                            onClick={async () => {
+                                                setDropdownOpen(false);
+                                                setQuery('');
+                                                await handleSelect(opt);
+                                            }}
+                                            className="flex items-center gap-3 px-3 py-2 text-bold hover:bg-[#262626] cursor-pointer text-sm text-white rounded-2xl"
+                                        >
+                                            {opt.image ? (
+                                                <img src={opt.image} alt={opt.label} className="w-10 h-10 rounded-md object-cover" />
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-md bg-gray-800 flex items-center justify-center text-xs text-gray-400">N/A</div>
+                                            )}
+                                            <div className="text-bold truncate">{opt.label}</div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
