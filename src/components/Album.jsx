@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 // import { AudioPlayerData } from '../context/AudioPlayerContext';
-import { Play, Clock3, XIcon } from 'lucide-react';
+import { Play, Clock3, MoveLeft } from 'lucide-react';
 import axios from 'axios';
 import { trimString } from '../utils/utils';
 import { Skeleton } from './ui/skeleton';
 import { useAudioPlayerContext } from 'react-use-audio-player';
 import { useAudioStore } from '@/app/storeZustand';
+
 const Album = () => {
     const [albumData, setAlbumData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -66,13 +67,19 @@ const Album = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 md:mt-0 mt-10 md:py-30 mb-20'>
+        <div className='w-full min-h-screen px-4 py-20  md:mt-0  md:py-30 mb-20'>
+            <div className='fixed top-0 left-0 bg-white h-full w-full'>
+                {/* Add gradient like Navbar.jsx */}
+                <div className='bg-gradient-to-b from-[#1a1a1a] to-black  h-full w-full' />
+            </div>
+            {/* from-[#1a1a1a] to-black */}
             <div className='max-w-7xl mx-auto md:mt-5'>
                 {albumData && (
                     <div className='flex flex-col gap-8'>
                         {/* bg-gradient-to-b from-[#1a1a1a] to-[#0a1113]  */}
 
-                        <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl '>
+                        <div className='flex md:flex-row flex-col z-[1] items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl '>
+
                             <img
                                 src={albumData.image.large}
                                 alt={albumData.title}
@@ -86,9 +93,9 @@ const Album = () => {
                             <button
                                 type='button'
                                 onClick={handleClose}
-                                className='absolute top-36 md:top-30 right-8 p-2 rounded-full hover:bg-gray-800'
+                                className='fixed top-6 md:top-30 left-6 lg:left-60 bg-[#0c0c0c] p-2 rounded-full hover:bg-gray-800'
                             >
-                                <XIcon className="w-6 h-6 text-white" onClick={handleClose}
+                                <MoveLeft className="w-6 h-6 text-white" onClick={handleClose}
                                 />
                             </button>
                         </div>

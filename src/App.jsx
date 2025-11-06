@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation, matchPath } from 'react-router-dom'
 import Album from './components/Album'
 import MusicPlayer from './components/MusicPlayer'
 import Navbar from './components/NavBar'
@@ -14,6 +14,7 @@ import History from './pages/History'
 import isOnline from './pages/IsOnline';
 import Downloads from './pages/Downloads'
 import AudioPlayerSync from './AudioPlayerSync'
+import { isMobile } from 'react-device-detect';
 const App = () => {
 
 
@@ -26,11 +27,18 @@ const App = () => {
     }
 
 
+    const location = useLocation();
+    const hidePaths = ['/artist/:artistId', '/album/:albumId'];
+    const shouldHide = hidePaths.some(path => {
+        matchPath(path, location.pathname);
+        return matchPath(path, location.pathname) !== null;
+    })
+    console.log(isMobile);
 
     return (
         <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
             <div className='flex flex-col min-h-screen bg-black text-white'>
-                <Navbar />
+                {(!isMobile || !shouldHide) && <Navbar />}
                 <AudioPlayerSync />
                 <div className="flex flex-1 relative">
                     <Sidebar />

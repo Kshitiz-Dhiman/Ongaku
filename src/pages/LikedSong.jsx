@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { EllipsisVertical } from 'lucide-react';
 import LikedSongSkeleton from '@/components/LikedSongSkeleton';
@@ -17,8 +17,10 @@ import {
     useRemoveFromLiked
 } from '../components/hooks/useQuery';
 import { useQueryClient } from '@tanstack/react-query';
-
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 const LikedSong = () => {
+    gsap.registerPlugin(useGSAP);
     const { playTrack } = useAudioStore();
     const queryClient = useQueryClient();
 
@@ -27,7 +29,7 @@ const LikedSong = () => {
     const { data: likedSongs, isLoading } = useLikedSongs();
     const removeFromLiked = useRemoveFromLiked();
     const { data: selectedSongData } = useSongById(selectedSongId);
-
+    const cardRef = useRef(null);
     useEffect(() => {
         if (!selectedSongData) return;
 
@@ -122,12 +124,23 @@ const LikedSong = () => {
         );
     }
 
+    useGSAP(() => {
+        gsap.from(cardRef.current, {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.out",
+            y: 20,
+            stagger: 0.1,
+        });
+    })
+
     return (
         <div className='w-full md:w-9/10 min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20 mb-24 md:ml-20'>
             <h1 className='text-3xl mb-7 md:text-3xl lg:text-4xl font-bold md:mt-10 text-[#6e7273] text-left'>
                 Liked Songs
             </h1>
-            <div className='flex flex-col w-full'>
+            <div ref={cardRef}
+                className='flex flex-col w-full'>
                 {isLoading ? (
                     <LikedSongSkeleton />
                 ) : likedSongs?.map((song) => (

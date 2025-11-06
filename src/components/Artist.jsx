@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, Clock3, XIcon, User } from 'lucide-react';
+import { Play, Clock3, MoveLeft, User } from 'lucide-react';
 import axios from 'axios';
 import { trimString } from '../utils/utils';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -90,9 +90,16 @@ const Artist = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-30 md:mt-0 mt-10 mb-20'>
-            <div className='max-w-7xl mx-auto md:mt-5'>
-                <div className='flex md:flex-row flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl'>
+        <div className='w-full min-h-screen bg-black px-4 py-20 md:py-30   mb-20'>
+            {/* <div className='fixed top-0 left-0 bg-white h-full w-full'>
+                <div className='bg-gradient-to-b from-[#1a1a1a] to-black  h-full w-full' />
+            </div> */}
+            <div className='fixed top-0 left-0  w-full h-100'>
+                <div className='bg-gradient-to-b from-[#1a1a1a] to-black w-full h-full'></div>
+            </div>
+            <div className='max-w-7xl mx-auto'>
+                <div className='relative flex md:flex-row  flex-col items-center md:items-end gap-6 pt-14 md:p-8 rounded-xl'>
+
                     <div className="w-48 h-48 shadow-xl rounded-xl overflow-hidden">
                         <img
                             src={artistData.image.large}
@@ -115,9 +122,10 @@ const Artist = () => {
                     <button
                         type='button'
                         onClick={handleClose}
-                        className='absolute md:top-30 top-36 right-8 p-2 rounded-full hover:bg-gray-800'
+                        className='fixed top-6 md:top-30 left-6 lg:left-60 bg-[#0c0c0c] p-2 rounded-full hover:bg-gray-800'
                     >
-                        <XIcon className="w-6 h-6 text-white" />
+                        <MoveLeft className="w-6 h-6 text-white" onClick={handleClose}
+                        />
                     </button>
                 </div>
                 <Tabs defaultValue="overview" className="w-full">

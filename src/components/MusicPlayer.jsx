@@ -235,7 +235,7 @@ const MusicPlayer = () => {
             </div>
             <div
                 ref={playerRef}
-                className='parentMusicClass bg-black border-t-1 border-gray-700 text-white rounded-t-xl md:h-30 fixed md:bottom-0 bottom-15 w-full flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'
+                className='parentMusicClass bg-black  border-t-1 border-gray-700 text-white rounded-t-xl md:h-30 fixed md:bottom-0 bottom-15 w-full flex flex-col md:flex-row items-center justify-between gap-4 px-7 md:px-10 py-4 md:py-0'
             >
                 {/* Info section - clickable to expand */}
                 <div
