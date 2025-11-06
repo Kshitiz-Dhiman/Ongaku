@@ -15,6 +15,7 @@ import isOnline from './pages/IsOnline';
 import Downloads from './pages/Downloads'
 import AudioPlayerSync from './AudioPlayerSync'
 import { isMobile } from 'react-device-detect';
+import PageWrapper from './components/PageWrapper'
 const App = () => {
 
 
@@ -46,17 +47,19 @@ const App = () => {
                         <Routes>
                             {/* To set element as entry point use this  */}
                             {/* <Route path='/' element={<Navigate to="/trending/default" replace />} /> */}
-                            <Route path='/' element={<TrendingHome />} />
-                            {/* <Route index element={<TrendingHome />} /> */}
-                            <Route path='/trending/:trend' element={<TrendingHome />} />
-                            <Route path='/album/:albumId' element={<Album />} />
-                            <Route path='/artist/:artistId' element={<Artist />} />
-                            <Route path='/login' element={<GoogleAuthWrapper />} />
-                            <Route path='/library/:lib' element={<LikedSong />} />
-                            <Route path='/account/:profile' element={<Profile />} />
-                            <Route path='/account/history' element={<History />} />
-                            <Route path='/library/downloads' element={<Downloads />} />
-                            <Route path='*' element={<ErrorPage />} />
+                            <Route element={<PageWrapper />}>
+                                <Route path='/' element={<TrendingHome />} />
+                                {/* <Route index element={<TrendingHome />} /> */}
+                                <Route path='/trending/:trend' element={<TrendingHome />} />
+                                <Route path='/album/:albumId' element={<Album />} />
+                                <Route path='/artist/:artistId' element={<Artist />} />
+                                <Route path='/login' element={<GoogleAuthWrapper />} />
+                                <Route path='/library/:lib' element={<LikedSong />} />
+                                <Route path='/account/:profile' element={<Profile />} />
+                                <Route path='/account/history' element={<History />} />
+                                <Route path='/library/downloads' element={<Downloads />} />
+                                <Route path='*' element={<ErrorPage />} />
+                            </Route>
                         </Routes>
                     </main>
                 </div>

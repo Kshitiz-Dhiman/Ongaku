@@ -68,7 +68,7 @@ const Album = () => {
 
     return (
         <div className='w-full min-h-screen px-4 py-20  md:mt-0  md:py-30 mb-20'>
-            <div className='fixed top-0 left-0 bg-white h-full w-full'>
+            <div className='lg:hidden md:hidden fixed top-0 left-0  h-full w-full'>
                 {/* Add gradient like Navbar.jsx */}
                 <div className='bg-gradient-to-b from-[#1a1a1a] to-black  h-full w-full' />
             </div>
@@ -93,7 +93,7 @@ const Album = () => {
                             <button
                                 type='button'
                                 onClick={handleClose}
-                                className='fixed top-6 md:top-30 left-6 lg:left-60 bg-[#0c0c0c] p-2 rounded-full hover:bg-gray-800'
+                                className='fixed top-6 md:top-30 left-6 lg:left-23 bg-[#0c0c0c] p-2 rounded-full hover:bg-gray-800'
                             >
                                 <MoveLeft className="w-6 h-6 text-white" onClick={handleClose}
                                 />

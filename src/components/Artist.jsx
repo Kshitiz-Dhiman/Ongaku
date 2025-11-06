@@ -94,7 +94,7 @@ const Artist = () => {
             {/* <div className='fixed top-0 left-0 bg-white h-full w-full'>
                 <div className='bg-gradient-to-b from-[#1a1a1a] to-black  h-full w-full' />
             </div> */}
-            <div className='fixed top-0 left-0  w-full h-100'>
+            <div className='fixed top-0 lg:hidden md:hidden left-0  w-full h-100'>
                 <div className='bg-gradient-to-b from-[#1a1a1a] to-black w-full h-full'></div>
             </div>
             <div className='max-w-7xl mx-auto'>
@@ -122,7 +122,7 @@ const Artist = () => {
                     <button
                         type='button'
                         onClick={handleClose}
-                        className='fixed top-6 md:top-30 left-6 lg:left-60 bg-[#0c0c0c] p-2 rounded-full hover:bg-gray-800'
+                        className='fixed top-6 md:top-30 left-6 lg:left-23 bg-[#0c0c0c] p-2 rounded-full hover:bg-gray-800'
                     >
                         <MoveLeft className="w-6 h-6 text-white" onClick={handleClose}
                         />

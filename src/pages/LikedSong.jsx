@@ -124,15 +124,7 @@ const LikedSong = () => {
         );
     }
 
-    useGSAP(() => {
-        gsap.from(cardRef.current, {
-            opacity: 0,
-            duration: 0.5,
-            ease: "power2.out",
-            y: 20,
-            stagger: 0.1,
-        });
-    })
+
 
     return (
         <div className='w-full md:w-9/10 min-h-screen bg-black px-4 py-20 mt-20 md:mt-0 md:py-20 mb-24 md:ml-20'>
